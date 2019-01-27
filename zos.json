@@ -1,0 +1,11 @@
+{
+  "zosversion": "2",
+  "name": "inflationary-token",
+  "version": "0.1.0",
+  "contracts": {
+    "InflationaryToken": "InflationaryToken"
+  },
+  "dependencies": {
+    "openzeppelin-eth": "^2.1.2"
+  }
+}

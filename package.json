@@ -1,0 +1,19 @@
+{
+  "name": "inflationary-token",
+  "version": "1.0.0",
+  "description": "An inflationary token.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test truffle test --network local"
+  },
+  "author": "Achill Rudolph",
+  "license": "ISC",
+  "dependencies": {
+    "openzeppelin-eth": "^2.1.2",
+    "truffle": "^5.0.2",
+    "zos-lib": "^2.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0"
+  }
+}
