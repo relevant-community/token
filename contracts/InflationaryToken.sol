@@ -81,7 +81,8 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
      * @dev Calculate and set the number of mintable tokens for the current round.
      */
     function setCurrentInflation() internal returns (uint256) {
-        // At this point we can later dynamically adjust the inflation based e.g. on participation:
+        // // At this point we can later dynamically adjust the inflation based e.g. on participation
+        // // or round number e.g. decrease inflationRate to inflationRate-x if roundNumber > y:
         // setInflation();
 
         // Set mintable tokens based on current inflation and current total token supply
