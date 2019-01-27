@@ -20,18 +20,14 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint8 public decimals;
     string public symbol;
     string public version;
-    // Token supply to start off with - gets minted to the distributor on mintInitialSupply()
     uint256 public initialSupply;
-    // Per round inflation rate
     uint256 public inflationRate;
-    // Address of person/contract that receives newly minted tokens
     address public distributor;
+    uint256 public roundLength;
     // Current number of mintable tokens. Reset every round
     uint256 public currentMintableTokens;
     // Current number of minted tokens. Reset every round
     uint256 public currentMintedTokens;
-    // Round length in blocks
-    uint256 public roundLength;
     // Last initialized round. After first round, this is the last round during which initializeRound() was called
     uint256 public lastInitializedRound;
     // Block in which the contract is deployed
@@ -39,7 +35,10 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
     /**
      * @dev InflationaryToken constructor
-     * @param _inflationRate Base inflation rate as a percentage of current total token supply (expressed in ppm)
+     * @param _initialSupply Token supply to start off with - gets minted to the distributor on mintInitialSupply()
+     * @param _inflationRate Base inflation rate per round as a percentage of current total token supply (expressed in ppm)
+     * @param _distributor Address of person/contract that receives newly minted tokens
+     * @param _roundLength Round length in blocks
      */
     function initialize(
         string memory _name, 
@@ -71,33 +70,38 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     }
 
     /**
-     * @dev Mint initial supply.
+     * @dev Mint initial supply. 
+            Can only be called by owner.
      */
     function mintInitialSupply() external {
         mint(distributor, initialSupply);
     }
 
     /**
-     * @dev Calculate and set number of mintable tokens for the current round.
+     * @dev Calculate and set the number of mintable tokens for the current round.
      */
     function setCurrentInflation() internal returns (uint256) {
         // At this point we can later dynamically adjust the inflation based e.g. on participation:
         // setInflation();
-        
+
         // Set mintable tokens based on current inflation and current total token supply
         currentMintableTokens = MathUtils.percOf(totalSupply(), inflationRate);
         currentMintedTokens = 0;
     }
 
     /**
-     * @dev Mint mintable tokens for the round to the distributor.
+     * @dev Mint inflationary tokens for the round. 
+            Can only be called by owner. 
+            For now, all inflationary token of the current round get minted at once and go to the distributor.
+            Later this could be called by the user to get the appropriate fraction of currentMintableTokens directly from the contract.
      */
     function mintCurrentInflation() public {
         mint(distributor, currentMintableTokens);
     }
 
     /**
-     * @dev Initialize the current round. Can only be called once per round
+     * @dev Initialize the current round. 
+            Can only be called once per round.
      */
     function initializeRound() external {
         uint256 currRound = currentRound();
@@ -119,7 +123,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
      * @dev Return current round
      */
     function currentRound() public view returns (uint256) {
-        // Compute # of rounds since start
+        // Compute # of rounds since start (div truncates quotient)
         uint256 roundsSinceStart = blockNum().sub(startBlock).div(roundLength);
         return roundsSinceStart;
     }
@@ -131,6 +135,9 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         return block.number;
     }
 
+    /**
+     * @dev Mock transaction to simulate change in block number for testing
+     */
     function blockMiner() public {
         name = "NewName";
     }

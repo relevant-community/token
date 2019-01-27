@@ -3,6 +3,8 @@ const InflationaryToken = artifacts.require('InflationaryToken');
 const { expect } = require('chai');
 
 contract('InflationaryToken', accounts => {
+    const ppm = 1000000;
+
     let inflationaryToken;
     let retInflationRate;
     let retOwner;
@@ -60,22 +62,26 @@ contract('InflationaryToken', accounts => {
         expect(
             retCurrentRound.toNumber()
         ).to.equal(0);
-        // Creating mock transactions to increase block number
+        // Creating mock transactions to increase block number (at least by testRoundLength)
         let mockTransactions = [];
         for (let i=0; i<testRoundLength; i++) {
             mockTransactions.push(inflationaryToken.blockMiner())
         }
         Promise.all(mockTransactions);
-        // initialize first round
+        // initialize first round (this also sets the currentMintableTokens)
         await inflationaryToken.initializeRound();
+        // Now round number should be 1
         retCurrentRound = await inflationaryToken.currentRound();
+        expect(
+            retCurrentRound.toNumber()
+        ).to.equal(1);
     });
 
     it('Calculates the current inflation correctly', async () => {
         retCurrentMintableTokens = await inflationaryToken.currentMintableTokens();
         expect(
             retCurrentMintableTokens.toNumber()
-        ).to.equal(testInitialSupply*testInflationRate/1000000);
+        ).to.equal(testInitialSupply*testInflationRate/ppm);
     });
 
     it('Allows minting the current inflation', async () => {
