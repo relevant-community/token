@@ -17,7 +17,7 @@ contract('InflationaryToken', accounts => {
     const testInflationRate = 300000; // ppm ==> same as 30%
     const testInitialSupply = 10000000;
     const testDistributor = accounts[0];
-    const testRoundLength = 5;
+    const testRoundLength = 5; // in blocks
 
     before(async () => {
         inflationaryToken = await InflationaryToken.new();
@@ -61,11 +61,11 @@ contract('InflationaryToken', accounts => {
             retCurrentRound.toNumber()
         ).to.equal(0);
         // Creating mock transactions to increase block number
-        await inflationaryToken.blockMiner();
-        await inflationaryToken.blockMiner();
-        await inflationaryToken.blockMiner();
-        await inflationaryToken.blockMiner();
-        await inflationaryToken.blockMiner();
+        let mockTransactions = [];
+        for (let i=0; i<testRoundLength; i++) {
+            mockTransactions.push(inflationaryToken.blockMiner())
+        }
+        Promise.all(mockTransactions);
         // initialize first round
         await inflationaryToken.initializeRound();
         retCurrentRound = await inflationaryToken.currentRound();
