@@ -1,4 +1,4 @@
-# Dynamic inflationary token inspired by (Livepeer)[https://github.com/livepeer/protocol]
+# Dynamic inflationary token inspired by [Livepeer](https://github.com/livepeer/protocol)
 
 
 ## Inflation mechanism
