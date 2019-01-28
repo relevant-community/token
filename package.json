@@ -4,7 +4,8 @@
   "description": "An inflationary token.",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test truffle test --network local"
+    "test": "NODE_ENV=test truffle test --network local",
+    "ganache": "ganache-cli --port 9545 --deterministic"
   },
   "author": "Achill Rudolph",
   "license": "ISC",
