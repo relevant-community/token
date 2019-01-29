@@ -13,7 +13,7 @@ import "./MathUtils.sol";
 
 contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
-    event NewRound(uint256 round);
+    event Released(uint256 numTokens);
     event ParameterUpdate(string param);
 
     string public name;
@@ -23,9 +23,12 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 public initialSupply;
     address public distributor;
     uint256 public initBlockReward;
+    uint256 public currBlockReward;
     uint256 public halvingTime;
     uint256 public lastHalvingPeriod;
     uint256 public startBlock; // Block number at which the contract is deployed
+    uint256 public releasableRewards;
+    uint256 public lastReleaseBlock; // Block number at which the last release was made
 
     /**
      * @dev InflationaryToken constructor
@@ -61,6 +64,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         halvingTime = _halvingTime;
         lastHalvingPeriod = _lastHalvingPeriod;
         startBlock = block.number;
+        currBlockReward = initBlockReward;
     }
 
     /**
@@ -83,28 +87,34 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
             totalRewards += blockReward * halvingTime;
             blockReward = blockReward.div(2);
         }
-        mint(distributor, totalRewards);
+        mint(address(this), totalRewards);
     }
 
-    // /**
-    //  * @dev Initialize the current round. 
-    //         Can only be called once per round.
-    //  */
-    // function initializeRound() external {
-    //     uint256 currRound = currentRound();
+    /**
+     * @dev Calculate and release currently releasable inflationary rewards. 
+     */
+    function releaseRewards() public {
 
-    //     // Check if already called for the current round
-    //     require(lastInitializedRound < currRound, "Current round already initialized");
+        // TODO: Calculate rewards since lastReleaseBlock
+        //
+        // lastReleaseBlock = currBlock;
+        // uint256 currentPeriod = blocksPassed.div(halvingTime);
+        // if (currentPeriod > lastHalvingPeriod) {
+        // } else {
+        //     initBlockReward
+        // }
+        // releasableRewards = blockNum().sub(startBlock).mul(currBlockReward);
 
-    //     // Set current round as initialized
-    //     lastInitializedRound = currRound;
-    //     // Set active transcoders for the round
+        uint256 currBlock = block.number;
+        // Check if already called for the current block
+        require(lastReleaseBlock < currBlock, "No new rewards available");
+        // Set current block as last release
+        uint256 releasableRewards = blockNum().sub(lastReleaseBlock).mul(currBlockReward);
 
-    //     // Set mintable rewards for the round
-    //     setCurrentInflation();
+        this.transfer(distributor, releasableRewards);
+        emit Released(releasableRewards);
+    }
 
-    //     emit NewRound(currRound);
-    // }
 
     /**
      * @dev Return current block number
