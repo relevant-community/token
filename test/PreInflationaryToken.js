@@ -13,11 +13,10 @@ contract('PreInflationaryToken', accounts => {
     const testDecimals = 18;
     const testSymbol = "RVT";
     const testVersion = "1.0";
-    const testInitialSupply = 0;
-    const testDistributor = accounts[0];
+    const testDevFund = accounts[0];
     const testInitBlockReward = 4; // should be a multiple of a power of 2, to allow halving without floating point arithmetic
-    const testHalvingTime = 5; // block rewards halve after 1 year
-    const testLastHalvingPeriod = 2; // block rewards stay constant after lastHalvingPeriod * halvingTime
+    const testHalvingTime = 2; // block rewards halve after halvingTime blocks
+    const testLastHalvingPeriod = 1; // block rewards stay constant after lastHalvingPeriod * halvingTime
 
     // calculate total rewards to be preminted:
     let totalInflationRewards = null;
@@ -35,8 +34,7 @@ contract('PreInflationaryToken', accounts => {
             testDecimals,
             testSymbol,
             testVersion,
-            testInitialSupply,
-            testDistributor,
+            testDevFund,
             testInitBlockReward,
             testHalvingTime,
             testLastHalvingPeriod
@@ -52,14 +50,6 @@ contract('PreInflationaryToken', accounts => {
         expect(
             retOwner.toString()
         ).to.equal(accounts[0]);
-    });
-
-    it('Mints the initial supply', async () => {
-        await preInflationaryToken.mintInitialSupply();
-        retBalanceDistributor = await preInflationaryToken.balanceOf(testDistributor);
-        expect(
-            retBalanceDistributor.toNumber()
-        ).to.equal(testInitialSupply);
     });
 
     it('Calculates and premints the total inflation rewards', async () => {
@@ -78,7 +68,7 @@ contract('PreInflationaryToken', accounts => {
         }
         Promise.all(mockTransactions);
         await preInflationaryToken.releaseRewards();
-        retBalanceDistributor = await preInflationaryToken.balanceOf(testDistributor);
+        retBalanceDistributor = await preInflationaryToken.balanceOf(testDevFund);
         expect(
             retBalanceDistributor.toNumber()
         ).to.equal(5*testInitBlockReward);

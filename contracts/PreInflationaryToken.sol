@@ -19,8 +19,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint8 public decimals;
     string public symbol;
     string public version;
-    uint256 public initialSupply;
-    address public distributor;
+    address public devFund;
     uint256 public initBlockReward;
     uint256 public currBlockReward;
     uint256 public halvingTime;
@@ -30,11 +29,11 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 public lastReleaseBlock; // Block number at which the last release was made
     uint256 public currentPeriod; // Number of the currently active period
     uint256 public currentPeriodStart; // Number of last block from previous period
+    uint256 public constantRewardStart; // Number of block at which constant rewards start
 
     /**
      * @dev InflationaryToken constructor
-     * @param _initialSupply Token supply to start off with - gets minted to the distributor on mintInitialSupply()
-     * @param _distributor Address of person/contract that receives newly minted tokens
+     * @param _devFund Address of person/contract that receives newly minted tokens
      * @param _initBlockReward Number of released inflationary tokens per block during the first period - should be multiple of a power of 2 (at least 2^_lastHalvingPeriod) to make halving simple
      * @param _halvingTime Number of blocks after which reward halves (e.g. 2102400 for 1 year on Ethereum based on 15 seconds block time)
      * @param _lastHalvingPeriod Number of halvingTime periods after which the reward should stay constant
@@ -44,37 +43,28 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         uint8 _decimals, 
         string memory _symbol, 
         string memory _version, 
-        uint256 _initialSupply,
-        address _distributor,
+        address _devFund,
         uint256 _initBlockReward,
         uint256 _halvingTime,
         uint256 _lastHalvingPeriod
     )   public 
         initializer 
     {
-        Ownable.initialize(_distributor);
-        ERC20Mintable.initialize(_distributor);
+        Ownable.initialize(_devFund);
+        ERC20Mintable.initialize(_devFund);
 
         name = _name;
         decimals = _decimals;
         symbol = _symbol;
         version = _version;
-        initialSupply = _initialSupply;
-        distributor = _distributor;
+        devFund = _devFund;
         initBlockReward = _initBlockReward;
         halvingTime = _halvingTime;
         lastHalvingPeriod = _lastHalvingPeriod;
         startBlock = block.number;
         currBlockReward = initBlockReward;
         lastReleaseBlock = block.number;
-    }
-
-    /**
-     * @dev Mint initial supply. 
-            Can only be called by owner. // TODO: Can only be called once.
-     */
-    function mintInitialSupply() external {
-        mint(distributor, initialSupply);
+        constantRewardStart = _lastHalvingPeriod.mul(_halvingTime);
     }
 
     /**
@@ -83,11 +73,11 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
      */
     function preMintInflation() public {
         uint256 totalRewards;
-        uint256 blockReward = initBlockReward;
-
+        uint256 periodBlockReward;
+        
         for (uint i = 0; i < lastHalvingPeriod; i++) {
-            totalRewards += blockReward * halvingTime;
-            blockReward = blockReward.div(2);
+            periodBlockReward = initBlockReward.div(2**i);
+            totalRewards += periodBlockReward * halvingTime;
         }
         mint(address(this), totalRewards);
     }
@@ -103,24 +93,32 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         require(lastReleaseBlock < currBlock, "No new rewards available");
 
         currentPeriod = (currBlock.sub(1).sub(startBlock)).div(halvingTime);
-        currBlockReward = initBlockReward.div(2**currentPeriod);
+        if (currBlock < constantRewardStart) {
+            currBlockReward = initBlockReward.div(2**currentPeriod);
+        } else {
+            currBlockReward = initBlockReward.div(2**lastHalvingPeriod);
+        }
 
         uint256 lastReleasePeriod = lastReleaseBlock.sub(startBlock).div(halvingTime);
 
         uint256 blocksPassed = currBlock - lastReleaseBlock;
 
-        if (currentPeriod == lastReleasePeriod || lastReleasePeriod > lastHalvingPeriod) {
-            // If last release and current block are in the same halving period OR if we are past the lastHalvingPeriod,
+        if (currentPeriod == lastReleasePeriod || lastReleasePeriod >= lastHalvingPeriod) {
+            // If last release and current block are in the same halving period OR if we are past the last halving event,
             // rewards are simply the number of passed blocks times the current block reward.
             releasableRewards = blocksPassed * currBlockReward;
+            if (lastReleasePeriod > lastHalvingPeriod) {
+            // if we are past the lastHalvingPeriod we still have to mint these
+                mint(devFund, releasableRewards);
+            }
         } else {
-            // If last release block was in a different period, we have to add up the rewards for each period separately
-            // uint256 periodsPassed = currentPeriod - lastReleasePeriod;
+            // If last release block was in a different period, we have to add up the rewards for each period, separately
             for (uint i = lastReleasePeriod; i <= currentPeriod; i++) {
                 uint256 periodBlockReward = initBlockReward.div(2**i);
                 if (i == lastReleasePeriod) {
                     uint256 lastReleasePeriodEnd = startBlock.add((lastReleasePeriod.add(1)).mul(halvingTime));
                     releasableRewards += (lastReleasePeriodEnd.sub(lastReleaseBlock)).mul(periodBlockReward);
+                    // TODO: rewards for lastReleaseBlock were already created - avoid double counting
                 }
                 if (i == currentPeriod) {
                     currentPeriodStart = startBlock.add(currentPeriod.mul(halvingTime));
@@ -130,8 +128,15 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                     releasableRewards += halvingTime.mul(periodBlockReward);
                 }
             }
+            if (lastReleasePeriod <= lastHalvingPeriod && currentPeriod > lastHalvingPeriod) {
+                // if we are releasing tokens for the first time after the lastHalvingPeriod and the last release was
+                // still within the halving periods, we have to mint new tokens
+                uint256 constantBlockReward = initBlockReward.div(2**lastHalvingPeriod);
+                uint256 toBeMinted = (blockNum().sub(constantRewardStart)).mul(constantBlockReward);
+                mint(devFund, toBeMinted);
+            }
         }
-        this.transfer(distributor, releasableRewards);
+        this.transfer(devFund, releasableRewards);
         emit Released(releasableRewards);
         // Set current block as last release
         lastReleaseBlock = currBlock;
