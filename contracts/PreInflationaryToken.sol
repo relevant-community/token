@@ -28,6 +28,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 public startBlock; // Block number at which the contract is deployed
     uint256 public releasableRewards;
     uint256 public lastReleaseBlock; // Block number at which the last release was made
+    uint256 public currentPeriod; // Number of the currently active period
     uint256 public currentPeriodStart; // Number of last block from previous period
 
     /**
@@ -101,7 +102,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         // Check if already called for the current block
         require(lastReleaseBlock < currBlock, "No new rewards available");
 
-        uint256 currentPeriod = currBlock.sub(startBlock).div(halvingTime);
+        currentPeriod = (currBlock.sub(1).sub(startBlock)).div(halvingTime);
         currBlockReward = initBlockReward.div(2**currentPeriod);
 
         uint256 lastReleasePeriod = lastReleaseBlock.sub(startBlock).div(halvingTime);
@@ -118,7 +119,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
             for (uint i = lastReleasePeriod; i <= currentPeriod; i++) {
                 uint256 periodBlockReward = initBlockReward.div(2**i);
                 if (i == lastReleasePeriod) {
-                    uint256 lastReleasePeriodEnd = startBlock.add((lastReleasePeriod + 1).mul(halvingTime));
+                    uint256 lastReleasePeriodEnd = startBlock.add((lastReleasePeriod.add(1)).mul(halvingTime));
                     releasableRewards += (lastReleasePeriodEnd.sub(lastReleaseBlock)).mul(periodBlockReward);
                 }
                 if (i == currentPeriod) {
@@ -126,7 +127,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                     releasableRewards += (blockNum().sub(currentPeriodStart)).mul(periodBlockReward);
                 }
                 if (i != lastReleasePeriod && i != currentPeriod) {
-                    releasableRewards += halvingTime * periodBlockReward;
+                    releasableRewards += halvingTime.mul(periodBlockReward);
                 }
             }
         }
