@@ -4,7 +4,6 @@ import "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "zos-lib/contracts/Initializable.sol";
-import "./MathUtils.sol";
 
 
 /**
@@ -29,12 +28,13 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 public startBlock; // Block number at which the contract is deployed
     uint256 public releasableRewards;
     uint256 public lastReleaseBlock; // Block number at which the last release was made
+    uint256 public currentPeriodStart; // Number of last block from previous period
 
     /**
      * @dev InflationaryToken constructor
      * @param _initialSupply Token supply to start off with - gets minted to the distributor on mintInitialSupply()
      * @param _distributor Address of person/contract that receives newly minted tokens
-     * @param _initBlockReward Number of released inflationary tokens per block during the first period
+     * @param _initBlockReward Number of released inflationary tokens per block during the first period - should be multiple of a power of 2 (at least 2^_lastHalvingPeriod) to make halving simple
      * @param _halvingTime Number of blocks after which reward halves (e.g. 2102400 for 1 year on Ethereum based on 15 seconds block time)
      * @param _lastHalvingPeriod Number of halvingTime periods after which the reward should stay constant
      */
@@ -65,6 +65,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         lastHalvingPeriod = _lastHalvingPeriod;
         startBlock = block.number;
         currBlockReward = initBlockReward;
+        lastReleaseBlock = block.number;
     }
 
     /**
@@ -94,25 +95,45 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
      * @dev Calculate and release currently releasable inflationary rewards. 
      */
     function releaseRewards() public {
+        uint256 releasableRewards;
+        uint256 currBlock = blockNum();
 
-        // TODO: Calculate rewards since lastReleaseBlock
-        //
-        // lastReleaseBlock = currBlock;
-        // uint256 currentPeriod = blocksPassed.div(halvingTime);
-        // if (currentPeriod > lastHalvingPeriod) {
-        // } else {
-        //     initBlockReward
-        // }
-        // releasableRewards = blockNum().sub(startBlock).mul(currBlockReward);
-
-        uint256 currBlock = block.number;
         // Check if already called for the current block
         require(lastReleaseBlock < currBlock, "No new rewards available");
-        // Set current block as last release
-        uint256 releasableRewards = blockNum().sub(lastReleaseBlock).mul(currBlockReward);
 
+        uint256 currentPeriod = currBlock.sub(startBlock).div(halvingTime);
+        currBlockReward = initBlockReward.div(2**currentPeriod);
+
+        uint256 lastReleasePeriod = lastReleaseBlock.sub(startBlock).div(halvingTime);
+
+        uint256 blocksPassed = currBlock - lastReleaseBlock;
+
+        if (currentPeriod == lastReleasePeriod || lastReleasePeriod > lastHalvingPeriod) {
+            // If last release and current block are in the same halving period OR if we are past the lastHalvingPeriod,
+            // rewards are simply the number of passed blocks times the current block reward.
+            releasableRewards = blocksPassed * currBlockReward;
+        } else {
+            // If last release block was in a different period, we have to add up the rewards for each period separately
+            // uint256 periodsPassed = currentPeriod - lastReleasePeriod;
+            for (uint i = lastReleasePeriod; i <= currentPeriod; i++) {
+                uint256 periodBlockReward = initBlockReward.div(2**i);
+                if (i == lastReleasePeriod) {
+                    uint256 lastReleasePeriodEnd = startBlock.add((lastReleasePeriod + 1).mul(halvingTime));
+                    releasableRewards += (lastReleasePeriodEnd.sub(lastReleaseBlock)).mul(periodBlockReward);
+                }
+                if (i == currentPeriod) {
+                    currentPeriodStart = startBlock.add(currentPeriod.mul(halvingTime));
+                    releasableRewards += (blockNum().sub(currentPeriodStart)).mul(periodBlockReward);
+                }
+                if (i != lastReleasePeriod && i != currentPeriod) {
+                    releasableRewards += halvingTime * periodBlockReward;
+                }
+            }
+        }
         this.transfer(distributor, releasableRewards);
         emit Released(releasableRewards);
+        // Set current block as last release
+        lastReleaseBlock = currBlock;
     }
 
 

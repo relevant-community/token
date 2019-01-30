@@ -15,9 +15,9 @@ contract('PreInflationaryToken', accounts => {
     const testVersion = "1.0";
     const testInitialSupply = 0;
     const testDistributor = accounts[0];
-    const testInitBlockReward = 40;
-    const testHalvingTime = 2102400; // block rewards halve after 1 year
-    const testLastHalvingPeriod = 4; // block rewards stay constant after 5 * halvingTime
+    const testInitBlockReward = 4; // should be a multiple of a power of 2, to allow halving without floating point arithmetic
+    const testHalvingTime = 5; // block rewards halve after 1 year
+    const testLastHalvingPeriod = 2; // block rewards stay constant after lastHalvingPeriod * halvingTime
 
     // calculate total rewards to be preminted:
     let totalInflationRewards = null;
