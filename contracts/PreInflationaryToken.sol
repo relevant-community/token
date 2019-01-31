@@ -19,21 +19,26 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint8 public decimals;
     string public symbol;
     string public version;
-    address public devFund;
+    address public devFundAddress;
     uint256 public initBlockReward;
     uint256 public currBlockReward;
     uint256 public halvingTime;
     uint256 public lastHalvingPeriod;
     uint256 public startBlock; // Block number at which the contract is deployed
-    uint256 public releasableRewards;
     uint256 public lastReleaseBlock; // Block number at which the last release was made
     uint256 public currentPeriod; // Number of the currently active period
     uint256 public currentPeriodStart; // Number of last block from previous period
     uint256 public constantRewardStart; // Number of block at which constant rewards start
+    
+    uint256 public curationRewards; // Bucket of inflationary tokens reserved for user rewards
+    uint256 public distributed; // Bucket of inflationary tokens claimed by users
+    uint256 public devFund; // Bucket of inflationary tokens reserved for development
+
+
 
     /**
      * @dev InflationaryToken constructor
-     * @param _devFund Address that receives newly minted tokens for development fund
+     * @param _devFundAddress Address that receives newly minted tokens for development fund
      * @param _initBlockReward Number of released inflationary tokens per block during the first period - should be multiple of a power of 2 (at least 2^_lastHalvingPeriod) to make halving simple
      * @param _halvingTime Number of blocks after which reward halves (e.g. 2102400 for 1 year on Ethereum based on 15 seconds block time)
      * @param _lastHalvingPeriod Number of halvingTime periods after which the reward should stay constant
@@ -43,7 +48,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         uint8 _decimals, 
         string memory _symbol, 
         string memory _version, 
-        address _devFund,
+        address _devFundAddress,
         uint256 _initBlockReward,
         uint256 _halvingTime,
         uint256 _lastHalvingPeriod
@@ -57,7 +62,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         decimals = _decimals;
         symbol = _symbol;
         version = _version;
-        devFund = _devFund;
+        devFundAddress = _devFundAddress;
         initBlockReward = _initBlockReward;
         halvingTime = _halvingTime;
         lastHalvingPeriod = _lastHalvingPeriod;
@@ -83,6 +88,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         mint(address(this), totalRewards);
     }
 
+    // @TODO: refactor into several smaller functions
     /**
      * @dev Calculate and release currently releasable inflationary rewards. 
      */
@@ -116,9 +122,8 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
             for (uint i = lastReleasePeriod; i <= currentPeriod; i++) {
                 uint256 periodBlockReward = initBlockReward.div(2**i);
                 if (i == lastReleasePeriod) {
-                    uint256 lastReleasePeriodEnd = startBlock.add((lastReleasePeriod.add(1)).mul(halvingTime));
-                    releasableRewards += (lastReleasePeriodEnd.sub(lastReleaseBlock)).mul(periodBlockReward);
-                    // TODO: rewards for lastReleaseBlock were already created - avoid double counting
+                    uint256 nextPeriodStart = startBlock.add((lastReleasePeriod.add(1)).mul(halvingTime));
+                    releasableRewards += (nextPeriodStart.sub(lastReleaseBlock)).mul(periodBlockReward);
                 }
                 if (i == currentPeriod) {
                     currentPeriodStart = startBlock.add(currentPeriod.mul(halvingTime));
@@ -136,11 +141,27 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                 mint(address(this), toBeMinted);
             }
         }
-        this.transfer(devFund, releasableRewards);
-        emit Released(releasableRewards);
+        // @TODO: deal with precision when making the 80/20 split
+        curationRewards += releasableRewards.mul(4).div(5); // 80% of inflation goes to curation rewards
+        devFund += releasableRewards.mul(1).div(5); // 20% of inflation goes to devFund
+
         // Set current block as last release
         lastReleaseBlock = currBlock;
+
+        emit Released(releasableRewards);
+        
     }
+
+
+    /**
+     * @dev Claim curation reward
+     */
+    function claim(uint256 _tokenAmount) public {
+        // @TODO: check if claim is valid & make sure claimed tokens are associated with claimant
+        curationRewards -= _tokenAmount;
+        distributed += _tokenAmount;
+    }
+
 
 
     /**

@@ -7,13 +7,14 @@ contract('PreInflationaryToken', accounts => {
     let preInflationaryToken;
     let retOwner;
     let retBalanceDistributor;
-    let tx;
+    let retCurationRewards;
+    let retDevFund;
 
     const testName = "Relevant Token";
     const testDecimals = 18;
     const testSymbol = "RVT";
     const testVersion = "1.0";
-    const testDevFund = accounts[0];
+    const testDevFundAddress = accounts[0];
     const testInitBlockReward = 2; // should be a multiple of a power of 2, to allow halving without floating point arithmetic
     const testHalvingTime = 2; // block rewards halve after halvingTime blocks
     const testLastHalvingPeriod = 1; // block rewards stay constant after lastHalvingPeriod * halvingTime
@@ -34,7 +35,7 @@ contract('PreInflationaryToken', accounts => {
             testDecimals,
             testSymbol,
             testVersion,
-            testDevFund,
+            testDevFundAddress,
             testInitBlockReward,
             testHalvingTime,
             testLastHalvingPeriod
@@ -68,9 +69,13 @@ contract('PreInflationaryToken', accounts => {
         }
         Promise.all(mockTransactions);
         await preInflationaryToken.releaseRewards();
-        retBalanceDistributor = await preInflationaryToken.balanceOf(testDevFund);
+        retCurationRewards = await preInflationaryToken.curationRewards();
+        retDevFund = await preInflationaryToken.devFund();
         expect(
-            retBalanceDistributor.toNumber()
+            retCurationRewards.toNumber()
+        ).to.be.above(0);
+        expect(
+            retDevFund.toNumber()
         ).to.be.above(0);
     });
 })
