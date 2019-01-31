@@ -165,6 +165,14 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
 
     /**
+     * @dev Transfer eligible tokens from devFund bucket to devFundAddress
+     */
+    function toDevFund() public {
+        require(this.transfer(devFundAddress, devFund), "Transfer to devFundAddress failed");
+        devFund = 0;
+    }
+
+    /**
      * @dev Return current block number
      */
     function blockNum() public view returns (uint256) {

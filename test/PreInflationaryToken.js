@@ -61,7 +61,7 @@ contract('PreInflationaryToken', accounts => {
         ).to.equal(totalInflationRewards);
     });
 
-    it('Releases rewards over time', async () => {
+    it('Releases rewards into buckets over time', async () => {
         // Creating mock transactions to increase block number
         let mockTransactions = [];
         for (let i=0; i<5; i++) {
@@ -76,6 +76,19 @@ contract('PreInflationaryToken', accounts => {
         ).to.be.above(0);
         expect(
             retDevFund.toNumber()
+        ).to.be.above(0);
+    });
+
+
+    it('Transfers devFund bucket to devFundAddress', async () => {
+        await preInflationaryToken.toDevFund();
+        retDevFund = await preInflationaryToken.devFund();
+        expect(
+            retDevFund.toNumber()
+        ).to.equal(0);
+        retDevFundBalance = await preInflationaryToken.balanceOf(testDevFundAddress);
+        expect(
+            retDevFundBalance.toNumber()
         ).to.be.above(0);
     });
 })
