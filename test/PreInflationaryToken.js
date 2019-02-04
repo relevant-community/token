@@ -61,16 +61,16 @@ contract('PreInflationaryToken', accounts => {
         ).to.equal(totalInflationRewards);
     });
 
-    it('Releases rewards into buckets over time', async () => {
+    it('Allocates rewards into buckets over time', async () => {
         // Creating mock transactions to increase block number
         let mockTransactions = [];
         for (let i=0; i<5; i++) {
             mockTransactions.push(preInflationaryToken.blockMiner())
         }
         Promise.all(mockTransactions);
-        await preInflationaryToken.releaseRewards();
-        retCurationRewards = await preInflationaryToken.curationRewards();
-        retDevFund = await preInflationaryToken.devFund();
+        await preInflationaryToken.allocateRewards();
+        retCurationRewards = await preInflationaryToken.rewardFund();
+        retDevFund = await preInflationaryToken.developmentFund();
         expect(
             retCurationRewards.toNumber()
         ).to.be.above(0);
@@ -82,7 +82,7 @@ contract('PreInflationaryToken', accounts => {
 
     it('Transfers devFund bucket to devFundAddress', async () => {
         await preInflationaryToken.toDevFund();
-        retDevFund = await preInflationaryToken.devFund();
+        retDevFund = await preInflationaryToken.developmentFund();
         expect(
             retDevFund.toNumber()
         ).to.equal(0);
