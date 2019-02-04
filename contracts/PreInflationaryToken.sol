@@ -168,9 +168,11 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         
     }
 
+
     /**
      * @dev Transfer eligible tokens from devFund bucket to devFundAddress
      */
+    // TODO: who should be able do call this? internal and called from allocateTokens? 
     function toDevFund() public {
         require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
         developmentFund = 0;
@@ -197,6 +199,24 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         require(this.transfer(msg.sender, _amount), "Transfer to claimant failed");
         return true;
     }
+
+
+    /**
+    * @dev Distribute airdrop rewards
+    * @param _recipients List of recipients
+    * @param _balances Amount to send to recipients
+    * TODO this is expensive - better solution:
+    * https://github.com/cardstack/merkle-tree-payment-pool
+    */
+    function distributeRewards(address[] _recipients, uint256[] _balances) onlyOwner public returns(bool) {
+        for(uint i = 0; i < _recipients.length; i++){
+            require(airdropFund >= _balances[i], "No airdrop rewards available");
+            airdropFund = airdropFund.sub(_balances[i]);
+            this.transfer(_recipients[i], _balances[i]);
+        }
+        return true;
+    }
+
 
 
     /**
