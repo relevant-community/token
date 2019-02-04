@@ -116,7 +116,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         uint256 blocksPassed = currBlock - lastAllocationBlock;
 
         if (currentPeriod == lastAllocationPeriod || lastAllocationPeriod >= lastHalvingPeriod) {
-            // If last release and current block are in the same halving period OR if we are past the last halving event,
+            // If last allocation and current block are in the same halving period OR if we are past the last halving event,
             // rewards are simply the number of passed blocks times the current block reward.
             releasableRewards = blocksPassed * currBlockReward;
             if (lastAllocationPeriod >= lastHalvingPeriod) {
@@ -124,7 +124,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                 mint(address(this), releasableRewards);
             }
         } else {
-            // If last release block was in a different period, we have to add up the rewards for each period, separately
+            // If last allocation block was in a different period, we have to add up the rewards for each period, separately
             for (uint i = lastAllocationPeriod; i <= currentPeriod; i++) {
                 uint256 periodBlockReward = initBlockReward.div(2**i);
                 if (i == lastAllocationPeriod) {
@@ -140,7 +140,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                 }
             }
             if (lastAllocationPeriod <= lastHalvingPeriod && currentPeriod >= lastHalvingPeriod) {
-                // if we are releasing tokens for the first time after the lastHalvingPeriod and the last release was
+                // if we are allocating tokens for the first time after the lastHalvingPeriod and the last allocation was
                 // still within the halving periods, we have to mint new tokens
                 uint256 constantBlockReward = initBlockReward.div(2**lastHalvingPeriod);
                 uint256 toBeMinted = (blockNum().sub(constantRewardStart)).mul(constantBlockReward);
