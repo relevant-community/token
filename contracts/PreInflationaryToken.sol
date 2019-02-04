@@ -208,7 +208,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     * TODO this is expensive - better solution:
     * https://github.com/cardstack/merkle-tree-payment-pool
     */
-    function distributeRewards(address[] _recipients, uint256[] _balances) onlyOwner public returns(bool) {
+    function distributeRewards(address[] memory _recipients, uint256[] memory _balances) public onlyOwner returns(bool) {
         for(uint i = 0; i < _recipients.length; i++){
             require(airdropFund >= _balances[i], "No airdrop rewards available");
             airdropFund = airdropFund.sub(_balances[i]);
