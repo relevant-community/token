@@ -7,17 +7,17 @@ contract('PreInflationaryToken', accounts => {
     let preInflationaryToken;
     let retOwner;
     let retBalanceDistributor;
-    let tx;
+    let retCurationRewards;
+    let retDevFund;
 
     const testName = "Relevant Token";
     const testDecimals = 18;
     const testSymbol = "RVT";
     const testVersion = "1.0";
-    const testInitialSupply = 0;
-    const testDistributor = accounts[0];
-    const testInitBlockReward = 4; // should be a multiple of a power of 2, to allow halving without floating point arithmetic
-    const testHalvingTime = 5; // block rewards halve after 1 year
-    const testLastHalvingPeriod = 2; // block rewards stay constant after lastHalvingPeriod * halvingTime
+    const testDevFundAddress = accounts[0];
+    const testInitBlockReward = 2; // should be a multiple of a power of 2, to allow halving without floating point arithmetic
+    const testHalvingTime = 2; // block rewards halve after halvingTime blocks
+    const testLastHalvingPeriod = 1; // block rewards stay constant after lastHalvingPeriod * halvingTime
 
     // calculate total rewards to be preminted:
     let totalInflationRewards = null;
@@ -35,8 +35,7 @@ contract('PreInflationaryToken', accounts => {
             testDecimals,
             testSymbol,
             testVersion,
-            testInitialSupply,
-            testDistributor,
+            testDevFundAddress,
             testInitBlockReward,
             testHalvingTime,
             testLastHalvingPeriod
@@ -54,14 +53,6 @@ contract('PreInflationaryToken', accounts => {
         ).to.equal(accounts[0]);
     });
 
-    it('Mints the initial supply', async () => {
-        await preInflationaryToken.mintInitialSupply();
-        retBalanceDistributor = await preInflationaryToken.balanceOf(testDistributor);
-        expect(
-            retBalanceDistributor.toNumber()
-        ).to.equal(testInitialSupply);
-    });
-
     it('Calculates and premints the total inflation rewards', async () => {
         await preInflationaryToken.preMintInflation();
         retBalanceDistributor = await preInflationaryToken.balanceOf(preInflationaryToken.address);
@@ -70,7 +61,7 @@ contract('PreInflationaryToken', accounts => {
         ).to.equal(totalInflationRewards);
     });
 
-    it('Releases rewards over time', async () => {
+    it('Releases rewards into buckets over time', async () => {
         // Creating mock transactions to increase block number
         let mockTransactions = [];
         for (let i=0; i<5; i++) {
@@ -78,10 +69,27 @@ contract('PreInflationaryToken', accounts => {
         }
         Promise.all(mockTransactions);
         await preInflationaryToken.releaseRewards();
-        retBalanceDistributor = await preInflationaryToken.balanceOf(testDistributor);
+        retCurationRewards = await preInflationaryToken.rewardFund();
+        retDevFund = await preInflationaryToken.developmentFund();
         expect(
-            retBalanceDistributor.toNumber()
-        ).to.equal(5*testInitBlockReward);
+            retCurationRewards.toNumber()
+        ).to.be.above(0);
+        expect(
+            retDevFund.toNumber()
+        ).to.be.above(0);
+    });
+
+
+    it('Transfers devFund bucket to devFundAddress', async () => {
+        await preInflationaryToken.toDevFund();
+        retDevFund = await preInflationaryToken.developmentFund();
+        expect(
+            retDevFund.toNumber()
+        ).to.equal(0);
+        retDevFundBalance = await preInflationaryToken.balanceOf(testDevFundAddress);
+        expect(
+            retDevFundBalance.toNumber()
+        ).to.be.above(0);
     });
 })
 
