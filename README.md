@@ -20,6 +20,10 @@ A peculiarity of this contract is that all the inflationary rewards until `lastH
 
 The resulting inflation dynamics can be viewed [here](https://drive.google.com/open?id=1zu1cf1fkoHiD_xTnecW9P33DH19zSsxqhrkdlSHm1WU).
 
+This drawing illustrates the different steps and buckets that are used to allocate rewards:
+
+![TokenFlow](https://user-images.githubusercontent.com/37867491/52302053-5af9ee80-298c-11e9-8c92-2163c0956ff7.png)
+
 
 
 ## Run
