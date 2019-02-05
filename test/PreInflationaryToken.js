@@ -6,7 +6,7 @@ contract('PreInflationaryToken', accounts => {
 
     let preInflationaryToken;
     let retOwner;
-    let retBalanceDistributor;
+    let retContractBalance;
     let retCurationRewards;
     let retDevFund;
 
@@ -54,34 +54,24 @@ contract('PreInflationaryToken', accounts => {
     });
 
     it('Calculates and premints the total inflation rewards', async () => {
-        await preInflationaryToken.preMintInflation();
-        retBalanceDistributor = await preInflationaryToken.balanceOf(preInflationaryToken.address);
+        retContractBalance = await preInflationaryToken.balanceOf(preInflationaryToken.address);
         expect(
-            retBalanceDistributor.toNumber()
+            retContractBalance.toNumber()
         ).to.equal(totalInflationRewards);
     });
 
-    it('Releases rewards into buckets over time', async () => {
+    it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
         // Creating mock transactions to increase block number
         let mockTransactions = [];
         for (let i=0; i<5; i++) {
             mockTransactions.push(preInflationaryToken.blockMiner())
         }
         Promise.all(mockTransactions);
-        await preInflationaryToken.releaseRewards();
+        await preInflationaryToken.releaseTokens();
         retCurationRewards = await preInflationaryToken.rewardFund();
-        retDevFund = await preInflationaryToken.developmentFund();
         expect(
             retCurationRewards.toNumber()
         ).to.be.above(0);
-        expect(
-            retDevFund.toNumber()
-        ).to.be.above(0);
-    });
-
-
-    it('Transfers devFund bucket to devFundAddress', async () => {
-        await preInflationaryToken.toDevFund();
         retDevFund = await preInflationaryToken.developmentFund();
         expect(
             retDevFund.toNumber()
@@ -91,6 +81,7 @@ contract('PreInflationaryToken', accounts => {
             retDevFundBalance.toNumber()
         ).to.be.above(0);
     });
+
 })
 
 // TODO: add tests for upgradeability (https://docs.zeppelinos.org/docs/testing.html)

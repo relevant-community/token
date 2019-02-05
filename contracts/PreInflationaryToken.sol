@@ -13,7 +13,7 @@ import "zos-lib/contracts/Initializable.sol";
 
 contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
-    event Released(uint256 releasableRewards, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
+    event Released(uint256 releasableTokens, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
     // event ParameterUpdate(string param);
 
     string public name;
@@ -34,8 +34,9 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     
     uint256 public rewardFund; // Bucket of inflationary tokens available to be allocated for curation rewards
     uint256 public airdropFund; // Bucket of inflationary tokens available for airdrops/new user/referral rewards
-    uint256 public developmentFund; // Bucket of inflationary tokens reserved for development
-    uint256 public distributedRewards; // Bucket of curation rewards tokens reserved/'spoken for' but not yet claimed by users
+    uint256 public developmentFund; // Bucket of inflationary tokens reserved for development - gets transferred to devFundAddress immediately
+    uint256 public allocatedRewards; // Bucket of curation reward tokens reserved/'spoken for' but not yet claimed by users
+    uint256 public allocatedAirdrops; // Bucket of airdrop reward tokens reserved/'spoken for' but not yet claimed by users
 
     mapping(address => uint256) nonces;
 
@@ -74,13 +75,14 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         currBlockReward = initBlockReward;
         lastReleaseBlock = block.number;
         constantRewardStart = _lastHalvingPeriod.mul(_halvingTime);
+
+        preMintTokens();
     }
 
     /**
-     * @dev Calculate and mint the number of inflationary tokens from start to lastHalvingPeriod.
-            Can only be called by owner. // TODO: Can only be called once.
+     * @dev Calculate and mint the number of inflationary tokens until lastHalvingPeriod at the beginning.
      */
-    function preMintInflation() public {
+    function preMintTokens() internal {
         uint256 totalRewards;
         uint256 periodBlockReward;
         
@@ -91,12 +93,12 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         mint(address(this), totalRewards);
     }
 
-    // @TODO: refactor into several smaller functions
+    // @TODO: refactor into several smaller functions?!
     /**
      * @dev Calculate and release currently releasable inflationary rewards. 
      */
-    function releaseRewards() public {
-        uint256 releasableRewards;
+    function releaseTokens() public {
+        uint256 releasableTokens;
         uint256 currBlock = blockNum();
 
         // Check if already called for the current block
@@ -118,10 +120,10 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         if (currentPeriod == lastReleasePeriod || lastReleasePeriod >= lastHalvingPeriod) {
             // If last release and current block are in the same halving period OR if we are past the last halving event,
             // rewards are simply the number of passed blocks times the current block reward.
-            releasableRewards = blocksPassed * currBlockReward;
+            releasableTokens = blocksPassed * currBlockReward;
             if (lastReleasePeriod >= lastHalvingPeriod) {
             // if we are past the lastHalvingPeriod we still have to mint these
-                mint(address(this), releasableRewards);
+                mint(address(this), releasableTokens);
             }
         } else {
             // If last release block was in a different period, we have to add up the rewards for each period, separately
@@ -129,14 +131,14 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                 uint256 periodBlockReward = initBlockReward.div(2**i);
                 if (i == lastReleasePeriod) {
                     uint256 nextPeriodStart = startBlock.add((lastReleasePeriod.add(1)).mul(halvingTime));
-                    releasableRewards += (nextPeriodStart.sub(lastReleaseBlock)).mul(periodBlockReward);
+                    releasableTokens += (nextPeriodStart.sub(lastReleaseBlock)).mul(periodBlockReward);
                 }
                 if (i == currentPeriod) {
                     currentPeriodStart = startBlock.add(currentPeriod.mul(halvingTime));
-                    releasableRewards += (blockNum().sub(currentPeriodStart)).mul(periodBlockReward);
+                    releasableTokens += (blockNum().sub(currentPeriodStart)).mul(periodBlockReward);
                 }
                 if (i != lastReleasePeriod && i != currentPeriod) {
-                    releasableRewards += halvingTime.mul(periodBlockReward);
+                    releasableTokens += halvingTime.mul(periodBlockReward);
                 }
             }
             if (lastReleasePeriod <= lastHalvingPeriod && currentPeriod >= lastHalvingPeriod) {
@@ -147,8 +149,8 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
                 mint(address(this), toBeMinted);
             }
         }
-        // @Note: When we devide by 5 the remainder gets lost - this is very small though if we have 18 decimals
-        uint256 userRewards = releasableRewards.mul(4).div(5); // 80% of inflation goes to the users
+        // @Note: When we divide by 5 the remainder gets lost - this is very small though if we have 18 decimals
+        uint256 userRewards = releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
         // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
         airdropFund += userRewards.div(2);
         rewardFund += userRewards.div(2);
@@ -159,73 +161,59 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         // airdropFund += userRewards.mul(airdropShare);
         // rewardFund += userRewards.mul(1-airdropShare);
 
-        developmentFund += releasableRewards.div(5); // 20% of inflation goes to devFund
+        developmentFund += releasableTokens.div(5); // 20% of inflation goes to devFund
+        toDevFund(); // transfer these out immediately
 
         // Set current block as last release
         lastReleaseBlock = currBlock;
 
-        emit Released(releasableRewards, rewardFund, airdropFund, developmentFund);
+        emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
         
     }
 
 
     /**
-    * @dev Efficient Distribution
-    * @param rewards to be distributed
-    */
-    function allocateRewards(uint256 rewards) public onlyOwner returns(bool) {
-        require(rewards <= rewardFund, "Not enough curation rewards available");
-        rewardFund = rewardFund.sub(rewards);
-        distributedRewards += rewards;
-        return true;
-    }
-
-
-    /**
-    * @dev Todo: airdrop allocation
-    * @param rewards to be distributed
-    */
-    function allocateAirdrops(uint256 rewards) public onlyOwner returns(bool) {
-        return true;
-    }
-
-
-    /**
-    * @dev Distribute airdrop rewards
-    * @param _recipients List of recipients
-    * @param _balances Amount to send to recipients
-    * TODO this is too expensive - better solution:
-    * https://github.com/cardstack/merkle-tree-payment-pool
-    */
-    function distributeRewards(address[] memory _recipients, uint256[] memory _balances) public onlyOwner returns(bool) {
-        for(uint i = 0; i < _recipients.length; i++){
-            require(airdropFund >= _balances[i], "No airdrop rewards available");
-            airdropFund = airdropFund.sub(_balances[i]);
-            this.transfer(_recipients[i], _balances[i]);
-        }
-        return true;
-    }
-
-
-    /**
      * @dev Transfer eligible tokens from devFund bucket to devFundAddress
-    // TODO: who should be able do call this? Automatical / internal and called from allocateTokens? 
      */
 
-    function toDevFund() public onlyOwner {
+    function toDevFund() internal {
         require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
         developmentFund = 0;
     }
 
 
     /**
-    * @dev Claim curation reward tokens
+    * @dev Allocate rewards
+    * @param rewards to be reserved for users claims
+    */
+    function allocateRewards(uint256 rewards) public onlyOwner returns(bool) {
+        require(rewards <= rewardFund, "Not enough curation rewards available");
+        rewardFund = rewardFund.sub(rewards);
+        allocatedRewards += rewards;
+        return true;
+    }
+
+
+    /**
+    * @dev Allocate airdrops
+    * @param rewards to be reserved for user claims
+    */
+    function allocateAirdrops(uint256 rewards) public onlyOwner returns(bool) {
+        require(rewards <= airdropFund, "Not enough airdrop rewards available");
+        airdropFund = airdropFund.sub(rewards);
+        allocatedAirdrops += rewards;
+        return true;
+    }
+
+
+    /**
+    * @dev Claim curation reward tokens (to be called by user)
     * @param  _amount amount to be transferred to user
     * @param  _sig Signature by contract owner authorizing the transaction
     */
     function claimTokens(uint256 _amount, bytes memory _sig) public returns(bool) {
         // check _amount + account matches hash
-        require(distributedRewards >= _amount);
+        require(allocatedRewards >= _amount);
 
         bytes32 hash = keccak256(abi.encodePacked(_amount, msg.sender, nonces[msg.sender]));
         hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
@@ -234,7 +222,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         address recOwner = ECDSA.recover(hash, _sig);
         require(owner() == recOwner, "Claim not authorized");
         nonces[msg.sender] += 1;
-        distributedRewards = distributedRewards.sub(_amount);
+        allocatedRewards = allocatedRewards.sub(_amount);
         require(this.transfer(msg.sender, _amount), "Transfer to claimant failed");
         return true;
     }
@@ -250,6 +238,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     /**
      * @dev Mock transaction to simulate change in block number for testing
      */
+    // @TODO: remove in production
     function blockMiner() public {
         name = "NewName";
     }
