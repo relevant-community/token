@@ -61,14 +61,14 @@ contract('PreInflationaryToken', accounts => {
         ).to.equal(totalInflationRewards);
     });
 
-    it('Allocates rewards into buckets over time', async () => {
+    it('Releases rewards into buckets over time', async () => {
         // Creating mock transactions to increase block number
         let mockTransactions = [];
         for (let i=0; i<5; i++) {
             mockTransactions.push(preInflationaryToken.blockMiner())
         }
         Promise.all(mockTransactions);
-        await preInflationaryToken.allocateRewards();
+        await preInflationaryToken.releaseRewards();
         retCurationRewards = await preInflationaryToken.rewardFund();
         retDevFund = await preInflationaryToken.developmentFund();
         expect(
