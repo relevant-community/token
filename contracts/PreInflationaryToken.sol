@@ -102,13 +102,16 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         // Check if already called for the current block
         require(lastReleaseBlock < currBlock, "No new rewards available");
 
+        // Determine what halving period we are in and what the corresponding block reward is
         currentPeriod = (currBlock.sub(startBlock)).div(halvingTime);
-        if (currBlock < constantRewardStart) {
+        if (currentPeriod < lastHalvingPeriod) {
             currBlockReward = initBlockReward.div(2**currentPeriod);
         } else {
             currBlockReward = initBlockReward.div(2**lastHalvingPeriod);
         }
 
+        // Determine the period in which the last release was made,
+        // in order to calculate how many new tokens are eligible for release
         uint256 lastReleasePeriod = lastReleaseBlock.sub(startBlock).div(halvingTime);
         uint256 blocksPassed = currBlock - lastReleaseBlock;
 
@@ -179,7 +182,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
 
     /**
-    * @dev Todo
+    * @dev Todo: airdrop allocation
     * @param rewards to be distributed
     */
     function allocateAirdrops(uint256 rewards) public onlyOwner returns(bool) {
@@ -191,7 +194,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     * @dev Distribute airdrop rewards
     * @param _recipients List of recipients
     * @param _balances Amount to send to recipients
-    * TODO this is expensive - better solution:
+    * TODO this is too expensive - better solution:
     * https://github.com/cardstack/merkle-tree-payment-pool
     */
     function distributeRewards(address[] memory _recipients, uint256[] memory _balances) public onlyOwner returns(bool) {
@@ -206,10 +209,10 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
     /**
      * @dev Transfer eligible tokens from devFund bucket to devFundAddress
-    // TODO: who should be able do call this? internal and called from allocateTokens? 
+    // TODO: who should be able do call this? Automatical / internal and called from allocateTokens? 
      */
 
-    function toDevFund() public {
+    function toDevFund() public onlyOwner {
         require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
         developmentFund = 0;
     }
