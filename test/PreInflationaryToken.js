@@ -43,10 +43,6 @@ contract('PreInflationaryToken', accounts => {
     });
 
     it('Returns expected parameters on initialization', async () => {
-        // retInflationRate = await inflationaryToken.inflationRate();
-        // expect(
-        //     retInflationRate.toNumber()
-        // ).to.equal(testInflationRate);
         retOwner = await preInflationaryToken.owner();
         expect(
             retOwner.toString()
