@@ -119,7 +119,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
             // If last release was during the decay period, we must distinguish two cases:
             if (currentBlock < constantRewardStart) {
                 totalIntegral = initBlockReward * (-timeConstant) * e ** (-currentBlock/timeConstant) + timeConstant;
-                releasableTokens = totalIntegral - totalReleased;
+                releasableTokens = totalIntegral.sub(totalReleased);
             }
             if (currentBlock >= constantRewardStart) {
                 uint256 toBeMinted = (currentBlock.sub(constantRewardStart)).mul(constantReward);
@@ -139,7 +139,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
         // airdropFund += userRewards.mul(airdropShare);
         // rewardFund += userRewards.mul(1-airdropShare);
 
-        developmentFund += releasableTokens.div(5); // 20% of inflation goes to devFund
+        developmentFund = developmentFund.add(releasableTokens.div(5)); // 20% of inflation goes to devFund
         toDevFund(); // transfer these out immediately
 
         // Set current block as last release
