@@ -115,14 +115,15 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
             // We still have to mint these
             mint(address(this), releasableTokens);
         } else {
+            uint256 totalIntegral;
             // If last release was during the decay period, we must distinguish two cases:
             if (currentBlock < constantRewardStart) {
-                uint256 totalIntegral = initBlockReward * (-timeConstant) * e ** (-currentBlock/timeConstant) + timeConstant;
+                totalIntegral = initBlockReward * (-timeConstant) * e ** (-currentBlock/timeConstant) + timeConstant;
                 releasableTokens = totalIntegral - totalReleased;
             }
             if (currentBlock >= constantRewardStart) {
                 uint256 toBeMinted = (currentBlock.sub(constantRewardStart)).mul(constantReward);
-                uint256 totalIntegral = initBlockReward * (-timeConstant) * e ** (-constantRewardStart/timeConstant) + timeConstant;
+                totalIntegral = initBlockReward * (-timeConstant) * e ** (-constantRewardStart/timeConstant) + timeConstant;
                 releasableTokens = totalIntegral.sub(totalReleased).add(toBeMinted);
                 mint(address(this), toBeMinted);
             }
