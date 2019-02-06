@@ -115,16 +115,13 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
             // We still have to mint these
             mint(address(this), releasableTokens);
         } else {
-            uint256 totalIntegral;
             // If last release was during the decay period, we must distinguish two cases:
             if (currentBlock < constantRewardStart) {
-                totalIntegral = initBlockReward * (-timeConstant) * e ** (-currentBlock/timeConstant) + timeConstant;
-                releasableTokens = totalIntegral.sub(totalReleased);
+                releasableTokens = totalIntegral(currentBlock).sub(totalReleased);
             }
             if (currentBlock >= constantRewardStart) {
                 uint256 toBeMinted = (currentBlock.sub(constantRewardStart)).mul(constantReward);
-                totalIntegral = initBlockReward * (-timeConstant) * e ** (-constantRewardStart/timeConstant) + timeConstant;
-                releasableTokens = totalIntegral.sub(totalReleased).add(toBeMinted);
+                releasableTokens = totalIntegral(constantRewardStart).sub(totalReleased).add(toBeMinted);
                 mint(address(this), toBeMinted);
             }
         }
@@ -153,12 +150,22 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
 
     /**
+     * @dev Calculates total number of tokens minted by taking the integral of the block reward function
+       @param _block Number of block until which the integral is taken
+     */
+    function totalIntegral(uint256 _block) public view returns (uint256) {
+        return initBlockReward * (-timeConstant) * e ** (-_block/timeConstant) + timeConstant;
+    }
+
+
+    /**
      * @dev Transfer eligible tokens from devFund bucket to devFundAddress
      */
 
-    function toDevFund() internal {
+    function toDevFund() internal returns(bool) {
         require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
         developmentFund = 0;
+        return true;
     }
 
 
