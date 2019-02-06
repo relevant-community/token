@@ -1,7 +1,7 @@
-# Two inflationary token designs [WIP]
+# 3 inflationary token designs [WIP]
 
 
-## InflationaryToken
+## 1 InflationaryToken
 
 This contract is modeled closely after [Livepeer](https://github.com/livepeer/protocol).
 
@@ -12,7 +12,7 @@ If and only if a new round has started, the owner of the token can initialize th
 The current implementation keeps inflation constant, but in the next step there will be a `setInflation()` function that adjusts the inflation rate in each period based on dynamic variables like participation rate or time passed since launch.
 
 
-## PreInflationaryToken
+## 2 PreInflationaryToken
 
 The inflation mechanism in this contract is inspired by Bitcoin, Ethereum, ZCash and co.: New tokens are released every block but the initial `initBlockReward` keeps getting cut in half after a specified `halvingTime` (expressed in number of blocks). After `lastHalvingPeriod * halvingTime` blocks, instead of reducing further, the block reward stays constant.
 
@@ -24,6 +24,10 @@ This drawing illustrates the different steps and buckets that are used to alloca
 
 ![TokenFlow](https://user-images.githubusercontent.com/37867491/52302053-5af9ee80-298c-11e9-8c92-2163c0956ff7.png)
 
+
+## 3 ContPreInflationaryToken
+
+This inflation mechanism is similar to 2, but instead of discrete changes in the blockReward after a certain number of blocks, the block reward shrinks continuously following an exponential decay. We can still specify a point after which we do not want the block reward to decrease further, so that it stays constant afterwards.
 
 
 ## Run
