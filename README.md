@@ -1,7 +1,7 @@
-# Two inflationary token designs [WIP]
+# 3 Inflationary Token Designs [WIP]
 
 
-## InflationaryToken
+## 1 InflationaryToken
 
 This contract is modeled closely after [Livepeer](https://github.com/livepeer/protocol).
 
@@ -12,17 +12,37 @@ If and only if a new round has started, the owner of the token can initialize th
 The current implementation keeps inflation constant, but in the next step there will be a `setInflation()` function that adjusts the inflation rate in each period based on dynamic variables like participation rate or time passed since launch.
 
 
-## PreInflationaryToken
+## 2 PreInflationaryToken
 
 The inflation mechanism in this contract is inspired by Bitcoin, Ethereum, ZCash and co.: New tokens are released every block but the initial `initBlockReward` keeps getting cut in half after a specified `halvingTime` (expressed in number of blocks). After `lastHalvingPeriod * halvingTime` blocks, instead of reducing further, the block reward stays constant.
 
 A peculiarity of this contract is that all the inflationary rewards until `lastHalvingPeriod * halvingTime` are pre-minted and locked in the contract until they are gradually released according to the inflation schedule by calling `releaseRewards`.
 
-The resulting inflation dynamics can be viewed [here](https://drive.google.com/open?id=1zu1cf1fkoHiD_xTnecW9P33DH19zSsxqhrkdlSHm1WU).
+Total supply, inflation rate and rewards will behave like this:
+
+![DiscSupply](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/c21ca0c5-00b5-4877-acf5-f52138acc4ce)
+![DiscInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/6c647354-5a81-452b-b724-e73391a88831)
+![DiscRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/c4bb4a1b-12e6-45f3-95c7-4cd09e26f82e)
+
+TDetailed calculations can be viewed [here](https://drive.google.com/open?id=1zu1cf1fkoHiD_xTnecW9P33DH19zSsxqhrkdlSHm1WU).
 
 This drawing illustrates the different steps and buckets that are used to allocate rewards:
 
 ![TokenFlow](https://user-images.githubusercontent.com/37867491/52302053-5af9ee80-298c-11e9-8c92-2163c0956ff7.png)
+
+
+## 3 ContPreInflationaryToken
+
+This inflation mechanism is similar to 2, but instead of discrete changes in the blockReward after a certain number of blocks, the block reward shrinks continuously following an exponential decay. We can still specify a point after which we do not want the block reward to decrease further, so that it stays constant afterwards.
+
+Again, all tokens up to the point of 0 decay are preminted and released gradually according to the same steps as for 2. However, since it only depends on parameters and is computationally expensive, the the amount of token to be preminted needs to be calculated outside of the contract and passed in on initialization.
+
+The resulting inflation dynamics will look much smoother, somewhat like this:
+
+![ContSupply](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/26288dad-c679-4c6d-9bcf-32b115d7a68d)
+![ContInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/ab7489f0-4d63-44f9-afc5-f84111162e3c)
+![ContRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/08de6f99-96ef-4122-9c5b-b63950579b7c)
+
 
 
 
