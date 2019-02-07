@@ -20,9 +20,9 @@ A peculiarity of this contract is that all the inflationary rewards until `lastH
 
 Total supply, inflation rate and rewards will behave like this:
 
-![DiscSupply](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/26288dad-c679-4c6d-9bcf-32b115d7a68d)
-![DiscInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/ab7489f0-4d63-44f9-afc5-f84111162e3c)
-![DiscRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/08de6f99-96ef-4122-9c5b-b63950579b7c)
+![DiscSupply](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/c21ca0c5-00b5-4877-acf5-f52138acc4ce)
+![DiscInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/6c647354-5a81-452b-b724-e73391a88831)
+![DiscRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/c4bb4a1b-12e6-45f3-95c7-4cd09e26f82e)
 
 TDetailed calculations can be viewed [here](https://drive.google.com/open?id=1zu1cf1fkoHiD_xTnecW9P33DH19zSsxqhrkdlSHm1WU).
 
@@ -39,9 +39,9 @@ Again, all tokens up to the point of 0 decay are preminted and released graduall
 
 The resulting inflation dynamics will look much smoother, somewhat like this:
 
-![ContSupply](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/4a6cf182-d455-480a-a13f-b8ba7e8ae26b)
-![ContInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/52e479ba-b2c4-4fdc-bbbb-362989cee18d)
-![ContRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/f0a51dfe-9031-455c-83e6-e71c53479f92)
+![ContSupply](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/26288dad-c679-4c6d-9bcf-32b115d7a68d)
+![ContInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/ab7489f0-4d63-44f9-afc5-f84111162e3c)
+![ContRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/08de6f99-96ef-4122-9c5b-b63950579b7c)
 
 
 
