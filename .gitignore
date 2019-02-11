@@ -1,1 +1,12 @@
 node_modules
+
+# local env variables
+.env
+
+# lol macs
+.DS_Store
+
+# Coverage directory used by tools like istanbul
+coverage
+coverage.json
+coverageEnv

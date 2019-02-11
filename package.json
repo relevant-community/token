@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test truffle test test/PreInflationaryToken.js --network local",
-    "ganache": "ganache-cli --port 9545 --deterministic"
+    "ganache": "ganache-cli --port 9545 --deterministic",
+    "coverage": "./node_modules/.bin/solidity-coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:sol": "solium -d .",
+    "lint:sol:fix": "solium -d . --fix"
   },
   "author": "Achill Rudolph",
   "license": "ISC",
@@ -15,6 +20,36 @@
     "zos-lib": "^2.1.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0"
+    "chai": "^4.2.0",
+    "eslint": "^5.13.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "ethlint": "^1.2.3",
+    "husky": "^1.3.1",
+    "lint-staged": "^8.1.3",
+    "prettier": "^1.16.4",
+    "solidity-coverage": "^0.5.11"
+  },
+  "eslintIgnore": [
+    "/coverage",
+    "/node_modules"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "linters": {
+      "*.js": [
+        "prettier --write",
+        "eslint --fix",
+        "solium -d . --fix",
+        "git add"
+      ]
+    },
+    "ignore": [
+      "/build"
+    ]
   }
 }
