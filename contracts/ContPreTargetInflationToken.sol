@@ -5,13 +5,15 @@ import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-eth/contracts/ownership/Ownable.sol";
 import "openzeppelin-eth/contracts/cryptography/ECDSA.sol";
 import "zos-lib/contracts/Initializable.sol";
+import "./Power.sol";
+
 
 
 /**
  * @title An Inflationary Token with Premint and Gradual Release
  */
 
-contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
+contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintable {
 
   event Released(uint256 releasableTokens, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
   // event ParameterUpdate(string param);
@@ -202,7 +204,9 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
     @param _block Number of block until which the integral is taken
    */
   function totalIntegral(uint256 _block) public view returns (uint256) {
-    return initBlockReward * (-timeConstant) * e ** (-_block/timeConstant) + timeConstant;
+    // TODO: this needs to be worked out! note that uint cannot be negative 
+    // and power() function from Bancor might be helpful to deal with fractional exponent?!
+    return initBlockReward.mul(-timeConstant).mul(fixedExp(-_block/timeConstant, 18)).add(timeConstant); 
   }
 
 
@@ -282,7 +286,7 @@ contract InflationaryToken is Initializable, ERC20, Ownable, ERC20Mintable {
    */
   // @TODO: remove in production
   function blockMiner() public {
-    name = "NewName";
+    name = "NewDummyNameToMakeStateChange";
   }
 
 
