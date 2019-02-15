@@ -10,7 +10,7 @@ import "./Power.sol";
 
 
 /**
- * @title An Inflationary Token with Premint and Gradual Release
+ * @title An Inflationary Token with premint, gradual release, exponential decay of inflationary rewards, and a target inflation rate
  */
 
 contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintable {
@@ -24,7 +24,6 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
   string public version;
   address public devFundAddress;
   uint256 public initRoundReward;
-  uint256 public initBlockReward;
   uint256 public currRoundReward;
   uint256 public timeConstant;
   uint256 public constantRoundInflation;
@@ -33,12 +32,9 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
   uint256 public roundDecay;
 
   uint256 public startBlock; // Block number at which the contract is deployed
-  uint256 public lastReleaseBlock; // Block number at which the last release was made
-  uint256 public totalReleased; // All tokens released until the last release
-
-  uint256 public lastReleaseRound; // Round number at which the last release was made
+  uint256 public lastReleaseRound; // Round at which the last release was made
   uint256 public lastReleaseRoundReward; // Reward of the round where tokens were last released
-
+  uint256 public totalReleased; // All tokens released until and including the last release
 
   uint256 public rewardFund; // Bucket of inflationary tokens available to be allocated for curation rewards
   uint256 public airdropFund; // Bucket of inflationary tokens available for airdrops/new user/referral rewards
@@ -52,16 +48,14 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
 
   /**
    * @dev ContPreInflationaryToken constructor
-   * @param _devFundAddress       Address that receives and manages newly minted tokens for development fund
-   * @param _initRoundReward      Number of released inflationary tokens per round during the first round
-   * @param _initBlockReward      Number of released inflationary tokens per block for the first block
-   * @param _timeConstant         Number of blocks after which reward reduces to 37% of initial value during exponential decay
-   *                              (take this times ln(2) to get the half life )
-   * @param _constantRoundInflation  Target round inflation rate at which the reward decay should stop // can be calculated from target yearly inflation rate
-   * @param _constantInflationStart  Number of block from which inflation stays constant - can be calculated from timeConstant, initRoundReward and constantInflation
-   * @param _totalPremint         Rewards that are preminted (all until decay stops) - can be calculated from timeConstant, initRoundReward and constantInflation
-   * @param _roundLength          Number of blocks that make up an inflation release round
-   * @param _roundDecay           Decay factor for the reward reduction during one round - can be calculated from timeConstant and roundLength
+   * @param _devFundAddress         Address that receives and manages newly minted tokens for development fund
+   * @param _initRoundReward        Number of released inflationary tokens per round during the first round
+   * @param _timeConstant           Number of blocks after which reward reduces to 37% of initial value during exponential decay - can be calculated from half-life
+   * @param _constantRoundInflation Target round inflation rate at which the reward decay should stop - can be calculated from target yearly inflation rate
+   * @param _constantInflationStart Number of round from which inflation stays constant - can be calculated from timeConstant, initRoundReward and constantInflation
+   * @param _roundLength            Number of blocks that make up an inflation release round
+   * @param _roundDecay             Decay factor for the reward reduction during one round - can be calculated from timeConstant and roundLength
+   * @param _totalPremint           Rewards that are preminted (all until decay stops) - can be calculated from timeConstant, initRoundReward and constantInflation
    */
   function initialize(
     string memory _name,
@@ -69,11 +63,8 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
     string memory _symbol,
     string memory _version,
     address _devFundAddress,
-    uint256 _initBlockReward,
     uint256 _initRoundReward,
     uint256 _timeConstant,
-    uint256 _constantReward,
-    uint256 _constantRewardStart,
     uint256 _constantRoundInflation,
     uint256 _constantInflationStart,
     uint256 _roundLength,
@@ -90,7 +81,6 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
     symbol = _symbol;
     version = _version;
     devFundAddress = _devFundAddress;
-    initBlockReward = _initBlockReward;
     initRoundReward = _initRoundReward;
     timeConstant = _timeConstant;
     constantRoundInflation = _constantRoundInflation;
@@ -102,7 +92,6 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
 
     startBlock = block.number;
     currRoundReward = initRoundReward;
-    lastReleaseBlock = block.number;
     lastReleaseRound = 0;
     lastReleaseRoundReward = initRoundReward;
 
@@ -112,8 +101,8 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
   /**
    * @dev Calculate and mint the number of inflationary tokens until constantInflations are reached
    */
-  function preMintTokens(uint256 _totalPreMint) internal {
-    mint(address(this), _totalPreMint);
+  function preMintTokens(uint256 _toBeMinted) internal {
+    mint(address(this), _toBeMinted);
   }
 
   /**
@@ -121,7 +110,6 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
    */
   function releaseTokens() public {
     uint256 releasableTokens;
-    uint256 currentBlock = blockNum();
     uint256 currentRound = roundNum();
 
     // Check if already called for the current round
@@ -130,7 +118,7 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
     // Determine the number of rounds that have passed since the last release
     uint256 roundsPassed = currentRound.sub(lastReleaseRound);
 
-    if (lastReleaseBlock >= constantInflationStart) {
+    if (lastReleaseRound >= constantInflationStart) {
       // If the decay had already stopped at the time of last release,
       // we have to loop through the passed rounds and add up the constant round inflation.
       uint256 totalTokens = totalSupply();
@@ -142,29 +130,29 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
       // We still have to mint these
       mint(address(this), releasableTokens);
     } else {
-      // If last release was during the decay period, we must distinguish two cases and within the first case again two cases:
-      if (currentBlock < constantInflationStart) {
+      // If last release was during the decay period, we must distinguish two cases and within the first case again two more cases:
+      if (currentRound < constantInflationStart) {
         // We are still in the decay period
         if (roundsPassed < 24) {
-        // If the last release was made less than 24 rounds ago, we use the discrete loop method.
-        // This is essentially taking an imprecise, step-wise integral where one step is the roundLength.
+        // If the last release was made less than 24 rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
           uint256 roundReward;
-          for (uint i = 0; i < 24; i++) {
+          for (uint i = 0; i < roundsPassed; i++) {
             roundReward = roundDecay.mul(lastReleaseRoundReward);
             releasableTokens = releasableTokens.add(roundReward);
             lastReleaseRoundReward = roundReward;
           }
         } else {
-        // If more rounds have passed we don't want to loop so many times
-        // and therefore use integration using exponential decay formula
-          releasableTokens = totalIntegral(currentBlock).sub(totalReleased);
+        // If more rounds have passed we don't want to loop that many times
+        // and therefore use integration using the exponential decay formula
+          releasableTokens = totalIntegral(currentRound).sub(totalReleased);
+        // TODO: still need to set lastReleaseRoundReward!
         }
       } else {
         // We have recently crossed from the decay period into the constantInflationPeriod
         // and therefore have to calculate the releasable tokens for both segments separately
         uint256 releasableFromDecayPeriod = totalIntegral(constantInflationStart).sub(totalReleased);
         uint256 totalTokens = totalSupply() + releasableFromDecayPeriod;
-        uint256 roundsSinceConstInflation = (currentBlock.sub(constantInflationStart)).div(roundLength);
+        uint256 roundsSinceConstInflation = currentRound.sub(constantInflationStart);
         uint256 toBeMinted;
         for (uint i = 0; i < roundsSinceConstInflation; i++) {
           uint256 toBeMintedInRound = constantRoundInflation.mul(totalTokens);
@@ -176,21 +164,19 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
       }
     }
     uint256 userRewards = releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
-    // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
+
     airdropFund += userRewards.div(2);
     rewardFund += userRewards.div(2);
 
-    // @Proposal: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (#months)
-    // uint256 monthsPassed = (currentBlock - startBlock).div(172800); // 172800 blocks per month
-    // uint256 airdropShare = 0.8 ** monthsPassed; // @TODO: figure out decimals / precision
-    // airdropFund += userRewards.mul(airdropShare);
-    // rewardFund += userRewards.mul(1-airdropShare);
+    // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
+    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (time)
+    // uint256 airdropShare = 0.999988 ** currentRound; // @TODO: figure out decimals / precision
 
     developmentFund = developmentFund.add(releasableTokens.div(5)); // 20% of inflation goes to devFund
     toDevFund(); // transfer these out immediately
 
-    // Set current block as last release
-    lastReleaseBlock = currentBlock;
+    // Set current round as last release
+    lastReleaseRound = currentRound;
     // Increase totalReleased count
     totalReleased = totalReleased.add(releasableTokens);
 
@@ -201,12 +187,12 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
 
   /**
    * @dev Calculates total number of tokens minted by taking the integral of the block reward function
-    @param _block Number of block until which the integral is taken
+    @param _round Round until which the integral is taken
    */
-  function totalIntegral(uint256 _block) public view returns (uint256) {
-    // TODO: this needs to be worked out! note that uint cannot be negative 
-    // and power() function from Bancor might be helpful to deal with fractional exponent?!
-    return initBlockReward.mul(-timeConstant).mul(fixedExp(-_block/timeConstant, 18)).add(timeConstant); 
+  function totalIntegral(uint256 _round) public view returns (uint256) {
+    // TODO: this needs to be worked out! take care of negative signs & use
+    // Power() contract from Bancor - can it help deal with fractional exponent?!
+    return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward)); 
   }
 
 
@@ -266,13 +252,6 @@ contract InflationaryToken is Power, Initializable, ERC20, Ownable, ERC20Mintabl
     return true;
   }
 
-
-  /**
-   * @dev Return current block number
-   */
-  function blockNum() public view returns (uint256) {
-    return block.number;
-  }
 
   /**
    * @dev Return current round number
