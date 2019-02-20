@@ -1,0 +1,116 @@
+const RelevantToken = artifacts.require('RelevantToken');
+
+const { expect } = require('chai');
+const BN = require('bignumber.js');
+
+contract('token', accounts => {
+  let token;
+  let retOwner;
+  let retContractBalance;
+  let retCurationRewards;
+  let retDevFund;
+  let retDevFundBalance;
+
+  const testName = 'Relevant Token';
+  const testDecimals = 18;
+  const p = 1e18;
+  const testSymbol = 'RVT';
+  const testVersion = '1.0';
+
+  const testDevFundAddress = accounts[0];
+  // // should be a multiple of a power of 2,to allow halving without floating point arithmetic
+  // const testInitBlockReward = 2;
+  // // block rewards halve after halvingTime blocks
+  // const testHalvingTime = 2;
+  // // block rewards stay constant after lastHalvingPeriod * halvingTime
+  // const testLastHalvingPeriod = 1;
+
+  const halfLife = 8760; // # of rounds to decay by half
+  let timeConstant = (halfLife / Math.LN2) * p;
+  const targetInflation = 10880216701148;
+  let initRoundReward = 2500 * p;
+  const roundLength = 1; // 240;
+  let roundDecay = 999920876739935000;
+  const targetRound = 26703;
+  let totalPremint = 27777044629743800000000000;
+
+  // calculate total rewards to be preminted:
+
+  let roundReward = initRoundReward;
+  let totalInflationRewards = roundReward;
+
+  for (let i = 0; i < targetRound; i++) {
+    roundReward *= roundDecay / p;
+    totalInflationRewards += roundReward;
+  }
+
+  console.log('Total Rewards', totalInflationRewards / p);
+  console.log('totalPremint', totalPremint / p);
+
+  // ugh is there a better way to do this
+  initRoundReward = new BN(initRoundReward).toFixed(0).toString();
+  timeConstant = new BN(timeConstant).toFixed(0).toString();
+  totalPremint = new BN(totalPremint).toFixed(0).toString();
+  roundDecay = new BN(roundDecay).toFixed(0).toString();
+
+  // string memory _name,
+  // uint8 _decimals,
+  // string memory _symbol,
+  // string memory _version,
+  // address _devFundAddress,
+  // uint256 _initRoundReward,
+  // uint256 _timeConstant,
+  // uint256 _targetInflation,
+  // uint256 _targetRound,
+  // uint256 _roundLength,
+  // uint256 _roundDecay,
+  // uint256 _totalPremint
+  before(async () => {
+    token = await RelevantToken.new();
+
+    expect(token.address).to.exist;
+
+    await token.initialize(
+      testName,
+      testDecimals,
+      testSymbol,
+      testVersion,
+      testDevFundAddress,
+      initRoundReward,
+      timeConstant,
+      targetInflation,
+      targetRound,
+      roundLength,
+      roundDecay,
+      totalPremint
+    );
+  });
+
+  it('Returns expected parameters on initialization', async () => {
+    retOwner = await token.owner();
+    expect(retOwner.toString()).to.equal(accounts[0]);
+  });
+
+  it('Calculates and premints the total inflation rewards', async () => {
+    retContractBalance = await token.balanceOf(token.address);
+    expect(retContractBalance.toString()).to.equal(totalPremint);
+  });
+
+  it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
+    // Creating mock transactions to increase block number
+    let mockTransactions = [];
+    for (let i = 0; i < 5; i++) {
+      mockTransactions.push(token.blockMiner());
+    }
+    Promise.all(mockTransactions);
+    await token.releaseTokens();
+    retCurationRewards = await token.rewardFund();
+    expect(retCurationRewards.toNumber()).to.be.above(0);
+    retDevFund = await token.developmentFund();
+    expect(retDevFund.toNumber()).to.equal(0);
+    retDevFundBalance = await token.balanceOf(testDevFundAddress);
+    expect(retDevFundBalance.toNumber()).to.be.above(0);
+  });
+});
+
+// TODO: add tests for upgradeability (https://docs.zeppelinos.org/docs/testing.html)

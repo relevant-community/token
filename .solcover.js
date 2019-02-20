@@ -5,7 +5,7 @@ module.exports = {
   // norpc: true,
   // dir: './secretDirectory',
   copyPackages: ["zeppelin-solidity"],
-  skipFiles: ["ConvertLib.sol", "mocks", "interfaces"],
-  compileCommand: "../node_modules/.bin/truffle compile",
-  testCommand: "../node_modules/.bin/truffle test --network coverage"
+  skipFiles: ["ConvertLib.sol", "mocks", "interfaces"]
+  // compileCommand: "../node_modules/.bin/truffle compile",
+  // testCommand: "../node_modules/.bin/truffle test --network coverage"
 };

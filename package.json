@@ -4,7 +4,8 @@
   "description": "An inflationary token.",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test truffle test test/PreInflationaryToken.js --network local",
+    "test": "NODE_ENV=test truffle test test/RelevantToken.js --network local",
+    "watch": "npm-watch",
     "ganache": "ganache-cli --port 9545 --deterministic",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "lint": "eslint .",
@@ -16,10 +17,12 @@
   "license": "ISC",
   "dependencies": {
     "openzeppelin-eth": "^2.1.2",
-    "truffle": "^5.0.2",
+    "truffle": "^5.0.4",
     "zos-lib": "^2.1.0"
   },
   "devDependencies": {
+    "big-number": "^2.0.0",
+    "bignumber.js": "^8.0.2",
     "chai": "^4.2.0",
     "eslint": "^5.13.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -27,6 +30,7 @@
     "ethlint": "^1.2.3",
     "husky": "^1.3.1",
     "lint-staged": "^8.1.3",
+    "npm-watch": "^0.6.0",
     "prettier": "^1.16.4",
     "solidity-coverage": "^0.5.11"
   },
@@ -34,6 +38,16 @@
     "/coverage",
     "/node_modules"
   ],
+  "watch": {
+    "test": {
+      "patterns": [
+        "truffle",
+        "test",
+        "contracts"
+      ],
+      "extensions": "js,json,sol"
+    }
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
