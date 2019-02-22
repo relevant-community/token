@@ -119,66 +119,28 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     if (lastRound >= targetRound) {
       // If the decay had already stopped at the time of last release,
       // we have to loop through the passed rounds and add up the constant round inflation.
-      uint256 totalTokens = totalSupply();
-      for (uint i = 0; i < roundsPassed; i++) {
-        uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**18);
-        releasableTokens = releasableTokens.add(toBeMintedInRound);
-        totalTokens = totalTokens.add(toBeMintedInRound);
-      }
-      // We still have to mint these
-      mint(address(this), releasableTokens);
+      releasableTokens = newTokensForConstantPhase(roundsPassed);
     } else {
-      // If last release was during the decay period, we must distinguish two cases and within the first case again two more cases:
+      // If last release was during the decay phase, we must distinguish two cases and within the first case again two more cases:
       if (currentRound < targetRound) {
-        // We are still in the decay period
-        if (roundsPassed < 1000000000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
-        // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
-          uint256 roundReward;
-          for (uint j = 0; j < roundsPassed; j++) {
-            roundReward = roundDecay.mul(lastRoundReward).div(10**18);
-            lastRoundReward = roundReward;
-            releasableTokens = releasableTokens.add(roundReward);
-          }
-        } else {
-        // If more rounds have passed we don't want to loop that many times
-        // and therefore use integration using the partial sum formula
-        // releasableTokens = partialSum(currentRound).sub(totalReleased);
-        // TODO: still need to set lastRoundReward!
-        }
+        // We are still in the decay phase
+        releasableTokens = newTokensForDecayPhase(roundsPassed);
       } else {
         // We have recently crossed from the decay period into the constantInflationPeriod
         // and therefore have to calculate the releasable tokens for both segments separately
-        uint256 releasableFromDecayPeriod = partialSum(targetRound).sub(totalReleased);
-        uint256 totalTokensK = totalSupply() + releasableFromDecayPeriod;
-        uint256 roundsSinceConstInflation = currentRound.sub(targetRound);
-        uint256 toBeMintedK;
-        for (uint k = 0; k < roundsSinceConstInflation; k++) {
-          uint256 toBeMintedInRoundK = targetInflation.mul(totalTokensK);
-          toBeMintedK = toBeMintedK.add(toBeMintedInRoundK);
-          totalTokensK = totalTokensK.add(toBeMintedInRoundK);
-        }
-        releasableTokens = releasableFromDecayPeriod.add(toBeMintedK);
-        mint(address(this), toBeMintedK);
+        releasableTokens = newTokensForCrossingPhase(currentRound);
       }
     }
-    uint256 userRewards = releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
 
-    airdropFund += userRewards.div(2);
-    rewardFund += userRewards.div(2);
-
-    // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
-    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (time)
-    // uint256 airdropShare = 0.999988 ** currentRound; // @TODO: figure out decimals / precision
-
-    developmentFund = developmentFund.add(releasableTokens.div(5)); // 20% of inflation goes to devFund
-    toDevFund(); // transfer these out immediately
+    splitRewards(releasableTokens); // split into different buckets (rewardFund, airdrop, devFund)
+    toDevFund(); // transfer devFund out immediately
 
     // Set current round as last release
     lastRound = currentRound;
     // Increase totalReleased count
     totalReleased = totalReleased.add(releasableTokens);
 
-    // emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
+    emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
 
   }
 
@@ -186,15 +148,75 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev compute number of tokens to release once inflation is constant
    * @params roundsPassed - number of rounds since last update
    */
-  function newTokensForConstantRound(uint256 roundsPassed) public view returns (uint256) {
+  function newTokensForConstantPhase(uint256 _roundsPassed) internal returns (uint256) {
     uint256 releasableTokens;
     uint256 totalTokens = totalSupply();
-    for (uint i = 0; i < roundsPassed; i++) {
-      uint256 toBeMintedInRound = targetInflation.mul(totalTokens);
+    for (uint i = 0; i < _roundsPassed; i++) {
+      uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**18);
       releasableTokens = releasableTokens.add(toBeMintedInRound);
       totalTokens = totalTokens.add(toBeMintedInRound);
     }
+    // We still have to mint these
+    mint(address(this), releasableTokens);
     return releasableTokens;
+  }
+
+  /*
+   * @dev compute number of tokens to release during decay phase
+   * @params roundsPassed - number of rounds since last update
+   */
+  function newTokensForDecayPhase(uint256 _roundsPassed) internal returns (uint256) {
+    uint256 releasableTokens;
+    if (_roundsPassed < 1000000000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
+    // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
+      uint256 roundReward;
+      for (uint j = 0; j < _roundsPassed; j++) {
+        roundReward = roundDecay.mul(lastRoundReward).div(10**18);
+        lastRoundReward = roundReward;
+        releasableTokens = releasableTokens.add(roundReward);
+      }
+    } else {
+    // If more rounds have passed we don't want to loop that many times
+    // and therefore use integration using the partial sum formula
+    // releasableTokens = partialSum(currentRound).sub(totalReleased);
+    // (then still need to set lastRoundReward!)
+    }
+    return releasableTokens;
+  }
+
+  /*
+   * @dev compute number of tokens to release when last release was during decay phase
+     and current round is in constant inflation phase (-> recently crossed)
+   * @params currentRound
+   */
+  function newTokensForCrossingPhase(uint256 _currentRound) internal returns (uint256) {
+    uint256 releasableFromDecayPeriod = partialSum(targetRound).sub(totalReleased);
+    uint256 totalTokens = totalSupply() + releasableFromDecayPeriod;
+    uint256 roundsSinceConstInflation = _currentRound.sub(targetRound);
+    uint256 toBeMinted;
+    for (uint k = 0; k < roundsSinceConstInflation; k++) {
+      uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**18);
+      toBeMinted = toBeMinted.add(toBeMintedInRound);
+      totalTokens = totalTokens.add(toBeMintedInRound);
+    }
+    uint256 releasableTokens = releasableFromDecayPeriod.add(toBeMinted);
+    mint(address(this), toBeMinted);
+    return releasableTokens;
+  }
+  
+
+  /*
+   * @dev put new rewards into the different buckets
+   * @params releasableTokens
+   */
+  function splitRewards(uint256 _releasableTokens) internal {
+    uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
+    airdropFund += userRewards.div(2);
+    rewardFund += userRewards.div(2);
+    // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
+    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (time)
+    // uint256 airdropShare = 0.999988 ** currentRound; // @TODO: figure out decimals / precision
+    developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
   }
 
   /**
@@ -267,8 +289,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
 
   /**
-   * @dev Return current round number // for now every time this gets called it simulates that 100 rounds have passed
-          // TODO: change back to view
+   * @dev Return current round number 
+      // for now every time this gets called it simulates that 100 rounds have passed
+      // TODO: change back to view
    */
   function roundNum() public returns (uint256) {
   // function roundNum() public view returns (uint256) {
