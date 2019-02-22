@@ -1,5 +1,13 @@
 # 4 Inflationary Token Designs [WIP]
 
+All calculations and graphs can be found [here](https://drive.google.com/open?id=1zu1cf1fkoHiD_xTnecW9P33DH19zSsxqhrkdlSHm1WU).
+
+## Reward distribution
+
+This drawing illustrates the different steps and buckets that are used to allocate rewards:
+
+![TokenFlow](https://user-images.githubusercontent.com/37867491/52302053-5af9ee80-298c-11e9-8c92-2163c0956ff7.png)
+
 
 ## 1 InflationaryToken
 
@@ -24,12 +32,6 @@ Total supply, inflation rate and rewards will behave like this:
 ![DiscInflation](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/6c647354-5a81-452b-b724-e73391a88831)
 ![DiscRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/c4bb4a1b-12e6-45f3-95c7-4cd09e26f82e)
 
-TDetailed calculations can be viewed [here](https://drive.google.com/open?id=1zu1cf1fkoHiD_xTnecW9P33DH19zSsxqhrkdlSHm1WU).
-
-This drawing illustrates the different steps and buckets that are used to allocate rewards:
-
-![TokenFlow](https://user-images.githubusercontent.com/37867491/52302053-5af9ee80-298c-11e9-8c92-2163c0956ff7.png)
-
 
 ## 3 ContPreInflationaryToken
 
@@ -46,7 +48,7 @@ The resulting inflation dynamics will look much smoother, somewhat like this:
 
 ## 4 RelevantToken (ConstantTargetInflation)
 
-The last inflation mechanism has the rewards decay exponentially, until an inflation rate is reached that should be maintained for the rest of time.
+The last inflation mechanism has the rewards decay exponentially, until an inflation rate is reached that should be maintained for the rest of time. This means that after the target inflation rate has been reached, the absolute reward amount starts increasing again.
 
 ![TargetInflationTotal](https://lh3.googleusercontent.com/41dqfZIRltavQCD5kgoU60wt-bb5gssQM81sXpeX4NCCl9k-ys2rAjg7hsRLxxrg40ZtHif15AJAHw7mKkIzbkLi5aWTzvdcBMTc9EHtVmLA4DA9Qfv0DRbaiy1YPpxJP2nZTEcgQj9-7aZo97DdGDeQrqXdS_zxRPHhG-YZV89t28oCRbxhUxsjmuiJ45jYSLZMtGSjDyrAvbXrfGQBhj4WctZ6eo8IzC6DO8DncsdBMcPVH-46MvOXmLJwHfb4Jt3N1zew9gAoLPJOsDeMAPrFi3aHycBlnFHmw9PesPk2U5_P-oxIb46-EgZG7lz1w5wfHo-jhC12PV9u3QN7R1nOHIjaXhmvrtZQinhRN8pdv0mbPtZBpSO4wVB7XSUQ3ikAb2nAwmD99ZOYAQrvE1fpo1r90KMVw3DHi-vpJL3j2D-EVSqzxAWnVwGJaiZKo65s7EY-S8Ag2xk6dwl6aKA1NsyOpP3SyUFQvXhyGNp18cIT2n_AX8dyiBgT0cGgMcn5uFGUju3fDBKypaspojiDYvoCRT8NDpa7UiVsOGWEdeHmyZH6WP_VsxZdinJBFbOwsCtgGuMwq3eN4XEQv6m9hHbvINCRK0fBa1F8qz3H6rv5t2ZjOTyG3Jq5V6cIQYHU6oZdRh9dUuEBKiQXVwIKFNePv2le=w494-h285-no)
 
