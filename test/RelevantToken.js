@@ -93,7 +93,9 @@ contract('token', accounts => {
 
   it('Calculates and premints the total inflation rewards', async () => {
     retContractBalance = await token.balanceOf(token.address);
+    const retTotalSupply = await token.totalSupply();
     expect(retContractBalance.toString()).to.equal(totalPremint);
+    expect(retTotalSupply.toString()).to.equal(totalPremint);
   });
 
   it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
@@ -105,7 +107,8 @@ contract('token', accounts => {
     retDevFund = await token.developmentFund();
     expect(retDevFund/p).to.equal(0);
     retDevFundBalance = await token.balanceOf(testDevFundAddress);
-    console.log(retDevFundBalance.toString(), 'devFundBalance after 10 rounds');
+    retTotalReleased = await token.totalReleased();
+    console.log('totalReleased after 10 rounds', retTotalReleased.toString(), 'devFundBalance after 10 rounds: ', retDevFundBalance.toString());
     expect(retDevFundBalance/p).to.be.above(0);
   });
 });

@@ -33,7 +33,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   uint256 public currentRound; // only for testing to simulate block progression
 
-
   uint256 public startBlock; // Block number at which the contract is deployed
   uint256 public lastRound; // Round at which the last release was made
   uint256 public lastRoundReward; // Reward of the round where tokens were last released
@@ -122,7 +121,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       // we have to loop through the passed rounds and add up the constant round inflation.
       uint256 totalTokens = totalSupply();
       for (uint i = 0; i < roundsPassed; i++) {
-        uint256 toBeMintedInRound = targetInflation.mul(totalTokens);
+        uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**18);
         releasableTokens = releasableTokens.add(toBeMintedInRound);
         totalTokens = totalTokens.add(toBeMintedInRound);
       }
@@ -133,7 +132,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       if (currentRound < targetRound) {
         // We are still in the decay period
         if (roundsPassed < 1000000000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
-        // If the last release was made less than 24 rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
+        // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
           uint256 roundReward;
           for (uint j = 0; j < roundsPassed; j++) {
             roundReward = roundDecay.mul(lastRoundReward).div(10**18);
@@ -142,14 +141,14 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
           }
         } else {
         // If more rounds have passed we don't want to loop that many times
-        // and therefore use integration using the exponential decay formula
-          releasableTokens = totalIntegral(currentRound).sub(totalReleased);
+        // and therefore use integration using the partial sum formula
+        // releasableTokens = partialSum(currentRound).sub(totalReleased);
         // TODO: still need to set lastRoundReward!
         }
       } else {
         // We have recently crossed from the decay period into the constantInflationPeriod
         // and therefore have to calculate the releasable tokens for both segments separately
-        uint256 releasableFromDecayPeriod = totalIntegral(targetRound).sub(totalReleased);
+        uint256 releasableFromDecayPeriod = partialSum(targetRound).sub(totalReleased);
         uint256 totalTokensK = totalSupply() + releasableFromDecayPeriod;
         uint256 roundsSinceConstInflation = currentRound.sub(targetRound);
         uint256 toBeMintedK;
@@ -172,7 +171,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     // uint256 airdropShare = 0.999988 ** currentRound; // @TODO: figure out decimals / precision
 
     developmentFund = developmentFund.add(releasableTokens.div(5)); // 20% of inflation goes to devFund
-    // NOT WORKING / CULPRIT! :
     toDevFund(); // transfer these out immediately
 
     // Set current round as last release
@@ -200,12 +198,13 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Calculates total number of tokens minted by taking the integral of the block reward function
-    @param _round Round until which the integral is taken
+   * @dev Calculates total number of tokens to be minted during the decay phase until _round
+    @param _round Round until which the partial sum is taken
    */
-  function totalIntegral(uint256 _round) public view returns (uint256) {
-    // TODO: this needs to be worked out! take care of negative signs & use
-    // Power() contract from Bancor - can it help deal with fractional exponent?!
+  function partialSum(uint256 _round) public view returns (uint256) {
+    // TODO: this needs to be worked out! with https://user-images.githubusercontent.com/337721/52804952-7e3f3080-3053-11e9-8bb2-9bc1c3df19ee.jpg
+    // and using Bancor's Power formula for e^x
+    // alternatively use the integral of the reward function:
     // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward)); 
   }
 
