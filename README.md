@@ -1,4 +1,4 @@
-# 3 Inflationary Token Designs [WIP]
+# 4 Inflationary Token Designs [WIP]
 
 
 ## 1 InflationaryToken
@@ -44,6 +44,11 @@ The resulting inflation dynamics will look much smoother, somewhat like this:
 ![ContRewards](https://images.zenhubusercontent.com/5c42fb74b0c6b33edb490cee/08de6f99-96ef-4122-9c5b-b63950579b7c)
 
 
+## 4 RelevantToken (ConstantTargetInflation)
+
+The last inflation mechanism has the rewards decay exponentially, until an inflation rate is reached that should be maintained for the rest of time.
+
+![TargetInflation](https://lh3.googleusercontent.com/Pl5vJV2Fxn3FbKPj_c3DBdDK0bsszcjhJ8MW8Kzc2pBApGMQo6lBPob8ai0Lu6tuN3Nld5RlklpV7keu9vYn1JiL2Jsu_PI3rRegT3hbAfjnGal80Z-m-J1BSxAbk10DrqIqlV1e9vFgyexTahKj8IKzeHfhqc5vufhg4TbWvG3f6IE3rsGa2Uv8YdtzCjD9WLRPbete2NohBh9v_z3NFev9omkXDihOFqp6vHFMCwAvpuNHHmNMtJsER8bCOtYxlRLv_DALv_ZhrCinurTmh3OTD5UjnZLb3aVRmxeVYAfRFVMh0VKfFMvm4c0KSnu-oDSN14qDYrOF7vAEFMRNuzLJJpNVMDA1Gu6WZR_txAQJ8yhKydPLvStfOnh1RQ9OzNh5ygB2O71uxv0AZtfaFvt__e2AycK2TRLTYvuITE31q6bXEogC2UaujxYmMVkcbmbaQSIKxwnBd-ABIgVCJXgHbHZPHRXdlxx68xAO_T6AlYzk7_fuE8c589rJ7GT-5UlGaMPJYyejIiMedksGWaFMHqNKthG6OaUeML2e4FtgfOFTo2M3ExaF9zzVQivJDtnq3DLVr7aYWSpkD-5lPuDxmrBDMj58ZEkkgOSnJEWu3JCRjKXrRDADATt8V4VpbQ1Fhzn7j5HuUMg8FkRiHIf8AFA8rmb7=w456-h283-no)
 
 
 ## Run
