@@ -32,7 +32,7 @@ contract('token', accounts => {
   const roundLength = 1; // 240;
   let roundDecay = 999920876739935000;
   const targetRound = 26703;
-  let totalPremint = 27777044629743800000000000;
+  let totalPremint = 27774544629743800000000000;
 
   // calculate total rewards to be preminted:
 
@@ -48,10 +48,10 @@ contract('token', accounts => {
   console.log('totalPremint', totalPremint / p);
 
   // ugh is there a better way to do this
-  initRoundReward = new BN(initRoundReward).toFixed(0).toString();
-  timeConstant = new BN(timeConstant).toFixed(0).toString();
-  totalPremint = new BN(totalPremint).toFixed(0).toString();
-  roundDecay = new BN(roundDecay).toFixed(0).toString();
+  initRoundReward = new BN(initRoundReward.toString()).toFixed(0).toString();
+  timeConstant = new BN(timeConstant.toString()).toFixed(0).toString();
+  totalPremint = new BN(totalPremint.toString()).toFixed(0).toString();
+  roundDecay = new BN(roundDecay.toString()).toFixed(0).toString();
 
   // string memory _name,
   // uint8 _decimals,
@@ -98,18 +98,15 @@ contract('token', accounts => {
 
   it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
     // Creating mock transactions to increase block number
-    let mockTransactions = [];
-    for (let i = 0; i < 5; i++) {
-      mockTransactions.push(token.blockMiner());
-    }
-    Promise.all(mockTransactions);
     await token.releaseTokens();
+    console.log('Simulating passage of 10 rounds')
     retCurationRewards = await token.rewardFund();
-    expect(retCurationRewards.toNumber()).to.be.above(0);
+    expect(retCurationRewards/p).to.be.above(0);
     retDevFund = await token.developmentFund();
-    expect(retDevFund.toNumber()).to.equal(0);
+    expect(retDevFund/p).to.equal(0);
     retDevFundBalance = await token.balanceOf(testDevFundAddress);
-    expect(retDevFundBalance.toNumber()).to.be.above(0);
+    console.log(retDevFundBalance.toString(), 'devFundBalance after 10 rounds');
+    expect(retDevFundBalance/p).to.be.above(0);
   });
 });
 

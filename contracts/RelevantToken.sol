@@ -31,6 +31,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public roundLength;
   uint256 public roundDecay;
 
+  uint256 public currentRound; // only for testing to simulate block progression
+
+
   uint256 public startBlock; // Block number at which the contract is deployed
   uint256 public lastRound; // Round at which the last release was made
   uint256 public lastRoundReward; // Reward of the round where tokens were last released
@@ -41,8 +44,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public developmentFund; // Bucket of inflationary tokens reserved for development - gets transferred to devFundAddress immediately
   uint256 public allocatedRewards; // Bucket of curation reward tokens reserved/'spoken for' but not yet claimed by users
   uint256 public allocatedAirdrops; // Bucket of airdrop reward tokens reserved/'spoken for' but not yet claimed by users
-
-  uint256 public e; // Euler's number // declared just to make the contract compile TODO: use Bancor Power formula
 
   mapping(address => uint256) nonces;
 
@@ -88,8 +89,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     roundLength = _roundLength;
     roundDecay = _roundDecay;
 
-    e = 2718281828459045235; // e*10^18
-
     startBlock = block.number;
     currRoundReward = initRoundReward;
     lastRound = 0;
@@ -133,13 +132,13 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       // If last release was during the decay period, we must distinguish two cases and within the first case again two more cases:
       if (currentRound < targetRound) {
         // We are still in the decay period
-        if (roundsPassed < 24) {
+        if (roundsPassed < 1000000000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
         // If the last release was made less than 24 rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
           uint256 roundReward;
           for (uint j = 0; j < roundsPassed; j++) {
-            roundReward = roundDecay.mul(lastRoundReward);
-            releasableTokens = releasableTokens.add(roundReward);
+            roundReward = roundDecay.mul(lastRoundReward).div(10**18);
             lastRoundReward = roundReward;
+            releasableTokens = releasableTokens.add(roundReward);
           }
         } else {
         // If more rounds have passed we don't want to loop that many times
@@ -173,6 +172,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     // uint256 airdropShare = 0.999988 ** currentRound; // @TODO: figure out decimals / precision
 
     developmentFund = developmentFund.add(releasableTokens.div(5)); // 20% of inflation goes to devFund
+    // NOT WORKING / CULPRIT! :
     toDevFund(); // transfer these out immediately
 
     // Set current round as last release
@@ -180,7 +180,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     // Increase totalReleased count
     totalReleased = totalReleased.add(releasableTokens);
 
-    emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
+    // emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
 
   }
 
@@ -268,20 +268,15 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
 
   /**
-   * @dev Return current round number
+   * @dev Return current round number // for now every time this gets called it simulates that 100 rounds have passed
+          // TODO: change back to view
    */
-  function roundNum() public view returns (uint256) {
-    return (block.number.sub(startBlock)).div(roundLength);
+  function roundNum() public returns (uint256) {
+  // function roundNum() public view returns (uint256) {
+    // return (block.number.sub(startBlock)).div(roundLength);
+    currentRound = currentRound.add(10);
+    return currentRound;
   }
-
-  /**
-   * @dev Mock transaction to simulate change in block number for testing
-   */
-  // @TODO: remove in production
-  function blockMiner() public {
-    name = "NewDummyNameToMakeStateChange";
-  }
-
 
   /**
   * @dev Nonce of user
