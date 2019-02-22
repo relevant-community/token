@@ -144,9 +144,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   }
 
-  /*
-   * @dev compute number of tokens to release once inflation is constant
-   * @params roundsPassed - number of rounds since last update
+  /** 
+   * @dev Compute number of tokens to release once inflation is constant
+   * @param _roundsPassed Number of rounds since last update
    */
   function newTokensForConstantPhase(uint256 _roundsPassed) internal returns (uint256) {
     uint256 releasableTokens;
@@ -161,9 +161,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     return releasableTokens;
   }
 
-  /*
-   * @dev compute number of tokens to release during decay phase
-   * @params roundsPassed - number of rounds since last update
+  /** 
+   * @dev Compute number of tokens to release during decay phase
+   * @param _roundsPassed Number of rounds since last update
    */
   function newTokensForDecayPhase(uint256 _roundsPassed) internal returns (uint256) {
     uint256 releasableTokens;
@@ -184,10 +184,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     return releasableTokens;
   }
 
-  /*
-   * @dev compute number of tokens to release when last release was during decay phase
+  /**
+   * @dev Compute number of tokens to release when last release was during decay phase
      and current round is in constant inflation phase (-> recently crossed)
-   * @params currentRound
+   * @param _currentRound Round during which current release is made
    */
   function newTokensForCrossingPhase(uint256 _currentRound) internal returns (uint256) {
     uint256 releasableFromDecayPeriod = partialSum(targetRound).sub(totalReleased);
@@ -205,9 +205,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
   
 
-  /*
-   * @dev put new rewards into the different buckets
-   * @params releasableTokens
+  /**
+   * @dev Put new rewards into the different buckets
+   * @param _releasableTokens Amount of tokens that needs to be split up
    */
   function splitRewards(uint256 _releasableTokens) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
@@ -221,7 +221,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   /**
    * @dev Calculates total number of tokens to be minted during the decay phase until _round
-    @param _round Round until which the partial sum is taken
+   * @param _round Round until which the partial sum is taken
    */
   function partialSum(uint256 _round) public view returns (uint256) {
     // TODO: this needs to be worked out! with https://user-images.githubusercontent.com/337721/52804952-7e3f3080-3053-11e9-8bb2-9bc1c3df19ee.jpg
@@ -253,7 +253,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     return true;
   }
 
-
   /**
   * @dev Allocate airdrops
   * @param rewards to be reserved for user claims
@@ -264,7 +263,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     allocatedAirdrops += rewards;
     return true;
   }
-
 
   /**
   * @dev Claim curation reward tokens (to be called by user)
@@ -286,7 +284,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     require(this.transfer(msg.sender, _amount), "Transfer to claimant failed");
     return true;
   }
-
 
   /**
    * @dev Return current round number 
