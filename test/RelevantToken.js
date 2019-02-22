@@ -1,3 +1,8 @@
+const zos = require('zos');
+
+const { TestHelper } = zos;
+console.log(TestHelper);
+
 const RelevantToken = artifacts.require('RelevantToken');
 
 const { expect } = require('chai');
@@ -10,6 +15,7 @@ contract('token', accounts => {
   let retCurationRewards;
   let retDevFund;
   let retDevFundBalance;
+  let retTotalReleased;
 
   const testName = 'Relevant Token';
   const testDecimals = 18;
@@ -101,15 +107,20 @@ contract('token', accounts => {
   it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
     // Creating mock transactions to increase block number
     await token.releaseTokens();
-    console.log('Simulating passage of 10 rounds')
+    console.log('Simulating passage of 10 rounds');
     retCurationRewards = await token.rewardFund();
-    expect(retCurationRewards/p).to.be.above(0);
+    expect(retCurationRewards / p).to.be.above(0);
     retDevFund = await token.developmentFund();
-    expect(retDevFund/p).to.equal(0);
+    expect(retDevFund / p).to.equal(0);
     retDevFundBalance = await token.balanceOf(testDevFundAddress);
     retTotalReleased = await token.totalReleased();
-    console.log('totalReleased after 10 rounds', retTotalReleased.toString(), 'devFundBalance after 10 rounds: ', retDevFundBalance.toString());
-    expect(retDevFundBalance/p).to.be.above(0);
+    console.log(
+      'totalReleased after 10 rounds',
+      retTotalReleased.toString(),
+      'devFundBalance after 10 rounds: ',
+      retDevFundBalance.toString()
+    );
+    expect(retDevFundBalance / p).to.be.above(0);
   });
 });
 

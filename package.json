@@ -18,6 +18,7 @@
   "dependencies": {
     "openzeppelin-eth": "^2.1.2",
     "truffle": "^5.0.4",
+    "zos": "^2.2.0",
     "zos-lib": "^2.1.0"
   },
   "devDependencies": {
