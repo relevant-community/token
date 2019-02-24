@@ -37,7 +37,7 @@ contract('token', accounts => {
   let initRoundReward = 2500 * p;
   const roundLength = 1; // 240;
   let roundDecay = 999920876739935000;
-  const targetRound = 26703;
+  const targetRound = 2; // 26703;
   let totalPremint = 27774544629743800000000000;
 
   // calculate total rewards to be preminted:

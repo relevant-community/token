@@ -8,7 +8,6 @@ import "zos-lib/contracts/Initializable.sol";
 // import "./Power.sol";
 
 
-
 /**
  * @title An Inflationary Token with premint, gradual release, exponential decay of inflationary rewards, and a target inflation rate
  */
@@ -30,12 +29,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public targetRound;
   uint256 public roundLength;
   uint256 public roundDecay;
-
+  uint256 public totalPremint;
   uint256 public currentRound; // only for testing to simulate block progression
-
   uint256 public startBlock; // Block number at which the contract is deployed
   uint256 public lastRound; // Round at which the last release was made
-  uint256 public lastRoundReward; // Reward of the round where tokens were last released
+  uint256 public lastRoundReward; // Reward of the round where tokens were last released (only computed during decay phase)
   uint256 public totalReleased; // All tokens released until and including the last release
 
   uint256 public rewardFund; // Bucket of inflationary tokens available to be allocated for curation rewards
@@ -92,92 +90,87 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     currRoundReward = initRoundReward;
     lastRound = 0;
     lastRoundReward = initRoundReward;
-
+    totalPremint = _totalPremint;
     preMintTokens(_totalPremint);
   }
 
   /**
-   * @dev Mint the number of inflationary tokens until constantInflations are reached
+   * @dev Mint the number of inflationary tokens until constant inflation/target round is reached
    */
-  function preMintTokens(uint256 _toBeMinted) internal {
+  function preMintTokens(uint256 _toBeMinted) internal returns (bool) {
     mint(address(this), _toBeMinted);
+    return true;
   }
 
   /**
-   * @dev Calculate and release currently releasable inflationary rewards.
+   * @dev Compute and release currently releasable inflationary rewards
    */
-  function releaseTokens() public {
+  function releaseTokens() public returns (bool) {
     uint256 releasableTokens;
     uint256 currentRound = roundNum();
-
-    // Check if already called for the current round
-    require(lastRound < currentRound, "No new rewards available");
-
-    // Determine the number of rounds that have passed since the last release
+    require(lastRound < currentRound, "No new rewards available"); // Check if already called for the current round
     uint256 roundsPassed = currentRound.sub(lastRound);
 
     if (lastRound >= targetRound) {
-      // If the decay had already stopped at the time of last release,
-      // we have to loop through the passed rounds and add up the constant round inflation.
-      releasableTokens = newTokensForConstantPhase(roundsPassed);
+      // Last release was during constant inflation, so we are entirely in the constant inflation phase
+      uint256 startTotalTokens = totalSupply(); // This still gives the right number, because the newly accrued tokens have not been minted, yet
+      releasableTokens = newTokensForConstantPhase(startTotalTokens, roundsPassed);
+      mint(address(this), releasableTokens);
     } else {
-      // If last release was during the decay phase, we must distinguish two cases and within the first case again two more cases:
+      // Last release was during the decay phase - 2 nested cases:
       if (currentRound < targetRound) {
-        // We are still in the decay phase
+        // We are currently still in the decay phase - no new mint, since this is covered by the pre-mint
         releasableTokens = newTokensForDecayPhase(roundsPassed);
       } else {
-        // We have recently crossed from the decay period into the constantInflationPeriod
-        // and therefore have to calculate the releasable tokens for both segments separately
-        releasableTokens = newTokensForCrossingPhase(currentRound);
+        // We have recently crossed from the decay phase into the constant inflation phase, so we have to compute separately
+        uint256 releasableFromDecay = newTokensForCrossingDecay();
+        uint256 releasableFromConst = newTokensForCrossingConst(currentRound);
+        releasableTokens = releasableFromDecay.add(releasableFromConst);
+        mint(address(this), releasableFromConst);
       }
     }
 
     splitRewards(releasableTokens); // split into different buckets (rewardFund, airdrop, devFund)
     toDevFund(); // transfer devFund out immediately
-
-    // Set current round as last release
-    lastRound = currentRound;
-    // Increase totalReleased count
-    totalReleased = totalReleased.add(releasableTokens);
-
+    lastRound = currentRound; // Set current round as last release
+    totalReleased = totalReleased.add(releasableTokens); // Increase totalReleased count
     emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
-
+    return true;
   }
 
-  /** 
+  /**
    * @dev Compute number of tokens to release once inflation is constant
-   * @param _roundsPassed Number of rounds since last update
+   * @param _totalTokens Number of tokens in supply at the beginning of the phase for which the rewards are being calculated
+   * @param _roundsPassed Number of rounds since last release
    */
-  function newTokensForConstantPhase(uint256 _roundsPassed) internal returns (uint256) {
+  function newTokensForConstantPhase(uint256 _totalTokens, uint256 _roundsPassed) internal view returns (uint256) {
+    uint256 totalTokens = _totalTokens;
     uint256 releasableTokens;
-    uint256 totalTokens = totalSupply();
     for (uint i = 0; i < _roundsPassed; i++) {
-      uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**18);
+      uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**uint256(decimals));
       releasableTokens = releasableTokens.add(toBeMintedInRound);
       totalTokens = totalTokens.add(toBeMintedInRound);
     }
-    // We still have to mint these
-    mint(address(this), releasableTokens);
     return releasableTokens;
   }
 
-  /** 
+  /**
    * @dev Compute number of tokens to release during decay phase
    * @param _roundsPassed Number of rounds since last update
    */
   function newTokensForDecayPhase(uint256 _roundsPassed) internal returns (uint256) {
     uint256 releasableTokens;
-    // if it is the very first release we have to make sure that initRoundReward is actually released
+    // if it is the very first release we have to make sure that initRoundReward is included in the release
     if (lastRound == 0) {
       releasableTokens = initRoundReward;
     }
-    if (_roundsPassed < 1000000000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
+    if (_roundsPassed < 100000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
     // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
       uint256 roundReward;
       for (uint j = 0; j < _roundsPassed; j++) {
-        roundReward = roundDecay.mul(lastRoundReward).div(10**18);
-        lastRoundReward = roundReward;
+        roundReward = roundDecay.mul(lastRoundReward).div(10**uint256(decimals));
         releasableTokens = releasableTokens.add(roundReward);
+        lastRoundReward = roundReward;
       }
     } else {
     // If more rounds have passed we don't want to loop that many times
@@ -189,37 +182,34 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Compute number of tokens to release when last release was during decay phase
-     and current round is in constant inflation phase (-> recently crossed)
-   * @param _currentRound Round during which current release is made
+   * @dev Compute number of tokens to release from the decay phase when recently crossed
    */
-  function newTokensForCrossingPhase(uint256 _currentRound) internal returns (uint256) {
-    uint256 releasableFromDecayPeriod = partialSum(targetRound).sub(totalReleased);
-    uint256 totalTokens = totalSupply() + releasableFromDecayPeriod;
-    uint256 roundsSinceConstInflation = _currentRound.sub(targetRound);
-    uint256 toBeMinted;
-    for (uint k = 0; k < roundsSinceConstInflation; k++) {
-      uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**18);
-      toBeMinted = toBeMinted.add(toBeMintedInRound);
-      totalTokens = totalTokens.add(toBeMintedInRound);
-    }
-    uint256 releasableTokens = releasableFromDecayPeriod.add(toBeMinted);
-    mint(address(this), toBeMinted);
-    return releasableTokens;
+  function newTokensForCrossingDecay() internal view returns (uint256) {
+    uint256 releasableFromDecayPhase = totalPremint.sub(totalReleased);
+    return releasableFromDecayPhase;
   }
-  
 
   /**
-   * @dev Put new rewards into the different buckets
+   * @dev Compute number of tokens to release from the constant inflation phase when recently crossed
+   * @param _currentRound Round during which current release is made
+   */
+  function newTokensForCrossingConst(uint256 _currentRound) internal view returns (uint256) {
+    uint256 constStartTotalTokens = totalPremint;
+    uint256 roundsSinceConstInflation = _currentRound.sub(targetRound);
+    uint256 toBeMinted = newTokensForConstantPhase(constStartTotalTokens, roundsSinceConstInflation);
+    return toBeMinted;
+  }
+
+  /**
+   * @dev Put new rewards into the different buckets (userRewards: [airdrop, rewardFund], developmentFund)
    * @param _releasableTokens Amount of tokens that needs to be split up
    */
   function splitRewards(uint256 _releasableTokens) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
-    airdropFund += userRewards.div(2);
-    rewardFund += userRewards.div(2);
+    airdropFund = airdropFund.add(userRewards.div(2));
+    rewardFund = rewardFund.add(userRewards.div(2));
     // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
-    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (time)
-    // uint256 airdropShare = 0.999988 ** currentRound; // @TODO: figure out decimals / precision
+    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (roundNumber)
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
   }
 
@@ -234,37 +224,34 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward)); 
   }
 
-
   /**
    * @dev Transfer eligible tokens from devFund bucket to devFundAddress
    */
-
   function toDevFund() internal returns(bool) {
     require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
     developmentFund = 0;
     return true;
   }
 
-
   /**
-  * @dev Allocate rewards
-  * @param rewards to be reserved for users claims
+  * @dev Allocate curation rewards
+  * @param _rewards to be reserved for users claims
   */
-  function allocateRewards(uint256 rewards) public onlyOwner returns(bool) {
-    require(rewards <= rewardFund, "Not enough curation rewards available");
-    rewardFund = rewardFund.sub(rewards);
-    allocatedRewards += rewards;
+  function allocateRewards(uint256 _rewards) public onlyOwner returns(bool) {
+    require(_rewards <= rewardFund, "Not enough curation rewards available");
+    rewardFund = rewardFund.sub(_rewards);
+    allocatedRewards = allocatedRewards.add(_rewards);
     return true;
   }
 
   /**
-  * @dev Allocate airdrops
-  * @param rewards to be reserved for user claims
+  * @dev Allocate airdrop rewards
+  * @param _rewards to be reserved for user claims
   */
-  function allocateAirdrops(uint256 rewards) public onlyOwner returns(bool) {
-    require(rewards <= airdropFund, "Not enough airdrop rewards available");
-    airdropFund = airdropFund.sub(rewards);
-    allocatedAirdrops += rewards;
+  function allocateAirdrops(uint256 _rewards) public onlyOwner returns(bool) {
+    require(_rewards <= airdropFund, "Not enough airdrop rewards available");
+    airdropFund = airdropFund.sub(_rewards);
+    allocatedAirdrops = allocatedAirdrops.add(_rewards);
     return true;
   }
 
@@ -276,7 +263,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   function claimTokens(uint256 _amount, bytes memory _sig) public returns(bool) {
     // check _amount + account matches hash
     require(allocatedRewards >= _amount);
-
     bytes32 hash = keccak256(abi.encodePacked(_amount, msg.sender, nonces[msg.sender]));
     hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
 
@@ -291,13 +277,12 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   /**
    * @dev Return current round number 
-      // for now every time this gets called it simulates that 100 rounds have passed
-      // TODO: change back to view
+      // for now every time this gets called it simulates that some rounds have passed. TODO: change back to view
    */
   function roundNum() public returns (uint256) {
   // function roundNum() public view returns (uint256) {
     // return (block.number.sub(startBlock)).div(roundLength);
-    currentRound = currentRound.add(10);
+    currentRound = currentRound.add(3);
     return currentRound;
   }
 
