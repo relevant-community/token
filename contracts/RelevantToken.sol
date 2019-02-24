@@ -88,7 +88,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
     startBlock = block.number;
     currRoundReward = initRoundReward;
-    lastRound = 0;
+    lastRound = 26704;
     lastRoundReward = initRoundReward;
     totalPremint = _totalPremint;
     preMintTokens(_totalPremint);
@@ -106,6 +106,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Compute and release currently releasable inflationary rewards
    */
   function releaseTokens() public returns (bool) {
+    incRoundNum(26720);
     uint256 releasableTokens;
     uint256 currentRound = roundNum();
     require(lastRound < currentRound, "No new rewards available"); // Check if already called for the current round
@@ -146,7 +147,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   function newTokensForConstantPhase(uint256 _totalTokens, uint256 _roundsPassed) internal view returns (uint256) {
     uint256 totalTokens = _totalTokens;
     uint256 releasableTokens;
-    for (uint i = 0; i < _roundsPassed; i++) {
+    for (uint i = 0; i <= _roundsPassed; i++) {
       uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**uint256(decimals));
       releasableTokens = releasableTokens.add(toBeMintedInRound);
       totalTokens = totalTokens.add(toBeMintedInRound);
@@ -277,13 +278,17 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   /**
    * @dev Return current round number 
-      // for now every time this gets called it simulates that some rounds have passed. TODO: change back to view
    */
-  function roundNum() public returns (uint256) {
-  // function roundNum() public view returns (uint256) {
+  function roundNum() public view returns (uint256) {
     // return (block.number.sub(startBlock)).div(roundLength);
-    currentRound = currentRound.add(3);
     return currentRound;
+  }
+
+  /**
+   * @dev Increase current round number // auxiliary function for testing (simulating block progression)
+   */
+  function incRoundNum(uint256 _incRounds) public returns (uint256) {
+    currentRound = currentRound.add(_incRounds);
   }
 
   /**
