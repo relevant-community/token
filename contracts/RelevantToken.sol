@@ -175,14 +175,14 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     } else {
     // If more rounds have passed we don't want to loop that many times
     // and therefore use integration using the partial sum formula
-    // releasableTokens = partialSum(currentRound).sub(totalReleased);
-    // (then still need to set lastRoundReward!)
+    // releasableTokens = initReward.add(partialSum(currentRound)).sub(totalReleased);
+    // (then still need to set lastRoundReward using A_0*e^(-round/τ))
     }
     return releasableTokens;
   }
 
   /**
-   * @dev Compute number of tokens to release from the decay phase when recently crossed
+   * @dev Compute number of tokens to release from the decay phase when recently crossed to constant inflation phase
    */
   function newTokensForCrossingDecay() internal view returns (uint256) {
     uint256 releasableFromDecayPhase = totalPremint.sub(totalReleased);
@@ -190,7 +190,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Compute number of tokens to release from the constant inflation phase when recently crossed
+   * @dev Compute number of tokens to release from the constant inflation phase when recently crossed from decay phase
    * @param _currentRound Round during which current release is made
    */
   function newTokensForCrossingConst(uint256 _currentRound) internal view returns (uint256) {
