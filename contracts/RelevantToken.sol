@@ -167,6 +167,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    */
   function newTokensForDecayPhase(uint256 _roundsPassed) internal returns (uint256) {
     uint256 releasableTokens;
+    // if it is the very first release we have to make sure that initRoundReward is actually released
+    if (lastRound == 0) {
+      releasableTokens = initRoundReward;
+    }
     if (_roundsPassed < 1000000000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
     // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
       uint256 roundReward;
