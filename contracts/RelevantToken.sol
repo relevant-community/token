@@ -88,7 +88,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
     startBlock = block.number;
     currRoundReward = initRoundReward;
-    lastRound = 26704;
+    lastRound = 0;
     lastRoundReward = initRoundReward;
     totalPremint = _totalPremint;
     preMintTokens(_totalPremint);
@@ -106,7 +106,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Compute and release currently releasable inflationary rewards
    */
   function releaseTokens() public returns (bool) {
-    incRoundNum(26720);
     uint256 releasableTokens;
     uint256 currentRound = roundNum();
     require(lastRound < currentRound, "No new rewards available"); // Check if already called for the current round
@@ -285,10 +284,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Increase current round number // auxiliary function for testing (simulating block progression)
+   * @dev Artificially increases current round number // auxiliary function for testing (simulating block progression)
    */
-  function incRoundNum(uint256 _incRounds) public returns (uint256) {
-    currentRound = currentRound.add(_incRounds);
+  function setRoundNum(uint256 _roundNum) public returns (uint256) {
+    currentRound = _roundNum;
+    return currentRound;
   }
 
   /**

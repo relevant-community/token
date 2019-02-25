@@ -40,6 +40,9 @@ contract('token', accounts => {
   const targetRound = 26704;
   let totalPremint = 27777044629743800000000000;
 
+  let startRoundNum;
+  let incRoundNum;
+
   // calculate total rewards to be preminted:
 
   let roundReward = initRoundReward;
@@ -105,9 +108,13 @@ contract('token', accounts => {
   });
 
   it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
-    // Creating mock transactions to increase block number
+    console.log(
+      `Simulating passage of ${incRoundNum} rounds starting at round ${startRoundNum}`
+    );
+    startRoundNum = 0;
+    incRoundNum = 500;
+    await token.setRoundNum(incRoundNum);
     await token.releaseTokens();
-    console.log('Simulating passage of 10 rounds');
     retCurationRewards = await token.rewardFund();
     expect(retCurationRewards / p).to.be.above(0);
     retDevFund = await token.developmentFund();
@@ -115,12 +122,21 @@ contract('token', accounts => {
     retDevFundBalance = await token.balanceOf(testDevFundAddress);
     retTotalReleased = await token.totalReleased();
     console.log(
-      'totalReleased after 10 rounds',
+      `totalReleased after ${incRoundNum} rounds`,
       retTotalReleased.toString(),
-      'devFundBalance after 10 rounds: ',
+      `devFundBalance after ${incRoundNum} rounds: `,
       retDevFundBalance.toString()
     );
     expect(retDevFundBalance / p).to.be.above(0);
+
+    const newRoundNum = 26720;
+    await token.setRoundNum(newRoundNum);
+    await token.releaseTokens();
+    retTotalReleased = await token.totalReleased();
+    console.log(
+      `totalReleased after ${newRoundNum} rounds`,
+      retTotalReleased.toString()
+    );
   });
 });
 
