@@ -113,7 +113,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
     if (lastRound >= targetRound) {
       // Last release was during constant inflation, so we are entirely in the constant inflation phase
-      uint256 startTotalTokens = totalSupply(); // This still gives the right number, because the newly accrued tokens have not been minted, yet
+      uint256 startTotalTokens = totalReleased;
       releasableTokens = newTokensForConstantPhase(startTotalTokens, roundsPassed);
       mint(address(this), releasableTokens);
     } else {
@@ -146,7 +146,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   function newTokensForConstantPhase(uint256 _totalTokens, uint256 _roundsPassed) internal view returns (uint256) {
     uint256 totalTokens = _totalTokens;
     uint256 releasableTokens;
-    for (uint i = 0; i <= _roundsPassed; i++) {
+    for (uint i = 0; i < _roundsPassed; i++) {
       uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**uint256(decimals));
       releasableTokens = releasableTokens.add(toBeMintedInRound);
       totalTokens = totalTokens.add(toBeMintedInRound);
@@ -195,7 +195,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    */
   function newTokensForCrossingConst(uint256 _currentRound) internal view returns (uint256) {
     uint256 constStartTotalTokens = totalPremint;
-    uint256 roundsSinceConstInflation = _currentRound.sub(targetRound);
+    uint256 roundsSinceConstInflation = _currentRound.sub(targetRound).add(1); // including the mint for target and for current round
     uint256 toBeMinted = newTokensForConstantPhase(constStartTotalTokens, roundsSinceConstInflation);
     return toBeMinted;
   }
@@ -294,7 +294,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   /**
    * @dev Artificially sets the last release round // auxiliary function for testing (simulating reward release)
    */
-  function setLastRoundDecay(uint256 _roundNum, uint256 _lastRoundReward, uint256 _totalReleased) public returns (uint256) {
+  function setLastRound(uint256 _roundNum, uint256 _lastRoundReward, uint256 _totalReleased) public returns (uint256) {
     require(_roundNum < currentRound, "Last release must be before current round");
     lastRound = _roundNum;
     lastRoundReward = _lastRoundReward;
