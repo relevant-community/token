@@ -24,6 +24,7 @@ contract('token', accounts => {
   let retTotalSupply;
   let inflationRewards;
   let totalReleased;
+  let lastRoundReward;
 
   // define contract parameters (TODO: automate tests for different parameters)
   const testName = 'Relevant Token';
@@ -60,22 +61,34 @@ contract('token', accounts => {
   const decayStartCheck3 = 100;
   const decayStartCheck4 = 500; // loop goes through - more rounds cause out of gas error
   const decayMiddleCheck = Math.round(targetRound / 2);
-  const decayEndCheck = targetRound - 300; // again integration
-  // const crossingDecayCheck = targetRound - 20; // again integration
-  // const crossingConstCheck = targetRound + 20; //
+  const decayEndCheck = targetRound - 300;
+  const crossingDecayCheck = targetRound - 20;
+  const crossingConstCheck = targetRound + 20;
   // const constStartCheck = targetRound + 100;
   // const constMiddleCheck = targetRound + 500;
 
   // calculate total rewards using loops with discrete decay factor
   const calcTotalRewards = roundNum => {
-    let roundReward = initRoundReward;
-    let rewardsSum = roundReward;
-    for (let i = 0; i < roundNum; i++) {
-      roundReward *= roundDecay / p;
-      rewardsSum += roundReward;
+    let roundReward;
+    let rewardsSum;
+    if (roundNum < targetRound) {
+      roundReward = initRoundReward;
+      rewardsSum = roundReward;
+      for (let i = 0; i < roundNum; i++) {
+        roundReward *= roundDecay / p;
+        rewardsSum += roundReward;
+      }
+      console.log('computed: ', (rewardsSum / p).toString());
+      return rewardsSum / p;
     }
-    console.log('computed: ', (rewardsSum / p).toString());
-    return rewardsSum / p;
+    let roundsPassed = roundNum - targetRound;
+    let totalTokens = totalPremint;
+    rewardsSum = roundReward;
+    for (let i = 0; i <= roundsPassed; i++) {
+      roundReward = (totalTokens * targetInflation) / p;
+      totalTokens += roundReward;
+    }
+    return totalTokens / p;
   };
 
   // get total released tokens from contract in comparable format
@@ -96,7 +109,7 @@ contract('token', accounts => {
     console.log(`COMPARING FOR ROUNDS ${lastRound} to ${currentRound}`);
     await token.setRoundNum(currentRound);
     if (lastRound !== 0) {
-      const lastRoundReward = new BN(
+      lastRoundReward = new BN(
         (initRoundReward * (roundDecay / p) ** lastRound).toString()
       )
         .toFixed(0)
@@ -155,14 +168,13 @@ contract('token', accounts => {
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 1);
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 100);
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 500);
-    await testForRounds(decayEndCheck, decayEndCheck + 50);
-    // await testForRounds(decayEndCheck);
+    await testForRounds(decayEndCheck, decayEndCheck + 5);
+    await testForRounds(decayEndCheck, decayEndCheck + 100);
   });
 
-  // it('Computes rewards correctly when crossing from decay to constant phase', async () => {
-  //   await testForRounds(crossingDecayCheck);
-  //   await testForRounds(crossingConstCheck);
-  // });
+  it('Computes rewards correctly when crossing from decay to constant phase', async () => {
+    await testForRounds(crossingDecayCheck, crossingConstCheck);
+  });
 
   // it('Computes rewards correctly in the constant inflation phase', async () => {
   //   await testForRounds(constStartCheck);
