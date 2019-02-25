@@ -287,7 +287,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Artificially increases current round number // auxiliary function for testing (simulating block progression)
    */
   function setRoundNum(uint256 _roundNum) public returns (uint256) {
-    require(_roundNum > currentRound, "Round number must increase over time");
     currentRound = _roundNum;
     return currentRound;
   }

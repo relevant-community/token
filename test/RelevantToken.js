@@ -64,8 +64,8 @@ contract('token', accounts => {
   const decayEndCheck = targetRound - 300;
   const crossingDecayCheck = targetRound - 20;
   const crossingConstCheck = targetRound + 20;
-  // const constStartCheck = targetRound + 100;
-  // const constMiddleCheck = targetRound + 500;
+  const constStartCheck = targetRound;
+  const constMiddleCheck = targetRound + 500;
 
   // calculate total rewards using loops with discrete decay factor
   const calcTotalRewards = roundNum => {
@@ -176,10 +176,10 @@ contract('token', accounts => {
     await testForRounds(crossingDecayCheck, crossingConstCheck);
   });
 
-  // it('Computes rewards correctly in the constant inflation phase', async () => {
-  //   await testForRounds(constStartCheck);
-  //   await testForRounds(constMiddleCheck);
-  // });
+  it('Computes rewards correctly in the constant inflation phase', async () => {
+    await testForRounds(constStartCheck, constStartCheck + 1);
+    await testForRounds(constMiddleCheck, constMiddleCheck + 100);
+  });
 
   it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
     retCurationRewards = await token.rewardFund();
