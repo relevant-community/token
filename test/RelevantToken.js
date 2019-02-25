@@ -5,8 +5,13 @@ console.log(TestHelper);
 
 const RelevantToken = artifacts.require('RelevantToken');
 
-const { expect } = require('chai');
+const chai = require('chai');
+
+const { expect } = chai;
 const BN = require('bignumber.js');
+chai.use(require('chai-bignumber')(BN));
+
+const { fromWei } = web3.utils;
 
 contract('token', accounts => {
   let token;
@@ -16,21 +21,17 @@ contract('token', accounts => {
   let retDevFund;
   let retDevFundBalance;
   let retTotalReleased;
+  let retTotalSupply;
+  let inflationRewards;
+  let totalReleased;
 
+  // define contract parameters (TODO: automate tests for different parameters)
   const testName = 'Relevant Token';
   const testDecimals = 18;
   const p = 1e18;
   const testSymbol = 'RVT';
   const testVersion = '1.0';
-
   const testDevFundAddress = accounts[0];
-  // // should be a multiple of a power of 2,to allow halving without floating point arithmetic
-  // const testInitBlockReward = 2;
-  // // block rewards halve after halvingTime blocks
-  // const testHalvingTime = 2;
-  // // block rewards stay constant after lastHalvingPeriod * halvingTime
-  // const testLastHalvingPeriod = 1;
-
   const halfLife = 8760; // # of rounds to decay by half
   let timeConstant = (halfLife / Math.LN2) * p;
   const targetInflation = 10880216701148;
@@ -40,58 +41,94 @@ contract('token', accounts => {
   const targetRound = 26704;
   let totalPremint = 27777044629743800000000000;
 
-  let startRoundNum;
-  let incRoundNum;
+  // transform big number parameters for contract initialization
+  // (ugh is there a better way to do this?)
+  let initRoundRewardBNString = new BN(initRoundReward.toString())
+    .toFixed(0)
+    .toString();
+  let timeConstantBNString = new BN(timeConstant.toString())
+    .toFixed(0)
+    .toString();
+  let totalPremintBNString = new BN(totalPremint.toString())
+    .toFixed(0)
+    .toString();
+  let roundDecayBNString = new BN(roundDecay.toString()).toFixed(0).toString();
 
-  // calculate total rewards to be preminted:
+  // Define test release schedule (TODO: automate tests for different release schedules)
+  const decayStartCheck1 = 1;
+  const decayStartCheck2 = 24;
+  const decayStartCheck3 = 100;
+  const decayStartCheck4 = 500; // loop goes through - more rounds cause out of gas error
+  const decayMiddleCheck = Math.round(targetRound / 2);
+  const decayEndCheck = targetRound - 300; // again integration
+  // const crossingDecayCheck = targetRound - 20; // again integration
+  // const crossingConstCheck = targetRound + 20; //
+  // const constStartCheck = targetRound + 100;
+  // const constMiddleCheck = targetRound + 500;
 
-  let roundReward = initRoundReward;
-  let totalInflationRewards = roundReward;
+  // calculate total rewards using loops with discrete decay factor
+  const calcTotalRewards = roundNum => {
+    let roundReward = initRoundReward;
+    let rewardsSum = roundReward;
+    for (let i = 0; i < roundNum; i++) {
+      roundReward *= roundDecay / p;
+      rewardsSum += roundReward;
+    }
+    console.log('computed: ', (rewardsSum / p).toString());
+    return rewardsSum / p;
+  };
 
-  for (let i = 0; i < targetRound; i++) {
-    roundReward *= roundDecay / p;
-    totalInflationRewards += roundReward;
-  }
+  // get total released tokens from contract in comparable format
+  const getReleasedTokens = async () => {
+    retTotalReleased = await token.totalReleased();
+    console.log('released: ', (retTotalReleased / p).toString());
+    const result = fromWei(retTotalReleased.toString());
+    return result;
+  };
 
-  console.log('Total Rewards', totalInflationRewards / p);
+  // calculate total premint
+  const totalInflationRewards = calcTotalRewards(targetRound);
+  console.log('Total Rewards', totalInflationRewards);
   console.log('totalPremint', totalPremint / p);
 
-  // ugh is there a better way to do this
-  initRoundReward = new BN(initRoundReward.toString()).toFixed(0).toString();
-  timeConstant = new BN(timeConstant.toString()).toFixed(0).toString();
-  totalPremint = new BN(totalPremint.toString()).toFixed(0).toString();
-  roundDecay = new BN(roundDecay.toString()).toFixed(0).toString();
+  // calculate rewards and compare with released rewards from contract
+  const testForRounds = async (lastRound, currentRound) => {
+    console.log(`COMPARING FOR ROUNDS ${lastRound} to ${currentRound}`);
+    await token.setRoundNum(currentRound);
+    if (lastRound !== 0) {
+      const lastRoundReward = new BN(
+        (initRoundReward * (roundDecay / p) ** lastRound).toString()
+      )
+        .toFixed(0)
+        .toString();
+      totalReleased = new BN((calcTotalRewards(lastRound) * p).toString())
+        .toFixed(0)
+        .toString();
+      await token.setLastRoundDecay(lastRound, lastRoundReward, totalReleased);
+    }
+    await token.releaseTokens();
+    totalReleased = await getReleasedTokens();
+    inflationRewards = calcTotalRewards(currentRound);
+    expect(totalReleased).to.be.bignumber.above(inflationRewards - 0.00001);
+    expect(totalReleased).to.be.bignumber.below(inflationRewards + 0.00001);
+  };
 
-  // string memory _name,
-  // uint8 _decimals,
-  // string memory _symbol,
-  // string memory _version,
-  // address _devFundAddress,
-  // uint256 _initRoundReward,
-  // uint256 _timeConstant,
-  // uint256 _targetInflation,
-  // uint256 _targetRound,
-  // uint256 _roundLength,
-  // uint256 _roundDecay,
-  // uint256 _totalPremint
   before(async () => {
     token = await RelevantToken.new();
-
     expect(token.address).to.exist;
-
     await token.initialize(
       testName,
       testDecimals,
       testSymbol,
       testVersion,
       testDevFundAddress,
-      initRoundReward,
-      timeConstant,
+      initRoundRewardBNString,
+      timeConstantBNString,
       targetInflation,
       targetRound,
       roundLength,
-      roundDecay,
-      totalPremint
+      roundDecayBNString,
+      totalPremintBNString
     );
   });
 
@@ -100,21 +137,39 @@ contract('token', accounts => {
     expect(retOwner.toString()).to.equal(accounts[0]);
   });
 
-  it('Calculates and premints the total inflation rewards', async () => {
+  it('Premints the total inflation rewards for decay phase', async () => {
     retContractBalance = await token.balanceOf(token.address);
-    const retTotalSupply = await token.totalSupply();
-    expect(retContractBalance.toString()).to.equal(totalPremint);
-    expect(retTotalSupply.toString()).to.equal(totalPremint);
+    retTotalSupply = await token.totalSupply();
+    expect(retContractBalance.toString()).to.equal(totalPremintBNString);
+    expect(retTotalSupply.toString()).to.equal(totalPremintBNString);
   });
 
+  it('Computes rewards correctly at the start of decay phase', async () => {
+    totalReleased = await testForRounds(0, decayStartCheck1);
+    await testForRounds(0, decayStartCheck2);
+    await testForRounds(0, decayStartCheck3);
+    await testForRounds(0, decayStartCheck4);
+  });
+
+  it('Computes rewards correctly in the middle and end of the decay phase', async () => {
+    await testForRounds(decayMiddleCheck, decayMiddleCheck + 1);
+    await testForRounds(decayMiddleCheck, decayMiddleCheck + 100);
+    await testForRounds(decayMiddleCheck, decayMiddleCheck + 500);
+    await testForRounds(decayEndCheck, decayEndCheck + 50);
+    // await testForRounds(decayEndCheck);
+  });
+
+  // it('Computes rewards correctly when crossing from decay to constant phase', async () => {
+  //   await testForRounds(crossingDecayCheck);
+  //   await testForRounds(crossingConstCheck);
+  // });
+
+  // it('Computes rewards correctly in the constant inflation phase', async () => {
+  //   await testForRounds(constStartCheck);
+  //   await testForRounds(constMiddleCheck);
+  // });
+
   it('Releases rewards into buckets over time and transfers devFund to devFundAddress', async () => {
-    console.log(
-      `Simulating passage of ${incRoundNum} rounds starting at round ${startRoundNum}`
-    );
-    startRoundNum = 0;
-    incRoundNum = 500;
-    await token.setRoundNum(incRoundNum);
-    await token.releaseTokens();
     retCurationRewards = await token.rewardFund();
     expect(retCurationRewards / p).to.be.above(0);
     retDevFund = await token.developmentFund();
@@ -122,21 +177,12 @@ contract('token', accounts => {
     retDevFundBalance = await token.balanceOf(testDevFundAddress);
     retTotalReleased = await token.totalReleased();
     console.log(
-      `totalReleased after ${incRoundNum} rounds`,
-      retTotalReleased.toString(),
-      `devFundBalance after ${incRoundNum} rounds: `,
-      retDevFundBalance.toString()
+      'totalReleased',
+      (retTotalReleased / p).toString(),
+      'devFundBalance',
+      (retDevFundBalance / p).toString()
     );
     expect(retDevFundBalance / p).to.be.above(0);
-
-    const newRoundNum = 26720;
-    await token.setRoundNum(newRoundNum);
-    await token.releaseTokens();
-    retTotalReleased = await token.totalReleased();
-    console.log(
-      `totalReleased after ${newRoundNum} rounds`,
-      retTotalReleased.toString()
-    );
   });
 });
 

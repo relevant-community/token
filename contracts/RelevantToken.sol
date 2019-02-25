@@ -276,7 +276,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Return current round number 
+   * @dev Return current round number // using the state variable set by setRoundNum, for testing
    */
   function roundNum() public view returns (uint256) {
     // return (block.number.sub(startBlock)).div(roundLength);
@@ -287,8 +287,20 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Artificially increases current round number // auxiliary function for testing (simulating block progression)
    */
   function setRoundNum(uint256 _roundNum) public returns (uint256) {
+    require(_roundNum > currentRound, "Round number must increase over time");
     currentRound = _roundNum;
     return currentRound;
+  }
+
+  /**
+   * @dev Artificially sets the last release round // auxiliary function for testing (simulating reward release)
+   */
+  function setLastRoundDecay(uint256 _roundNum, uint256 _lastRoundReward, uint256 _totalReleased) public returns (uint256) {
+    require(_roundNum < currentRound, "Last release must be before current round");
+    lastRound = _roundNum;
+    lastRoundReward = _lastRoundReward;
+    totalReleased = _totalReleased;
+    return lastRound;
   }
 
   /**

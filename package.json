@@ -16,8 +16,10 @@
   "author": "Achill Rudolph",
   "license": "ISC",
   "dependencies": {
+    "chai-bignumber": "^3.0.0",
     "openzeppelin-eth": "^2.1.2",
     "truffle": "^5.0.4",
+    "web3": "^1.0.0-beta.46",
     "zos": "^2.2.0",
     "zos-lib": "^2.1.0"
   },
