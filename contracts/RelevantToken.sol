@@ -276,6 +276,15 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
+  * @dev Nonce of user
+  * @param _account User account address
+  * @return nonce of user
+  */
+  function nonceOf(address _account) public view returns(uint256) {
+    return nonces[_account];
+  }
+
+  /**
    * @dev Return current round number // using the state variable set by setRoundNum, for testing
    */
   function roundNum() public view returns (uint256) {
@@ -299,16 +308,18 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     lastRound = _roundNum;
     lastRoundReward = _lastRoundReward;
     totalReleased = _totalReleased;
+    rewardFund = _totalReleased.mul(2).div(5);
+    airdropFund = _totalReleased.mul(2).div(5);
+    // devFund is always 0 since it gets transferred right away 
     return lastRound;
   }
 
   /**
-  * @dev Nonce of user
-  * @param _account User account address
-  * @return nonce of user
-  */
-  function nonceOf(address _account) public view returns(uint256) {
-    return nonces[_account];
+   * @dev Artificially empties the devFund account of all accumulated tokens // auxiliary function for testing
+   */
+  function emptyDevBalance() public {
+    uint devBalance = balanceOf(devFundAddress);
+    this.transferFrom(devFundAddress, address(0x123), devBalance);
   }
 
 }

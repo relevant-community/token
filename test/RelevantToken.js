@@ -18,6 +18,7 @@ contract('token', accounts => {
   let retOwner;
   let retContractBalance;
   let retCurationRewards;
+  let retAirdropRewards;
   let retDevFund;
   let retDevFundBalance;
   let retTotalReleased;
@@ -25,6 +26,11 @@ contract('token', accounts => {
   let inflationRewards;
   let totalReleased;
   let lastRoundRewardDecay;
+  let curationRewards;
+  let airdropRewards;
+  let devFundBalance;
+  let allocatedAirdrops;
+  let allocatedRewards;
 
   // define contract parameters (TODO: automate tests for different parameters)
   const testName = 'Relevant Token';
@@ -55,7 +61,7 @@ contract('token', accounts => {
     .toString();
   let roundDecayBNString = new BN(roundDecay.toString()).toFixed(0).toString();
 
-  // compute total rewards using loops with discrete decay factor
+  // compute total rewards accumulated until roundNum using loops with discrete decay factor
   const calcTotalRewards = roundNum => {
     let roundReward;
     let rewardsSum;
@@ -66,21 +72,42 @@ contract('token', accounts => {
         roundReward *= roundDecay / p;
         rewardsSum += roundReward;
       }
-      return rewardsSum / p;
+    } else {
+      rewardsSum = totalPremint;
+      let roundsPassedSinceConst = roundNum - targetRound;
+      for (let i = 0; i <= roundsPassedSinceConst; i++) {
+        roundReward = (rewardsSum * targetInflation) / p;
+        rewardsSum += roundReward;
+      }
     }
-    let roundsPassedSinceConst = roundNum - targetRound;
-    let totalTokens = totalPremint;
-    for (let i = 0; i <= roundsPassedSinceConst; i++) {
-      roundReward = (totalTokens * targetInflation) / p;
-      totalTokens += roundReward;
-    }
-    return totalTokens / p;
+    return rewardsSum / p;
   };
 
-  // get total released tokens from contract in comparable format
+  // get total released tokens from contract in comparable number format
   const getReleasedTokens = async () => {
     retTotalReleased = await token.totalReleased();
     const result = fromWei(retTotalReleased.toString());
+    return result;
+  };
+
+  // get curation rewards from contract in comparable number format
+  const getCurationRewards = async () => {
+    retCurationRewards = await token.rewardFund();
+    const result = fromWei(retCurationRewards.toString());
+    return result;
+  };
+
+  // get airdrop rewards from contract in comparable number format
+  const getAirdropRewards = async () => {
+    retAirdropRewards = await token.airdropFund();
+    const result = fromWei(retAirdropRewards.toString());
+    return result;
+  };
+
+  // get token balance of devFundAddress in comparable number format
+  const getDevFundBalance = async () => {
+    retDevFundBalance = await token.balanceOf(testDevFundAddress);
+    const result = fromWei(retDevFundBalance.toString());
     return result;
   };
 
@@ -89,25 +116,24 @@ contract('token', accounts => {
   console.log('Total Rewards', totalInflationRewards);
   console.log('totalPremint', totalPremint / p);
 
-  // calculate rewards and compare with released rewards from contract
+  // compute rewards from ]lastRound, currentRound] and compare to released
   const testForRounds = async (lastRound, currentRound) => {
     console.log(`COMPARING FOR ROUNDS ${lastRound + 1} to ${currentRound}`);
     await token.setRoundNum(currentRound);
-    if (lastRound !== 0) {
-      lastRoundRewardDecay = new BN(
-        (initRoundReward * (roundDecay / p) ** lastRound).toString()
-      )
-        .toFixed(0)
-        .toString();
-      totalReleased = new BN((calcTotalRewards(lastRound) * p).toString())
-        .toFixed(0)
-        .toString();
-      await token.setLastRound(lastRound, lastRoundRewardDecay, totalReleased);
-      // if (lastRound === targetRound) {
-      //   await token.setLastRound(lastRound, lastRoundReward, totalPremintBNString);
-      // }
+    // compute the last release data to simulate contract state at current release
+    lastRoundRewardDecay = new BN(
+      (initRoundReward * (roundDecay / p) ** lastRound).toString()
+    )
+      .toFixed(0)
+      .toString();
+    totalReleased = new BN((calcTotalRewards(lastRound) * p).toString())
+      .toFixed(0)
+      .toString();
+    if (lastRound === 0) {
+      // Usually the rewards from lastRound have already been released. Round 0 is an exception.
+      totalReleased = 0;
     }
-
+    await token.setLastRound(lastRound, lastRoundRewardDecay, totalReleased);
     await token.releaseTokens();
     totalReleased = await getReleasedTokens();
     inflationRewards = calcTotalRewards(currentRound);
@@ -148,14 +174,14 @@ contract('token', accounts => {
     expect(retTotalSupply.toString()).to.equal(totalPremintBNString);
   });
 
-  it('Computes rewards correctly at the start of decay phase', async () => {
+  it('Computes total rewards correctly at the start of decay phase', async () => {
     totalReleased = await testForRounds(0, 1);
     await testForRounds(0, 24);
     await testForRounds(0, 100);
     await testForRounds(0, 500);
   });
 
-  it('Computes rewards correctly in the middle and end of the decay phase', async () => {
+  it('Computes total rewards correctly in the middle and end of the decay phase', async () => {
     const decayMiddleCheck = Math.round(targetRound / 2);
     const decayEndCheck = targetRound - 300;
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 1);
@@ -165,34 +191,92 @@ contract('token', accounts => {
     await testForRounds(decayEndCheck, decayEndCheck + 100);
   });
 
-  it('Computes rewards correctly when crossing from decay to constant phase', async () => {
+  it('Computes total rewards correctly when crossing from decay to constant phase', async () => {
     await testForRounds(targetRound - 1, targetRound);
     await testForRounds(targetRound - 1, targetRound + 10);
     await testForRounds(targetRound - 5, targetRound + 5);
   });
 
-  it('Computes rewards correctly in the constant inflation phase', async () => {
+  it('Computes total rewards correctly in the constant inflation phase', async () => {
     const constMiddleCheck = targetRound + 500;
     await testForRounds(targetRound, targetRound + 1);
     await testForRounds(constMiddleCheck, constMiddleCheck + 100);
   });
 
-  it('Releases rewards into buckets and transfers devFund to devFundAddress', async () => {
-    retTotalReleased = await token.totalReleased();
-    // take 1/5 and 4/5
-    retCurationRewards = await token.rewardFund();
-    expect(retCurationRewards / p).to.be.above(0);
-    retDevFund = await token.developmentFund();
-    expect(retDevFund / p).to.equal(0);
-    retDevFundBalance = await token.balanceOf(testDevFundAddress);
-    console.log(
-      'totalReleased',
-      (retTotalReleased / p).toString(),
-      'devFundBalance',
-      (retDevFundBalance / p).toString()
+  it('Splits user rewards into curation and airdrop buckets', async () => {
+    await testForRounds(0, 100);
+    totalReleased = await getReleasedTokens();
+    console.log(totalReleased);
+    curationRewards = await getCurationRewards();
+    airdropRewards = await getAirdropRewards();
+    // for now the contract splits user rewards 50/50 into curation and aidrops
+    // (together 4/5th of total)
+    expect(curationRewards).to.be.bignumber.below(
+      (totalReleased * 2) / 5 + 0.00001
     );
-    expect(retDevFundBalance / p).to.be.above(0);
+    expect(curationRewards).to.be.bignumber.above(
+      (totalReleased * 2) / 5 - 0.00001
+    );
+    expect(airdropRewards).to.be.bignumber.below(
+      (totalReleased * 2) / 5 + 0.00001
+    );
+    expect(airdropRewards).to.be.bignumber.above(
+      (totalReleased * 2) / 5 - 0.00001
+    );
   });
+
+  it('Transfers devFund to devFundAddress', async () => {
+    // devFund should be empty, because every release
+    // automatically transfers those rewards to devFundAddress
+    retDevFund = await token.developmentFund();
+    expect(retDevFund.toNumber()).to.equal(0);
+    retDevFundBalance = await token.balanceOf(testDevFundAddress);
+    // transfer all tokens out of testDevFundAddress,
+    // that have accumulated through the previous tests
+    await token.approve(token.address, retDevFundBalance, {
+      from: testDevFundAddress
+    });
+    await token.emptyDevBalance();
+    devFundBalance = await getDevFundBalance();
+    expect(devFundBalance).to.be.bignumber.equal(0);
+    // simulate some rounds
+    await testForRounds(0, 100);
+    totalReleased = await getReleasedTokens();
+    devFundBalance = await getDevFundBalance();
+    // devFundAddress should get 1/5th of all rewards
+    expect(devFundBalance).to.be.bignumber.below(totalReleased / 5 + 0.00001);
+    expect(devFundBalance).to.be.bignumber.above(totalReleased / 5 - 0.00001);
+  });
+
+  it('Allocates user and airdrop rewards', async () => {
+    // allocated rewards should be 0 since we have not allocated yet
+    allocatedRewards = await token.allocatedRewards();
+    allocatedAirdrops = await token.allocatedAirdrops();
+    expect(allocatedRewards.toNumber()).to.equal(0);
+    expect(allocatedAirdrops.toNumber()).to.equal(0);
+    // check available rewards
+    retCurationRewards = await token.rewardFund();
+    retAirdropRewards = await token.airdropFund();
+    // allocate all available rewards
+    await token.allocateRewards(retCurationRewards);
+    await token.allocateAirdrops(retAirdropRewards);
+    // allocated rewards should be equal to previously available rewards
+    // and available rewards should now be 0 again
+    allocatedRewards = await token.allocatedRewards();
+    allocatedAirdrops = await token.allocatedAirdrops();
+    expect(allocatedRewards.toString()).to.be.bignumber.equal(
+      retCurationRewards.toString()
+    );
+    expect(allocatedAirdrops.toString()).to.be.bignumber.equal(
+      retAirdropRewards.toString()
+    );
+    retCurationRewards = await token.rewardFund();
+    retAirdropRewards = await token.airdropFund();
+    expect(retCurationRewards.toNumber()).to.equal(0);
+    expect(retAirdropRewards.toNumber()).to.equal(0);
+  });
+
+  it('Allows user to claim rewards', async () => {});
 });
 
 // TODO: add tests for upgradeability (https://docs.zeppelinos.org/docs/testing.html)
