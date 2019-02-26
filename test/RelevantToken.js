@@ -55,17 +55,7 @@ contract('token', accounts => {
     .toString();
   let roundDecayBNString = new BN(roundDecay.toString()).toFixed(0).toString();
 
-  // Define test release schedule (TODO: automate tests for different release schedules)
-  const decayStartCheck1 = 1;
-  const decayStartCheck2 = 24;
-  const decayStartCheck3 = 100;
-  const decayStartCheck4 = 500; // loop goes through - more rounds cause out of gas error
-  const decayMiddleCheck = Math.round(targetRound / 2);
-  const decayEndCheck = targetRound - 300;
-  const constStartCheck = targetRound;
-  const constMiddleCheck = targetRound + 500;
-
-  // calculate total rewards using loops with discrete decay factor
+  // compute total rewards using loops with discrete decay factor
   const calcTotalRewards = roundNum => {
     let roundReward;
     let rewardsSum;
@@ -76,7 +66,6 @@ contract('token', accounts => {
         roundReward *= roundDecay / p;
         rewardsSum += roundReward;
       }
-      console.log('computed: ', (rewardsSum / p).toString());
       return rewardsSum / p;
     }
     let roundsPassedSinceConst = roundNum - targetRound;
@@ -91,7 +80,6 @@ contract('token', accounts => {
   // get total released tokens from contract in comparable format
   const getReleasedTokens = async () => {
     retTotalReleased = await token.totalReleased();
-    console.log('released: ', (retTotalReleased / p).toString());
     const result = fromWei(retTotalReleased.toString());
     return result;
   };
@@ -115,7 +103,6 @@ contract('token', accounts => {
         .toFixed(0)
         .toString();
       await token.setLastRound(lastRound, lastRoundRewardDecay, totalReleased);
-      console.log('last release', totalReleased / p);
       // if (lastRound === targetRound) {
       //   await token.setLastRound(lastRound, lastRoundReward, totalPremintBNString);
       // }
@@ -124,6 +111,8 @@ contract('token', accounts => {
     await token.releaseTokens();
     totalReleased = await getReleasedTokens();
     inflationRewards = calcTotalRewards(currentRound);
+    console.log('computed: ', inflationRewards.toString());
+    console.log('released: ', totalReleased.toString());
     expect(totalReleased).to.be.bignumber.above(inflationRewards - 0.00001);
     expect(totalReleased).to.be.bignumber.below(inflationRewards + 0.00001);
   };
@@ -160,13 +149,15 @@ contract('token', accounts => {
   });
 
   it('Computes rewards correctly at the start of decay phase', async () => {
-    totalReleased = await testForRounds(0, decayStartCheck1);
-    await testForRounds(0, decayStartCheck2);
-    await testForRounds(0, decayStartCheck3);
-    await testForRounds(0, decayStartCheck4);
+    totalReleased = await testForRounds(0, 1);
+    await testForRounds(0, 24);
+    await testForRounds(0, 100);
+    await testForRounds(0, 500);
   });
 
   it('Computes rewards correctly in the middle and end of the decay phase', async () => {
+    const decayMiddleCheck = Math.round(targetRound / 2);
+    const decayEndCheck = targetRound - 300;
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 1);
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 100);
     await testForRounds(decayMiddleCheck, decayMiddleCheck + 500);
@@ -175,11 +166,14 @@ contract('token', accounts => {
   });
 
   it('Computes rewards correctly when crossing from decay to constant phase', async () => {
+    await testForRounds(targetRound - 1, targetRound);
     await testForRounds(targetRound - 1, targetRound + 10);
+    await testForRounds(targetRound - 5, targetRound + 5);
   });
 
   it('Computes rewards correctly in the constant inflation phase', async () => {
-    await testForRounds(constStartCheck, constStartCheck + 1);
+    const constMiddleCheck = targetRound + 500;
+    await testForRounds(targetRound, targetRound + 1);
     await testForRounds(constMiddleCheck, constMiddleCheck + 100);
   });
 
