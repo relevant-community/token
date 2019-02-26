@@ -11,7 +11,7 @@ const { expect } = chai;
 const BN = require('bignumber.js');
 chai.use(require('chai-bignumber')(BN));
 
-const { fromWei } = web3.utils;
+const { fromWei, soliditySha3 } = web3.utils;
 
 contract('token', accounts => {
   let token;
@@ -118,7 +118,7 @@ contract('token', accounts => {
 
   // compute rewards from ]lastRound, currentRound] and compare to released
   const testForRounds = async (lastRound, currentRound) => {
-    console.log(`COMPARING FOR ROUNDS ${lastRound + 1} to ${currentRound}`);
+    console.log(`COMPARING FOR ROUNDS ]${lastRound}, ${currentRound}]`);
     await token.setRoundNum(currentRound);
     // compute the last release data to simulate contract state at current release
     lastRoundRewardDecay = new BN(
@@ -276,7 +276,33 @@ contract('token', accounts => {
     expect(retAirdropRewards.toNumber()).to.equal(0);
   });
 
-  it('Allows user to claim rewards', async () => {});
+  it('Allows user to claim rewards and fails with used nonce', async () => {
+    let amount = await token.allocatedRewards.call();
+    let startBalance = await token.balanceOf(accounts[1]);
+
+    let nonce = await token.nonceOf.call(accounts[1]);
+    let hash = soliditySha3(amount, accounts[1], nonce.toNumber());
+    let sig = await web3.eth.sign(hash, accounts[0]);
+
+    let claimTokens = await token.claimTokens(amount, sig, {
+      from: accounts[1]
+    });
+    console.log('claimTokens gas ', claimTokens.receipt.gasUsed);
+
+    let endBalance = await token.balanceOf(accounts[1]);
+    expect(endBalance.sub(startBalance).toString()).to.bignumber.equal(
+      amount.toString()
+    );
+
+    // should fail with previous nonce
+    let didThrow = false;
+    try {
+      await token.claimTokens(amount, sig, { from: accounts[1] });
+    } catch (e) {
+      didThrow = true;
+    }
+    expect(didThrow).to.be.true;
+  });
 });
 
 // TODO: add tests for upgradeability (https://docs.zeppelinos.org/docs/testing.html)
