@@ -13,6 +13,7 @@ module.exports = {
       gas: 5000000,
       gasPrice: 5e9,
       network_id: '*'
+      // network_id: 5777
     }
   }
 };

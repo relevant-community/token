@@ -15,7 +15,6 @@ import "zos-lib/contracts/Initializable.sol";
 contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   event Released(uint256 releasableTokens, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
-  // event ParameterUpdate(string param);
 
   string public name;
   uint8 public decimals;
@@ -38,6 +37,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   uint256 public rewardFund; // Bucket of inflationary tokens available to be allocated for curation rewards
   uint256 public airdropFund; // Bucket of inflationary tokens available for airdrops/new user/referral rewards
+  uint256 public reserveFund; // Reserve bucket - these tokens are reserved for main protocol launch;
   uint256 public developmentFund; // Bucket of inflationary tokens reserved for development - gets transferred to devFundAddress immediately
   uint256 public allocatedRewards; // Bucket of curation reward tokens reserved/'spoken for' but not yet claimed by users
   uint256 public allocatedAirdrops; // Bucket of airdrop reward tokens reserved/'spoken for' but not yet claimed by users
@@ -206,8 +206,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    */
   function splitRewards(uint256 _releasableTokens) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
-    airdropFund = airdropFund.add(userRewards.div(2));
-    rewardFund = rewardFund.add(userRewards.div(2));
+    airdropFund = airdropFund.add(userRewards.div(3));
+    rewardFund = rewardFund.add(userRewards.div(3));
+    reserveFund = reserveFund.add(userRewards.div(3));
     // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
     // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (roundNumber)
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
@@ -288,39 +289,14 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Return current round number // using the state variable set by setRoundNum, for testing
    */
   function roundNum() public view returns (uint256) {
-    // return (block.number.sub(startBlock)).div(roundLength);
-    return currentRound;
+    return (block.number.sub(startBlock)).div(roundLength);
   }
 
   /**
-   * @dev Artificially increases current round number // auxiliary function for testing (simulating block progression)
+   * @dev Return rounds since last release
    */
-  function setRoundNum(uint256 _roundNum) public returns (uint256) {
-    currentRound = _roundNum;
-    return currentRound;
+  function roundsSincleLast() public view returns (uint256) {
+    return roundNum() - lastRound;
   }
-
-  /**
-   * @dev Artificially sets the last release round // auxiliary function for testing (simulating reward release)
-   */
-  function setLastRound(uint256 _roundNum, uint256 _lastRoundReward, uint256 _totalReleased) public returns (uint256) {
-    require(_roundNum < currentRound, "Last release must be before current round");
-    lastRound = _roundNum;
-    lastRoundReward = _lastRoundReward;
-    totalReleased = _totalReleased;
-    rewardFund = _totalReleased.mul(2).div(5);
-    airdropFund = _totalReleased.mul(2).div(5);
-    // devFund is always 0 since it gets transferred right away 
-    return lastRound;
-  }
-
-  /**
-   * @dev Artificially empties the devFund account of all accumulated tokens // auxiliary function for testing
-   */
-  function emptyDevBalance() public {
-    uint devBalance = balanceOf(devFundAddress);
-    this.transferFrom(devFundAddress, address(0x123), devBalance);
-  }
-
 }
 
