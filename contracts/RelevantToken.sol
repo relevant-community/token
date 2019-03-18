@@ -44,6 +44,12 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   mapping(address => uint256) nonces;
 
+  // added in upgrade #1
+  uint256 public initRoundAirdrop; // Initial airdrop amount (<= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
+  uint256 public lastRoundAirdrop; // Airdrop of the round where tokens were last released
+  uint256 public airdropRoundDecay;
+
+
   /**
    * @dev ContPreInflationaryToken constructor
    * @param _devFundAddress         Address that receives and manages newly minted tokens for development fund
@@ -54,6 +60,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @param _roundLength            Number of blocks that make up an inflation release round
    * @param _roundDecay             Decay factor for the reward reduction during one round - can be calculated from timeConstant and roundLength
    * @param _totalPremint           Rewards that are preminted (all until decay stops) - can be calculated from timeConstant, initRoundReward and targetInflation
+   * @param _airdropRoundDecay      Decay factor for the airdrops reduction during one round - should be much higher than roundDecay => airdrops decrease faster
    */
   function initialize(
     string memory _name,
@@ -67,7 +74,8 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 _targetRound,
     uint256 _roundLength,
     uint256 _roundDecay,
-    uint256 _totalPremint
+    uint256 _totalPremint,
+    uint256 _airdropRoundDecay
   )   public
     initializer
   {
@@ -92,6 +100,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     lastRoundReward = initRoundReward;
     totalPremint = _totalPremint;
     preMintTokens(_totalPremint);
+
+    // added in upgrade #1
+    initRoundAirdrop = initRoundReward; // can change this to anything below initRoundReward (passing additional argument)
+    lastRoundAirdrop = initRoundAirdrop;
+    airdropRoundDecay = _airdropRoundDecay;
   }
 
   /**
@@ -130,7 +143,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       }
     }
 
-    splitRewards(releasableTokens); // split into different buckets (rewardFund, airdrop, devFund)
+    splitRewards(releasableTokens, roundsPassed); // split into different buckets (rewardFund, airdrop, devFund)
     toDevFund(); // transfer devFund out immediately
     lastRound = currentRound; // Set current round as last release
     totalReleased = totalReleased.add(releasableTokens); // Increase totalReleased count
@@ -204,14 +217,20 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Put new rewards into the different buckets (userRewards: [airdrop, rewardFund], developmentFund)
    * @param _releasableTokens Amount of tokens that needs to be split up
    */
-  function splitRewards(uint256 _releasableTokens) internal {
+  function splitRewards(uint256 _releasableTokens, uint256 _roundsPassed) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
-    airdropFund = airdropFund.add(userRewards.div(3));
-    rewardFund = rewardFund.add(userRewards.div(3));
-    reserveFund = reserveFund.add(userRewards.div(3));
-    // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
-    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (roundNumber)
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
+
+    uint256 airdrops;
+    uint256 roundAirdrop;
+    for (uint j = 0; j < _roundsPassed; j++) {
+      roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
+      airdrops = airdrops.add(roundAirdrop);
+      lastRoundAirdrop = roundAirdrop;
+    }
+    airdropFund = airdropFund.add(airdrops);
+    rewardFund = rewardFund.add((userRewards-airdrops).div(2));
+    reserveFund = reserveFund.add((userRewards-airdrops).div(2));
   }
 
   /**
