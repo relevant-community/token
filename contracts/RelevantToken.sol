@@ -44,7 +44,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   mapping(address => uint256) nonces;
 
-  // added in upgrade #1
+  // added in version #2
   uint256 public initRoundAirdrop; // Initial airdrop amount (<= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
   uint256 public lastRoundAirdrop; // Airdrop of the round where tokens were last released
   uint256 public airdropRoundDecay;
@@ -100,8 +100,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     lastRoundReward = initRoundReward;
     totalPremint = _totalPremint;
     preMintTokens(_totalPremint);
+  }
 
-    // added in upgrade #1
+  function initializeVersion2(uint256 _airdropRoundDecay) {
+    // added in version #2
     initRoundAirdrop = initRoundReward; // can change this to anything below initRoundReward (passing additional argument)
     lastRoundAirdrop = initRoundAirdrop;
     airdropRoundDecay = _airdropRoundDecay;
