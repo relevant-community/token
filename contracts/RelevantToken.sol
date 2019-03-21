@@ -44,10 +44,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   mapping(address => uint256) nonces;
 
-  // added in version #2
-  uint256 public initRoundAirdrop; // Initial airdrop amount (<= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
+  // added in RewardSplit upgrade
+  uint256 public initRoundAirdrop; // Initial airdrop amount 
+  // (initRoundAirdrop should be <= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
   uint256 public lastRoundAirdrop; // Airdrop of the round where tokens were last released
-  uint256 public airdropRoundDecay;
+  uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round
 
 
   /**
@@ -102,8 +103,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     preMintTokens(_totalPremint);
   }
 
-  function initializeVersion2(uint256 _airdropRoundDecay) {
-    // added in version #2
+  function initializeRewardSplit(uint256 _airdropRoundDecay) public {
+    require(initRoundAirdrop == 0 && lastRoundAirdrop == 0 && airdropRoundDecay == 0, "Already initialized");
+    // added in RewardSplit upgrade
     initRoundAirdrop = initRoundReward; // can change this to anything below initRoundReward (passing additional argument)
     lastRoundAirdrop = initRoundAirdrop;
     airdropRoundDecay = _airdropRoundDecay;
@@ -231,8 +233,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       lastRoundAirdrop = roundAirdrop;
     }
     airdropFund = airdropFund.add(airdrops);
-    rewardFund = rewardFund.add((userRewards-airdrops).div(2));
-    reserveFund = reserveFund.add((userRewards-airdrops).div(2));
+    // remaining rewards are divided equally between rewardFund and reserveFund:
+    rewardFund = rewardFund.add((userRewards.sub(airdrops)).div(2));
+    reserveFund = reserveFund.add((userRewards.sub(airdrops)).div(2));
   }
 
   /**
