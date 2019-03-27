@@ -3,6 +3,7 @@
 // console.log(TestHelper);
 
 const RelevantToken = artifacts.require('RelevantTokenMock');
+const TimeLock = artifacts.require('TimeLock');
 
 const chai = require('chai');
 
@@ -13,6 +14,8 @@ chai.use(require('chai-bignumber')(BN));
 const { fromWei, soliditySha3 } = web3.utils;
 
 contract('token', accounts => {
+  // define variables for token rewards testing
+
   let token;
   let retOwner;
   let retContractBalance;
@@ -28,6 +31,20 @@ contract('token', accounts => {
   let devFundBalance;
   let allocatedAirdrops;
   let allocatedRewards;
+
+  // define variables for lock testing
+
+  let timeLock;
+  let lockingUser = accounts[2];
+  let testVestingDuration = 2; // just 2 seconds to make testing faster
+  let retVestingDuration;
+  let lockUserBalance;
+  let newLockUserBalance;
+  let preLockContractBalance;
+  let postLockContractBalance;
+  let currentLockNonce;
+  let lockupAmount;
+  let vestedTokens;
 
   // define contract parameters (TODO: automate tests for different parameters)
   const testName = 'Relevant Token';
@@ -103,11 +120,15 @@ contract('token', accounts => {
       roundDecayBNString,
       totalPremintBNString
     );
+    timeLock = await TimeLock.new();
+    await timeLock.initialize(testVestingDuration, token.address, false);
   });
 
   it('Returns expected parameters on initialization', async () => {
     retOwner = await token.owner();
     expect(retOwner.toString()).to.equal(accounts[0]);
+    retVestingDuration = await timeLock.duration();
+    expect(retVestingDuration.toNumber()).to.equal(testVestingDuration);
   });
 
   it('Premints the total inflation rewards for decay phase', async () => {
@@ -306,6 +327,101 @@ contract('token', accounts => {
     expect(totalReleased).to.be.bignumber.above(inflationRewards - 0.00001);
     expect(totalReleased).to.be.bignumber.below(inflationRewards + 0.00001);
   };
+
+  it('Locks up tokens for vesting', async () => {
+    // first create some tokens for the devFundAddress:
+    await testForRounds(0, 100);
+    preLockContractBalance = await token.balanceOf(timeLock.address);
+    retDevFundBalance = await token.balanceOf(testDevFundAddress);
+    // transfer these to the locking user (defined above):
+    await token.transfer(lockingUser, retDevFundBalance, {
+      from: testDevFundAddress
+    });
+    lockUserBalance = await token.balanceOf(lockingUser);
+    expect(lockUserBalance.toString()).to.be.bignumber.equal(
+      retDevFundBalance.toString()
+    );
+    // approve all owned tokens for lock up by contract
+    await token.approve(timeLock.address, lockUserBalance, {
+      from: lockingUser
+    });
+    // and finally lock them up! (this transfers the tokens from the user to the contract)
+    await timeLock.lockTokens(lockUserBalance, {
+      from: lockingUser
+    });
+
+    // user should not have any tokens in her own possession anymore
+    newLockUserBalance = await token.balanceOf(lockingUser);
+    expect(newLockUserBalance.toString()).to.be.bignumber.equal(0);
+    // tokens should be stored in contract
+    postLockContractBalance = await token.balanceOf(timeLock.address);
+    expect(postLockContractBalance.toString()).to.be.bignumber.equal(
+      (preLockContractBalance + lockUserBalance).toString()
+    );
+    currentLockNonce = await timeLock.lock_nonce(lockingUser);
+    lockupAmount = await timeLock.locked_tokens(lockingUser, currentLockNonce);
+    expect(lockupAmount.toString()).to.be.bignumber.equal(
+      lockUserBalance.toString()
+    );
+  });
+
+  it('Vests tokens over time', async () => {
+    await timeLock.startWithdraw({
+      from: lockingUser
+    });
+
+    function timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    // see how many tokens have vested after a 5th of the vesting period
+    await timeout((1000 * testVestingDuration) / 5); // duration in contract is given in seconds
+    vestedTokens = await timeLock.vestedAmount({
+      from: lockingUser
+    });
+    // in the case of cliff vesting, where all tokens are releasable only afte the lock period,
+    // the number of vested tokens should be 0 at any point before the end of the lock period:
+
+    expect(vestedTokens.toString()).to.be.bignumber.equal(0);
+
+    // should fail to release (because no tokens to be released yet)
+    let didThrow = false;
+    try {
+      await timeLock.releaseVestedTokens({
+        from: lockingUser
+      });
+    } catch (e) {
+      didThrow = true;
+    }
+    expect(didThrow).to.be.true;
+
+    // in the case of linear vesting (vesting = true), some tokens should be available
+    // even before the full vesting period has passed:
+    // expect(vestedTokens.toString()).to.be.bignumber.above(0);
+    // expect(vestedTokens.toString()).to.be.bignumber.below(
+    //  lockupAmount.toString()
+    // );
+    // more precisely, with a linear vesting schedule, vestedTokens
+    // should be roughly equal to 1/5 * lockupAmount
+
+    // after the testVestingDuration has passed entirely, all locked up tokens should have vested:
+    await timeout(testVestingDuration * 1000);
+    vestedTokens = await timeLock.vestedAmount({
+      from: lockingUser
+    });
+    expect(vestedTokens.toString()).to.be.bignumber.equal(
+      lockupAmount.toString()
+    );
+  });
+
+  it('Releases vested tokens', async () => {
+    await timeLock.releaseVestedTokens({
+      from: lockingUser
+    });
+    newLockUserBalance = await token.balanceOf(lockingUser);
+    expect(newLockUserBalance.toString()).to.be.bignumber.equal(
+      lockupAmount.toString()
+    );
+  });
 });
 
 // TODO: add tests for upgradeability (https://docs.zeppelinos.org/docs/testing.html)
