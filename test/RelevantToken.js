@@ -36,7 +36,7 @@ contract('token', accounts => {
 
   let timeLock;
   let lockingUser = accounts[2];
-  let testVestingDuration = 2; // just 2 seconds to make testing faster
+  let testVestingDuration = 3; // just 3 seconds to make testing faster
   let retVestingDuration;
   let lockUserBalance;
   let newLockUserBalance;
@@ -121,7 +121,7 @@ contract('token', accounts => {
       totalPremintBNString
     );
     timeLock = await TimeLock.new();
-    await timeLock.initialize(testVestingDuration, token.address, false);
+    await timeLock.initialize(testVestingDuration, token.address);
   });
 
   it('Returns expected parameters on initialization', async () => {
@@ -393,15 +393,6 @@ contract('token', accounts => {
       didThrow = true;
     }
     expect(didThrow).to.be.true;
-
-    // in the case of linear vesting (vesting = true), some tokens should be available
-    // even before the full vesting period has passed:
-    // expect(vestedTokens.toString()).to.be.bignumber.above(0);
-    // expect(vestedTokens.toString()).to.be.bignumber.below(
-    //  lockupAmount.toString()
-    // );
-    // more precisely, with a linear vesting schedule, vestedTokens
-    // should be roughly equal to 1/5 * lockupAmount
 
     // after the testVestingDuration has passed entirely, all locked up tokens should have vested:
     await timeout(testVestingDuration * 1000);
