@@ -42,9 +42,7 @@ contract('token', accounts => {
   let newLockUserBalance;
   let preLockContractBalance;
   let postLockContractBalance;
-  let currentLockNonce;
   let lockupAmount;
-  let vestedTokens;
 
   // define contract parameters (TODO: automate tests for different parameters)
   const testName = 'Relevant Token';
@@ -358,30 +356,16 @@ contract('token', accounts => {
     expect(postLockContractBalance.toString()).to.be.bignumber.equal(
       (preLockContractBalance + lockUserBalance).toString()
     );
-    currentLockNonce = await timeLock.lock_nonce(lockingUser);
-    lockupAmount = await timeLock.locked_tokens(lockingUser, currentLockNonce);
+    lockupAmount = await timeLock.locked_tokens(lockingUser);
     expect(lockupAmount.toString()).to.be.bignumber.equal(
       lockUserBalance.toString()
     );
   });
 
   it('Vests tokens over time', async () => {
-    await timeLock.startWithdraw({
+    await timeLock.startWithdraw(lockUserBalance, {
       from: lockingUser
     });
-
-    function timeout(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    // see how many tokens have vested after a 5th of the vesting period
-    await timeout((1000 * testVestingDuration) / 5); // duration in contract is given in seconds
-    vestedTokens = await timeLock.vestedAmount({
-      from: lockingUser
-    });
-    // in the case of cliff vesting, where all tokens are releasable only afte the lock period,
-    // the number of vested tokens should be 0 at any point before the end of the lock period:
-
-    expect(vestedTokens.toString()).to.be.bignumber.equal(0);
 
     // should fail to release (because no tokens to be released yet)
     let didThrow = false;
@@ -393,18 +377,16 @@ contract('token', accounts => {
       didThrow = true;
     }
     expect(didThrow).to.be.true;
-
-    // after the testVestingDuration has passed entirely, all locked up tokens should have vested:
-    await timeout(testVestingDuration * 1000);
-    vestedTokens = await timeLock.vestedAmount({
-      from: lockingUser
-    });
-    expect(vestedTokens.toString()).to.be.bignumber.equal(
-      lockupAmount.toString()
-    );
   });
 
   it('Releases vested tokens', async () => {
+    function timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // after the testVestingDuration has passed entirely, all locked up tokens should have vested:
+    await timeout(testVestingDuration * 1000);
+
     await timeLock.releaseVestedTokens({
       from: lockingUser
     });
