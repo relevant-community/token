@@ -49,7 +49,11 @@ contract('token', accounts => {
   const targetRound = 26704;
   let totalPremint = 27777044629743800000000000;
 
+  // parameters added in airdrop-reward-split upgrade:
+
+  let airdropSwitchRound = 8352;
   let airdropRoundDecay = 999762649000782000;
+  let firstNewAirdrop = 3442651863295480000000;
 
   // transform big number parameters for contract initialization
   // (ugh is there a better way to do this?)
@@ -63,6 +67,13 @@ contract('token', accounts => {
     .toFixed(0)
     .toString();
   let roundDecayBNString = new BN(roundDecay.toString()).toFixed(0).toString();
+
+  let airdropRoundDecayBNString = new BN(airdropRoundDecay.toString())
+    .toFixed(0)
+    .toString();
+  let firstNewAirdropBNString = new BN(firstNewAirdrop.toString())
+    .toFixed(0)
+    .toString();
 
   // compute total rewards accumulated until roundNum using loops with discrete decay factor
   const calcTotalRewards = roundNum => {
@@ -167,7 +178,11 @@ contract('token', accounts => {
   });
 
   it('Splits rewards into curation rewards, airdrops and reserve buckets', async () => {
-    await token.initializeRewardSplit(airdropRoundDecay); // feature was added in contract upgrade
+    await token.initializeRewardSplit(
+      airdropSwitchRound,
+      airdropRoundDecayBNString,
+      firstNewAirdropBNString
+    ); // feature was added in contract upgrade
     await testForRounds(0, 100); // TODO: test for multiple round windows
     totalReleased = await getReleasedTokens();
     console.log('totalReleased', totalReleased);

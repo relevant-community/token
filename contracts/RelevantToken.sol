@@ -47,8 +47,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   // added in RewardSplit upgrade
   uint256 public initRoundAirdrop; // Initial airdrop amount 
   // (initRoundAirdrop should be <= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
-  uint256 public lastRoundAirdrop; // Airdrop of the round where tokens were last released
-  uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round
+  uint256 public airdropSwitchRound; // Round at which we switch to exponential airdrop decay
+  uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round in new airdrop schedule
+  uint256 public lastRoundAirdrop; // Airdrop of the last round from which tokens were released
 
 
   /**
@@ -61,7 +62,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @param _roundLength            Number of blocks that make up an inflation release round
    * @param _roundDecay             Decay factor for the reward reduction during one round - can be calculated from timeConstant and roundLength
    * @param _totalPremint           Rewards that are preminted (all until decay stops) - can be calculated from timeConstant, initRoundReward and targetInflation
-   * @param _airdropRoundDecay      Decay factor for the airdrops reduction during one round - should be much higher than roundDecay => airdrops decrease faster
    */
   function initialize(
     string memory _name,
@@ -75,8 +75,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 _targetRound,
     uint256 _roundLength,
     uint256 _roundDecay,
-    uint256 _totalPremint,
-    uint256 _airdropRoundDecay
+    uint256 _totalPremint
   )   public
     initializer
   {
@@ -103,12 +102,17 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     preMintTokens(_totalPremint);
   }
 
-  function initializeRewardSplit(uint256 _airdropRoundDecay) public {
+  // * @dev Initialize new storage variables added in airdrop-reward-split upgrade
+  // * @param _airdropRoundDecay      Decay factor for the airdrops reduction during one round -
+  //                                  (should be much higher than roundDecay => airdrops decrease faster)
+  // * @param _airdropSwitchRound     Round at which airdrops from previous calculation and exponentially decaying airdrops are the same
+  //                                  (assumed to be below targetRound, so we can solve for this by setting old airdrops equal to new airdrops)
+  function initializeRewardSplit(uint256 _airdropSwitchRound, uint256 _airdropRoundDecay, uint256 _firstNewAirdrop) public {
     require(initRoundAirdrop == 0 && lastRoundAirdrop == 0 && airdropRoundDecay == 0, "Already initialized");
-    // added in RewardSplit upgrade
     initRoundAirdrop = initRoundReward; // can change this to anything below initRoundReward (passing additional argument)
-    lastRoundAirdrop = initRoundAirdrop;
+    airdropSwitchRound = _airdropSwitchRound;
     airdropRoundDecay = _airdropRoundDecay;
+    lastRoundAirdrop = _firstNewAirdrop; // the lastRoundAirdrop will be needed for the recursive calculation starting at airdropSwitchRound
   }
 
   /**
@@ -147,7 +151,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       }
     }
 
-    splitRewards(releasableTokens, roundsPassed); // split into different buckets (rewardFund, airdrop, devFund)
+    splitRewards(releasableTokens, roundsPassed, currentRound); // split into different buckets (rewardFund, airdrop, devFund)
     toDevFund(); // transfer devFund out immediately
     lastRound = currentRound; // Set current round as last release
     totalReleased = totalReleased.add(releasableTokens); // Increase totalReleased count
@@ -221,21 +225,27 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Put new rewards into the different buckets (userRewards: [airdrop, rewardFund], developmentFund)
    * @param _releasableTokens Amount of tokens that needs to be split up
    */
-  function splitRewards(uint256 _releasableTokens, uint256 _roundsPassed) internal {
+  function splitRewards(uint256 _releasableTokens, uint256 _roundsPassed, uint256 _currentRound) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
 
-    uint256 airdrops;
-    uint256 roundAirdrop;
-    for (uint j = 0; j < _roundsPassed; j++) {
-      roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
-      airdrops = airdrops.add(roundAirdrop);
-      lastRoundAirdrop = roundAirdrop;
+    if (_currentRound < airdropSwitchRound) {
+      airdropFund = airdropFund.add(userRewards.div(3));
+      rewardFund = rewardFund.add(userRewards.div(3));
+      reserveFund = reserveFund.add(userRewards.div(3));
+    } else {
+      uint256 airdrops;
+      uint256 roundAirdrop;
+      for (uint j = 0; j < _roundsPassed; j++) {
+        roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
+        airdrops = airdrops.add(roundAirdrop);
+        lastRoundAirdrop = roundAirdrop;
+      }
+      airdropFund = airdropFund.add(airdrops);
+      // remaining rewards are divided equally between rewardFund and reserveFund:
+      rewardFund = rewardFund.add((userRewards.sub(airdrops)).div(2));
+      reserveFund = reserveFund.add((userRewards.sub(airdrops)).div(2));
     }
-    airdropFund = airdropFund.add(airdrops);
-    // remaining rewards are divided equally between rewardFund and reserveFund:
-    rewardFund = rewardFund.add((userRewards.sub(airdrops)).div(2));
-    reserveFund = reserveFund.add((userRewards.sub(airdrops)).div(2));
   }
 
   /**
