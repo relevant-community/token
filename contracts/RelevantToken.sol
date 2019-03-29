@@ -228,7 +228,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   function splitRewards(uint256 _releasableTokens, uint256 _roundsPassed, uint256 _currentRound) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
-
     if (_currentRound < airdropSwitchRound) {
       airdropFund = airdropFund.add(userRewards.div(3));
       rewardFund = rewardFund.add(userRewards.div(3));
@@ -236,16 +235,19 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     } else {
       uint256 airdrops;
       uint256 roundAirdrop;
+      
       for (uint j = 0; j < _roundsPassed; j++) {
         roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
         airdrops = airdrops.add(roundAirdrop);
         lastRoundAirdrop = roundAirdrop;
       }
+      
       airdropFund = airdropFund.add(airdrops);
       // remaining rewards are divided equally between rewardFund and reserveFund:
       rewardFund = rewardFund.add((userRewards.sub(airdrops)).div(2));
       reserveFund = reserveFund.add((userRewards.sub(airdrops)).div(2));
     }
+  
   }
 
   /**
