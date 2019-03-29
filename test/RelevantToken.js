@@ -198,10 +198,13 @@ contract('token', accounts => {
     await testRewardsSplitForRounds(0, 24);
     await testRewardsSplitForRounds(0, 100);
     await testRewardsSplitForRounds(0, 200);
-    await testRewardsSplitForRounds(8252, 8452);
 
     // under new airdrop schedule:
-    // await testRewardsSplitForRounds(airdropSwitchRound, airdropSwitchRound+100);
+    await testRewardsSplitForRounds(airdropSwitchRound, airdropSwitchRound + 1);
+    await testRewardsSplitForRounds(
+      airdropSwitchRound,
+      airdropSwitchRound + 100
+    );
   });
 
   it('Transfers devFund to devFundAddress', async () => {
