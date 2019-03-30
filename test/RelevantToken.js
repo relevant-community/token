@@ -54,7 +54,7 @@ contract('token', accounts => {
 
   let airdropSwitchRound = 8352;
   let airdropRoundDecay = 999762649000782000;
-  let firstNewAirdrop = 3442651863295480000000;
+  let firstNewAirdrop = 3442799625893100000000;
 
   // transform big number parameters for contract initialization
   // (ugh is there a better way to do this?)
@@ -108,13 +108,13 @@ contract('token', accounts => {
       roundAirdrop = firstNewAirdrop / p; // this assumes that initRoundAirdrop is set equal
       // to initRoundReward (i.e. all token rewards in the very first round are airdrops)
       let roundsPassedSinceSwitch = roundNum - airdropSwitchRound;
-      airdropSum = (((calcTotalRewards(airdropSwitchRound - 1) * 4) / 5) * 1) / 3;
-      for (let i = 0; i <= roundsPassedSinceSwitch; i++) {
+      airdropSum = (((calcTotalRewards(airdropSwitchRound - 1) * 4) / 5) * 1) / 3
+        + firstNewAirdrop / p;
+      for (let i = 0; i < roundsPassedSinceSwitch; i++) {
         roundAirdrop *= airdropRoundDecay / p;
         airdropSum += roundAirdrop;
       }
     }
-    console.log('computed airdrops here!!! for round: ', roundNum, airdropSum);
     return airdropSum; // don't need to divide by p because
     // calcTotalRewards and calcTotalAirdrops already do so.
   };
@@ -147,8 +147,6 @@ contract('token', accounts => {
   it('Returns expected parameters on initialization', async () => {
     retOwner = await token.owner();
     expect(retOwner.toString()).to.equal(accounts[0]);
-
-    calcTotalAirdrops(8352);
   });
 
   it('Premints the total inflation rewards for decay phase', async () => {
