@@ -105,8 +105,7 @@ contract('token', accounts => {
     if (roundNum < airdropSwitchRound) {
       airdropSum = (((calcTotalRewards(roundNum) * 4) / 5) * 1) / 3;
     } else {
-      roundAirdrop = firstNewAirdrop / p; // this assumes that initRoundAirdrop is set equal
-      // to initRoundReward (i.e. all token rewards in the very first round are airdrops)
+      roundAirdrop = firstNewAirdrop / p;
       let roundsPassedSinceSwitch = roundNum - airdropSwitchRound;
       airdropSum = (((calcTotalRewards(airdropSwitchRound - 1) * 4) / 5) * 1) / 3
         + firstNewAirdrop / p;
@@ -196,13 +195,32 @@ contract('token', accounts => {
     await testRewardsSplitForRounds(0, 24);
     await testRewardsSplitForRounds(0, 100);
     await testRewardsSplitForRounds(0, 200);
+    await testRewardsSplitForRounds(100, 300);
+
+    // before new airdrop schedule:
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 100,
+      airdropSwitchRound - 1
+    );
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 10,
+      airdropSwitchRound - 1
+    );
 
     // under new airdrop schedule:
-    await testRewardsSplitForRounds(airdropSwitchRound, airdropSwitchRound + 1);
     await testRewardsSplitForRounds(
-      airdropSwitchRound,
+      airdropSwitchRound - 1,
+      airdropSwitchRound + 24
+    );
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 1,
       airdropSwitchRound + 100
     );
+
+    // CAUTION: We must not do a release at or right after airdropSwitchRound that covers too many
+    // of the previous rounds (because all those previous rounds will be considered under the
+    // new airdrop schedule, as long as the current release round is >= airdropSwitchRound).
+    // For perfect precision, do a release right before the switch, i.e. airdropSwitchRound-1
   });
 
   it('Transfers devFund to devFundAddress', async () => {
@@ -320,24 +338,56 @@ contract('token', accounts => {
     totalReleased = new BN((calcTotalRewards(lastRound) * p).toString())
       .toFixed(0)
       .toString();
-    if (lastRound === 0) {
-      // Usually the rewards from lastRound have already been released. Round 0 is an exception.
-      totalReleased = 0;
-    }
+
     totalAirdrops = new BN((calcTotalAirdrops(lastRound) * p).toString())
       .toFixed(0)
       .toString();
+
+    let lastRoundAirdropDecay = new BN(
+      (initRoundReward * (airdropRoundDecay / p) ** lastRound).toString()
+    )
+      .toFixed(0)
+      .toString(); // this assumes that initRoundAirdrop is set equal
+    // to initRoundReward (i.e. all token rewards in the very first round are airdrops)
+
+    let totalRewardReserve = new BN(
+      (
+        (calcTotalRewards(lastRound) * p * 4) / 5
+        - calcTotalAirdrops(lastRound) * p
+      ).toString()
+    )
+      .toFixed(0)
+      .toString();
+
+    if (lastRound === 0) {
+      // Usually the rewards from lastRound have already been released. Round 0 is an exception.
+      totalReleased = 0;
+      totalAirdrops = 0;
+      totalRewardReserve = 0;
+    }
+    console.log(
+      'Contract initialized to:',
+      'total tokens released-',
+      totalReleased,
+      'total airdrops-',
+      totalAirdrops,
+      'rewards+reserve-',
+      totalRewardReserve
+    );
+
     await token.setLastRound(
       lastRound,
       lastRoundRewardDecay,
       totalReleased,
-      totalAirdrops
+      totalAirdrops,
+      lastRoundAirdropDecay,
+      totalRewardReserve
     );
     await token.releaseTokens();
     totalReleased = await getReleasedTokens();
     inflationRewards = calcTotalRewards(currentRound);
-    console.log('computed: ', inflationRewards.toString());
-    console.log('released: ', totalReleased.toString());
+    console.log('computed total rewards: ', inflationRewards.toString());
+    console.log('released total rewards: ', totalReleased.toString());
     expect(totalReleased).to.be.bignumber.above(inflationRewards - 0.00001);
     expect(totalReleased).to.be.bignumber.below(inflationRewards + 0.00001);
   };
@@ -348,7 +398,6 @@ contract('token', accounts => {
     );
     await testRewardsForRounds(lastRound, currentRound);
     totalReleased = await getReleasedTokens();
-    console.log('totalReleased', totalReleased);
 
     retCurationRewards = await getValue('rewardFund');
     retAirdropRewards = await getValue('airdropFund');
@@ -375,6 +424,7 @@ contract('token', accounts => {
     // TODO: FIX PRECISION ISSUE OR SLIGHT CALCULATION ERROR HERE:
     expect(retAirdropRewards).to.be.bignumber.below(airdropFund + 0.00001);
     expect(retAirdropRewards).to.be.bignumber.above(airdropFund - 0.00001);
+
     expect(retCurationRewards).to.be.bignumber.below(
       curationRewardFund + 0.00001
     );
