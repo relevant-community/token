@@ -1,0 +1,396 @@
+{
+  "contracts": {
+    "RelevantToken": {
+      "address": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D",
+      "constructorCode": "608060405234801561001057600080fd5b50613c8c806100206000396000f3fe",
+      "bodyBytecodeHash": "b8a1cb48c394a7c623bd278ee9431897d399024a385a61c47af3acd26af94741",
+      "localBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
+      "deployedBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_mapping<t_uint256>": {
+          "id": "t_mapping<t_uint256>",
+          "valueType": "t_uint256",
+          "label": "mapping(key => uint256)",
+          "kind": "mapping"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<Roles.Role>": {
+          "id": "t_struct<Roles.Role>",
+          "kind": "struct",
+          "label": "Roles.Role",
+          "members": [
+            {
+              "label": "bearer",
+              "astId": 2439,
+              "type": "t_mapping<t_bool>",
+              "src": "150:32:5"
+            }
+          ]
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        },
+        "t_string": {
+          "id": "t_string",
+          "kind": "elementary",
+          "label": "string"
+        },
+        "t_uint8": {
+          "id": "t_uint8",
+          "kind": "elementary",
+          "label": "uint8"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 3535,
+          "type": "t_bool",
+          "src": "757:24:13"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 3537,
+          "type": "t_bool",
+          "src": "876:25:13"
+        },
+        {
+          "contract": "Initializable",
+          "path": "zos-lib/contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 3586,
+          "type": "t_array:50<t_uint256>",
+          "src": "1891:29:13"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_balances",
+          "astId": 2990,
+          "type": "t_mapping<t_uint256>",
+          "src": "774:46:10"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_allowed",
+          "astId": 2996,
+          "type": "t_mapping<t_uint256>",
+          "src": "827:66:10"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "_totalSupply",
+          "astId": 2998,
+          "type": "t_uint256",
+          "src": "900:28:10"
+        },
+        {
+          "contract": "ERC20",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "label": "______gap",
+          "astId": 3412,
+          "type": "t_array:50<t_uint256>",
+          "src": "7661:29:10"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "_owner",
+          "astId": 2862,
+          "type": "t_address",
+          "src": "302:22:9"
+        },
+        {
+          "contract": "Ownable",
+          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "label": "______gap",
+          "astId": 2973,
+          "type": "t_array:50<t_uint256>",
+          "src": "2186:29:9"
+        },
+        {
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "_minters",
+          "astId": 2546,
+          "type": "t_struct<Roles.Role>",
+          "src": "271:27:6"
+        },
+        {
+          "contract": "MinterRole",
+          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "label": "______gap",
+          "astId": 2645,
+          "type": "t_array:50<t_uint256>",
+          "src": "1081:29:6"
+        },
+        {
+          "contract": "ERC20Mintable",
+          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
+          "label": "______gap",
+          "astId": 3461,
+          "type": "t_array:50<t_uint256>",
+          "src": "745:29:11"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "name",
+          "astId": 1571,
+          "type": "t_string",
+          "src": "673:18:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "decimals",
+          "astId": 1573,
+          "type": "t_uint8",
+          "src": "695:21:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "symbol",
+          "astId": 1575,
+          "type": "t_string",
+          "src": "720:20:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "version",
+          "astId": 1577,
+          "type": "t_string",
+          "src": "744:21:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "devFundAddress",
+          "astId": 1579,
+          "type": "t_address",
+          "src": "769:29:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "initRoundReward",
+          "astId": 1581,
+          "type": "t_uint256",
+          "src": "802:30:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "currRoundReward",
+          "astId": 1583,
+          "type": "t_uint256",
+          "src": "836:30:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "timeConstant",
+          "astId": 1585,
+          "type": "t_uint256",
+          "src": "870:27:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "targetInflation",
+          "astId": 1587,
+          "type": "t_uint256",
+          "src": "901:30:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "targetRound",
+          "astId": 1589,
+          "type": "t_uint256",
+          "src": "935:26:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "roundLength",
+          "astId": 1591,
+          "type": "t_uint256",
+          "src": "965:26:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "roundDecay",
+          "astId": 1593,
+          "type": "t_uint256",
+          "src": "995:25:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "totalPremint",
+          "astId": 1595,
+          "type": "t_uint256",
+          "src": "1024:27:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "currentRound",
+          "astId": 1597,
+          "type": "t_uint256",
+          "src": "1055:27:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "startBlock",
+          "astId": 1599,
+          "type": "t_uint256",
+          "src": "1136:25:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "lastRound",
+          "astId": 1601,
+          "type": "t_uint256",
+          "src": "1215:24:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "lastRoundReward",
+          "astId": 1603,
+          "type": "t_uint256",
+          "src": "1287:30:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "totalReleased",
+          "astId": 1605,
+          "type": "t_uint256",
+          "src": "1411:28:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "rewardFund",
+          "astId": 1607,
+          "type": "t_uint256",
+          "src": "1504:25:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "airdropFund",
+          "astId": 1609,
+          "type": "t_uint256",
+          "src": "1613:26:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "reserveFund",
+          "astId": 1611,
+          "type": "t_uint256",
+          "src": "1725:26:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "developmentFund",
+          "astId": 1613,
+          "type": "t_uint256",
+          "src": "1827:30:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "allocatedRewards",
+          "astId": 1615,
+          "type": "t_uint256",
+          "src": "1968:31:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "allocatedAirdrops",
+          "astId": 1617,
+          "type": "t_uint256",
+          "src": "2090:32:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "nonces",
+          "astId": 1621,
+          "type": "t_mapping<t_uint256>",
+          "src": "2213:34:3"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    }
+  },
+  "solidityLibs": {},
+  "proxies": {
+    "inflationary-token/RelevantToken": [
+      {
+        "address": "0x1211A9d6731a862c116590Bd8c3BAd95aF21370c",
+        "version": "0.1.0",
+        "implementation": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D"
+      }
+    ]
+  },
+  "zosversion": "2.2",
+  "version": "0.1.0",
+  "dependencies": {
+    "openzeppelin-eth": {
+      "package": "0xa44bb80b290de8a465d17b14269df53cf0b9bf4f",
+      "version": "2.1.3"
+    }
+  },
+  "proxyAdmin": {
+    "address": "0x544e202bD4b593183207fFcE8569b9E5D5AB9A11"
+  }
+}

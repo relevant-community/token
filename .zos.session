@@ -1,5 +1,4 @@
 {
-  "network": "local",
-  "from": "0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1",
-  "expires": "2019-03-03T07:15:50.732Z"
+  "network": "rinkeby",
+  "expires": "2019-05-13T20:43:40.694Z"
 }
