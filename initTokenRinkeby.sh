@@ -28,14 +28,20 @@ npx zos create RelevantToken --init initialize --args $args --network rinkeby
 # we need to trick ZeppelinOS into thinking that this test network has the same state as the real Rinkeby. To do this, we just need to:
 # cp zos.rinkeby.json zos.dev-1004.json
 
-# now you can run `truffle console --network rinkeby-test` and interact with the main proxy contract on your own forked chain
+# if you want to verify that your chain is actually forked with the current state, you can run `truffle console --network rinkeby-test` 
+# and interact with the main proxy contract using the same address returned after the `npx zos create` command from above
 
-# it't time to make your contract changes, push them to this forked chain and test them before going public:
+# now it's time to make your contract changes, push them to this forked chain and test them before going public:
+
 # first start a new session to connect to the forked network: `npx zos session --network rinkeby-test --from $SOME_ADDRESS_YOU_CONTROL`
 # make the desired contract changes and run `npx zos push --network rinkeby-test`
 
-# Lastly connect the newly deployed logic contract with the existing proxy
-# `npx zos update RelevantToken`
+# Lastly connect the newly deployed logic contract with the existing proxy, by running `npx zos update RelevantToken`
+
+# Now test the new proxy using `truffle console --network rinkeby-test`
+# If all upgrades appear to have worked, push and update on the actual rinkeby
+
+# Be happy!
 
 
 `

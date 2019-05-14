@@ -43,6 +43,8 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public allocatedAirdrops; // Bucket of airdrop reward tokens reserved/'spoken for' but not yet claimed by users
 
   mapping(address => uint256) nonces;
+  
+  uint256 public hello;
 
   /**
    * @dev ContPreInflationaryToken constructor
@@ -297,6 +299,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    */
   function roundsSincleLast() public view returns (uint256) {
     return roundNum() - lastRound;
+  }
+
+  function helloThere() public {
+    hello = 10;
   }
 }
 

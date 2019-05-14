@@ -1,11 +1,11 @@
 {
   "contracts": {
     "RelevantToken": {
-      "address": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D",
-      "constructorCode": "608060405234801561001057600080fd5b50613c8c806100206000396000f3fe",
-      "bodyBytecodeHash": "b8a1cb48c394a7c623bd278ee9431897d399024a385a61c47af3acd26af94741",
-      "localBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
-      "deployedBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
+      "address": "0x6B780c3759DAe904855dA4F6A60920cfc7cbb8d9",
+      "constructorCode": "608060405234801561001057600080fd5b50613cf6806100206000396000f3fe",
+      "bodyBytecodeHash": "d974ec69606a0f70957e71be8ae00c6402223782c9daeff18b42e984abd8f3ef",
+      "localBytecodeHash": "9da7b8a65da089f1a50665a936d33c8811e890dd98d2f70fe4042c7d7efca621",
+      "deployedBytecodeHash": "9da7b8a65da089f1a50665a936d33c8811e890dd98d2f70fe4042c7d7efca621",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -42,7 +42,7 @@
           "members": [
             {
               "label": "bearer",
-              "astId": 2439,
+              "astId": 2449,
               "type": "t_mapping<t_bool>",
               "src": "150:32:5"
             }
@@ -70,7 +70,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 3535,
+          "astId": 3545,
           "type": "t_bool",
           "src": "757:24:13"
         },
@@ -78,7 +78,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 3537,
+          "astId": 3547,
           "type": "t_bool",
           "src": "876:25:13"
         },
@@ -86,7 +86,7 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 3586,
+          "astId": 3596,
           "type": "t_array:50<t_uint256>",
           "src": "1891:29:13"
         },
@@ -94,7 +94,7 @@
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "_balances",
-          "astId": 2990,
+          "astId": 3000,
           "type": "t_mapping<t_uint256>",
           "src": "774:46:10"
         },
@@ -102,7 +102,7 @@
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "_allowed",
-          "astId": 2996,
+          "astId": 3006,
           "type": "t_mapping<t_uint256>",
           "src": "827:66:10"
         },
@@ -110,7 +110,7 @@
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "_totalSupply",
-          "astId": 2998,
+          "astId": 3008,
           "type": "t_uint256",
           "src": "900:28:10"
         },
@@ -118,7 +118,7 @@
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "______gap",
-          "astId": 3412,
+          "astId": 3422,
           "type": "t_array:50<t_uint256>",
           "src": "7661:29:10"
         },
@@ -126,7 +126,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 2862,
+          "astId": 2872,
           "type": "t_address",
           "src": "302:22:9"
         },
@@ -134,7 +134,7 @@
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 2973,
+          "astId": 2983,
           "type": "t_array:50<t_uint256>",
           "src": "2186:29:9"
         },
@@ -142,7 +142,7 @@
           "contract": "MinterRole",
           "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
           "label": "_minters",
-          "astId": 2546,
+          "astId": 2556,
           "type": "t_struct<Roles.Role>",
           "src": "271:27:6"
         },
@@ -150,7 +150,7 @@
           "contract": "MinterRole",
           "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
           "label": "______gap",
-          "astId": 2645,
+          "astId": 2655,
           "type": "t_array:50<t_uint256>",
           "src": "1081:29:6"
         },
@@ -158,7 +158,7 @@
           "contract": "ERC20Mintable",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
           "label": "______gap",
-          "astId": 3461,
+          "astId": 3471,
           "type": "t_array:50<t_uint256>",
           "src": "745:29:11"
         },
@@ -361,6 +361,14 @@
           "astId": 1621,
           "type": "t_mapping<t_uint256>",
           "src": "2213:34:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "hello",
+          "astId": 1623,
+          "type": "t_uint256",
+          "src": "2254:20:3"
         }
       ],
       "warnings": {
@@ -368,7 +376,31 @@
         "hasSelfDestruct": false,
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
+        "uninitializedBaseContracts": [],
+        "storageUncheckedVars": [
+          {
+            "contract": "MinterRole",
+            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+            "label": "_minters",
+            "astId": 2556,
+            "type": "t_struct<Roles.Role>",
+            "src": "271:27:6"
+          }
+        ],
+        "storageDiff": [
+          {
+            "action": "append",
+            "updated": {
+              "index": 37,
+              "contract": "RelevantToken",
+              "path": "contracts/RelevantToken.sol",
+              "label": "hello",
+              "astId": 1623,
+              "type": "t_uint256",
+              "src": "2254:20:3"
+            }
+          }
+        ]
       }
     }
   },
@@ -376,14 +408,9 @@
   "proxies": {
     "inflationary-token/RelevantToken": [
       {
-        "address": "0x1211A9d6731a862c116590Bd8c3BAd95aF21370c",
-        "version": "0.1.0",
-        "implementation": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D"
-      },
-      {
         "address": "0x6F6BE90BAcAa295C08299AF0eBe38df718a4b072",
         "version": "0.1.0",
-        "implementation": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D"
+        "implementation": "0x6B780c3759DAe904855dA4F6A60920cfc7cbb8d9"
       }
     ]
   },

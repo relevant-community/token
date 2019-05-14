@@ -50,7 +50,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 81,
-        "sourceUnit": 2856,
+        "sourceUnit": 2866,
         "src": "25:54:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -75,10 +75,10 @@
               "id": 3,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2855,
+              "referencedDeclaration": 2865,
               "src": "110:8:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$2855",
+                "typeIdentifier": "t_contract$_SafeMath_$2865",
                 "typeString": "library SafeMath"
               }
             },
@@ -404,7 +404,7 @@
                           "lValueRequested": false,
                           "memberName": "mul",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2762,
+                          "referencedDeclaration": 2772,
                           "src": "907:11:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -432,7 +432,7 @@
                       "lValueRequested": false,
                       "memberName": "div",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 2786,
+                      "referencedDeclaration": 2796,
                       "src": "907:49:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -666,7 +666,7 @@
                           "lValueRequested": false,
                           "memberName": "mul",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2762,
+                          "referencedDeclaration": 2772,
                           "src": "1351:11:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -694,7 +694,7 @@
                       "lValueRequested": false,
                       "memberName": "div",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 2786,
+                      "referencedDeclaration": 2796,
                       "src": "1351:25:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -902,7 +902,7 @@
                           "lValueRequested": false,
                           "memberName": "mul",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2762,
+                          "referencedDeclaration": 2772,
                           "src": "1715:12:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -930,7 +930,7 @@
                       "lValueRequested": false,
                       "memberName": "div",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 2786,
+                      "referencedDeclaration": 2796,
                       "src": "1715:30:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1097,7 +1097,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 81,
-        "sourceUnit": 2856,
+        "sourceUnit": 2866,
         "src": "25:54:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1122,10 +1122,10 @@
               "id": 3,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2855,
+              "referencedDeclaration": 2865,
               "src": "110:8:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$2855",
+                "typeIdentifier": "t_contract$_SafeMath_$2865",
                 "typeString": "library SafeMath"
               }
             },
@@ -1451,7 +1451,7 @@
                           "lValueRequested": false,
                           "memberName": "mul",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2762,
+                          "referencedDeclaration": 2772,
                           "src": "907:11:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1479,7 +1479,7 @@
                       "lValueRequested": false,
                       "memberName": "div",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 2786,
+                      "referencedDeclaration": 2796,
                       "src": "907:49:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1713,7 +1713,7 @@
                           "lValueRequested": false,
                           "memberName": "mul",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2762,
+                          "referencedDeclaration": 2772,
                           "src": "1351:11:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1741,7 +1741,7 @@
                       "lValueRequested": false,
                       "memberName": "div",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 2786,
+                      "referencedDeclaration": 2796,
                       "src": "1351:25:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1949,7 +1949,7 @@
                           "lValueRequested": false,
                           "memberName": "mul",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 2762,
+                          "referencedDeclaration": 2772,
                           "src": "1715:12:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1977,7 +1977,7 @@
                       "lValueRequested": false,
                       "memberName": "div",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 2786,
+                      "referencedDeclaration": 2796,
                       "src": "1715:30:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -2123,7 +2123,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-05-14T07:39:01.660Z",
+  "updatedAt": "2019-05-14T08:11:16.255Z",
   "devdoc": {
     "methods": {}
   },

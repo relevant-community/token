@@ -376,11 +376,6 @@
   "proxies": {
     "inflationary-token/RelevantToken": [
       {
-        "address": "0x1211A9d6731a862c116590Bd8c3BAd95aF21370c",
-        "version": "0.1.0",
-        "implementation": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D"
-      },
-      {
         "address": "0x6F6BE90BAcAa295C08299AF0eBe38df718a4b072",
         "version": "0.1.0",
         "implementation": "0x66e1bE380bFe3A65CE577d7F614569bf6bf87c4D"
