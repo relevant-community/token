@@ -34,6 +34,8 @@ npx zos create RelevantToken --init initialize --args $args --network rinkeby
 # first start a new session to connect to the forked network: `npx zos session --network rinkeby-test --from $SOME_ADDRESS_YOU_CONTROL`
 # make the desired contract changes and run `npx zos push --network rinkeby-test`
 
+# Lastly connect the newly deployed logic contract with the existing proxy
+# `npx zos update RelevantToken`
 
 
 `
