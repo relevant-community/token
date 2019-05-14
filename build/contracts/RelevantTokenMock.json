@@ -4222,7 +4222,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-05-13T20:29:45.128Z",
+  "updatedAt": "2019-05-14T07:39:01.741Z",
   "devdoc": {
     "methods": {
       "allocateAirdrops(uint256)": {
