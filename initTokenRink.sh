@@ -1,13 +1,14 @@
 # this testing strategy is from: https://blog.zeppelinos.org/testing-real-world-contract-upgrades/
 
-# first, run `npx zos push --network rinkeby` to deploy the current logic contract
+# first start a session to make sure all following commands go to rinkeby: npx zos session --network rinkeby --from $SOME_ADDRESS_YOU_CONTROL
+# then, run `npx zos push` to deploy the current logic contract
 # then execute this script (change the testDevFundAddress if you want) to create the corresponding proxy
 
 testName='RelevantToken'
 testDecimals=18
 testSymbol='RVT'
 testVersion='v1'
-testDevFundAddress='0xffcf8fdee72ac11b5c542428b35eef5769c409f0'
+testDevFundAddress='0x118e26f0245dCC9FCFA98d7939d0825B7D041EBa'
 initRoundReward=25000
 initRoundRewardBNString=$(echo "$initRoundReward*10^18" | bc)
 timeConstantBNString=12638008558187319448473
@@ -19,8 +20,7 @@ totalPremintBNString=277770446297438000000000000
 
 args=$(echo $testName,$testDecimals,$testSymbol,$testVersion,$testDevFundAddress,$initRoundRewardBNString,$timeConstantBNString,$targetInflation,$targetRound,$roundLength,$roundDecayBNString,$totalPremintBNString)
 echo $args
-npx zos create RelevantToken --init initialize --args $args --network rinkeby
-
+npx zos create RelevantToken --init initialize --args $args
 
 
 # to test upgrading, run a forked rinkeby network from a separate terminal window:

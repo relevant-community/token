@@ -3,7 +3,7 @@
   "name": "inflationary-token",
   "version": "0.1.0",
   "contracts": {
-    "RelevantToken": "RelevantToken",
+    "RelevantToken": "RelevantToken"
   },
   "dependencies": {
     "openzeppelin-eth": "^2.1.3"
