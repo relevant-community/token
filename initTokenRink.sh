@@ -38,6 +38,12 @@ npx zos create RelevantToken --init initialize --args $args
 # make the desired contract changes and run `npx zos push --network rinkeby-test`
 
 # Lastly connect the newly deployed logic contract with the existing proxy, by running `npx zos update RelevantToken`
+# Don't forget to initialize the contract changes! either with truffle console: c.initializeRewardSplit(8352,"999762649000782000","3442799625893100000000")
+# or as an argument to zos update:
+
+# upgradeInitArgs=$(echo $airdropSwitchRound,$airdropRoundDecay,$firstNewAirdrop)
+# echo $upgradeInitArgs
+# npx zos update RelevantToken --init initializeT --args $upgradeInitArgs
 
 # Now test the new proxy using `truffle console --network rinkeby-test`
 # If all upgrades appear to have worked, push and update on the actual rinkeby
