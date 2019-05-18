@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "contracts": {
     "RelevantToken": "RelevantToken",
-    "MyContract": "MyContract"
   },
   "dependencies": {
     "openzeppelin-eth": "^2.1.3"
