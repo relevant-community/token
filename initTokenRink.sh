@@ -1,7 +1,9 @@
 # this testing strategy is from: https://blog.zeppelinos.org/testing-real-world-contract-upgrades/
 
 # first start a session to make sure all following commands go to rinkeby: npx zos session --network rinkeby --from $SOME_ADDRESS_YOU_CONTROL
+
 # then, run `npx zos push` to deploy the current logic contract
+
 # then execute this script (change the testDevFundAddress if you want) to create the corresponding proxy
 
 testName='RelevantToken'
@@ -24,12 +26,12 @@ npx zos create RelevantToken --init initialize --args $args
 
 
 # to test upgrading, run a forked rinkeby network from a separate terminal window:
-# ganache-cli --fork rinkeby.infura.io/v3/<INFURA_API_KEY> --unlock "$SOME_ADDRESS_YOU_CONTROL" --port 9545 --networkId 1004 --deterministic
+# ganache-cli --fork https://rinkeby.infura.io/v3/<INFURA_API_KEY> --unlock "$SOME_ADDRESS_YOU_CONTROL" --port 9545 --networkId 1004 --deterministic
 
 # we need to trick ZeppelinOS into thinking that this test network has the same state as the real Rinkeby. To do this, we just need to:
 # cp zos.rinkeby.json zos.dev-1004.json
 
-# if you want to verify that your chain is actually forked with the current state, you can run `truffle console --network rinkeby-test` 
+# if you want to verify that your chain is actually forked with the current state, you can run `truffle console --network rinkeby-test`
 # and interact with the main proxy contract using the same address returned after the `npx zos create` command from above
 
 # now it's time to make your contract changes, push them to this forked chain and test them before going public:
