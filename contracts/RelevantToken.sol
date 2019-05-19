@@ -44,6 +44,13 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
 
   mapping(address => uint256) nonces;
 
+  // added in RewardSplit upgrade
+  uint256 public initRoundAirdrop; // Initial airdrop amount -- will be hardcoded to equal initRoundReward
+  // (initRoundAirdrop should be <= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
+  uint256 public airdropSwitchRound; // Round at which we switch to exponential airdrop decay
+  uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round in new airdrop schedule
+  uint256 public lastRoundAirdrop; // Airdrop of the last round from which tokens were released
+
   /**
    * @dev ContPreInflationaryToken constructor
    * @param _devFundAddress         Address that receives and manages newly minted tokens for development fund
@@ -311,14 +318,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   function roundsSincleLast() public view returns (uint256) {
     return roundNum() - lastRound;
   }
-
-
-  // added in RewardSplit upgrade
-  uint256 public initRoundAirdrop; // Initial airdrop amount -- will be hardcoded to equal initRoundReward
-  // (initRoundAirdrop should be <= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
-  uint256 public airdropSwitchRound; // Round at which we switch to exponential airdrop decay
-  uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round in new airdrop schedule
-  uint256 public lastRoundAirdrop; // Airdrop of the last round from which tokens were released
 
   // * @dev Initialize new storage variables added in airdrop-reward-split upgrade
   // * @param _airdropRoundDecay      Decay factor for the airdrops reduction during one round -
