@@ -39,9 +39,9 @@ The resulting inflation dynamics will look much smoother:
 
 The final inflation mechanism has the rewards decay exponentially, until an inflation rate is reached that should be maintained for the rest of time. This means that after the target inflation rate has been reached, the absolute reward amount starts increasing again. The choice of that target inflation rate determines the `targetRound` from which inflation should stay constant.
 
-![TargetInflationTotal](https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzvgvwpqAewSBgFbeLosFO2j5mJ5t8DfKVLt-aJVCAQ7BBF7MullGYJfYYFeRhzDjkwJhbeUb4osN/pubchart?oid=1921205365&format=image)
+![TargetInflationTotal](https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzvgvwpqAewSBgFbeLosFO2j5mJ5t8DfKVLt-aJVCAQ7BBF7MullGYJfYYFeRhzDjkwJhbeUb4osN/pubchart?oid=416274888&format=image)
 
-![TargetInflationNew](https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzvgvwpqAewSBgFbeLosFO2j5mJ5t8DfKVLt-aJVCAQ7BBF7MullGYJfYYFeRhzDjkwJhbeUb4osN/pubchart?oid=7429942&format=image)
+![TargetInflationNew](https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzvgvwpqAewSBgFbeLosFO2j5mJ5t8DfKVLt-aJVCAQ7BBF7MullGYJfYYFeRhzDjkwJhbeUb4osN/pubchart?oid=1580316024&format=image)
 
 ![TargetInflationInflation](https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzvgvwpqAewSBgFbeLosFO2j5mJ5t8DfKVLt-aJVCAQ7BBF7MullGYJfYYFeRhzDjkwJhbeUb4osN/pubchart?oid=1228023220&format=image)
 
