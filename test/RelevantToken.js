@@ -232,19 +232,27 @@ contract('token', accounts => {
   });
 
   it('Allows user to claim rewards and fails with used nonce', async () => {
-    let amount = await token.allocatedRewards.call();
-    let startBalance = await token.balanceOf(accounts[1]);
+    let owner = await token.owner.call();
+    const user = owner;
 
-    let nonce = await token.nonceOf.call(accounts[1]);
-    let hash = soliditySha3(amount, accounts[1], nonce.toNumber());
+    // let amount = await token.allocatedRewards.call();
+    let amount = new BN(100);
+
+    let startBalance = await token.balanceOf(user);
+
+    let nonce = await token.nonceOf.call(user);
+    let hash = soliditySha3(amount, user, nonce.toNumber());
     let sig = await web3.eth.sign(hash, accounts[0]);
 
+    console.log(hash);
+    console.log(sig);
+
     let claimTokens = await token.claimTokens(amount, sig, {
-      from: accounts[1]
+      from: user
     });
     console.log('claimTokens gas ', claimTokens.receipt.gasUsed);
 
-    let endBalance = await token.balanceOf(accounts[1]);
+    let endBalance = await token.balanceOf(user);
     expect(endBalance.sub(startBalance).toString()).to.bignumber.equal(
       amount.toString()
     );
@@ -252,7 +260,7 @@ contract('token', accounts => {
     // should fail with previous nonce
     let didThrow = false;
     try {
-      await token.claimTokens(amount, sig, { from: accounts[1] });
+      await token.claimTokens(amount, sig, { from: user });
     } catch (e) {
       didThrow = true;
     }

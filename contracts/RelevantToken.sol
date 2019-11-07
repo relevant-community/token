@@ -131,9 +131,9 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     }
 
     splitRewards(releasableTokens); // split into different buckets (rewardFund, airdrop, devFund)
-    toDevFund(); // transfer devFund out immediately
     lastRound = currentRound; // Set current round as last release
     totalReleased = totalReleased.add(releasableTokens); // Increase totalReleased count
+    toDevFund(); // transfer devFund out immediately
     emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
     return true;
   }
@@ -222,15 +222,16 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     // TODO: this needs to be worked out! with https://user-images.githubusercontent.com/337721/52804952-7e3f3080-3053-11e9-8bb2-9bc1c3df19ee.jpg
     // and using Bancor's Power formula for e^x
     // alternatively use the integral of the reward function:
-    // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward)); 
+    // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward));
   }
 
   /**
    * @dev Transfer eligible tokens from devFund bucket to devFundAddress
    */
   function toDevFund() internal returns(bool) {
-    require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
+    uint256 amount = developmentFund;
     developmentFund = 0;
+    require(this.transfer(devFundAddress, amount), "Transfer to devFundAddress failed");
     return true;
   }
 
@@ -263,7 +264,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   */
   function claimTokens(uint256 _amount, bytes memory _sig) public returns(bool) {
     // check _amount + account matches hash
-    require(allocatedRewards >= _amount);
+    require(allocatedRewards >= _amount, "Not enought allocated rewarads");
     bytes32 hash = keccak256(abi.encodePacked(_amount, msg.sender, nonces[msg.sender]));
     hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
 
@@ -293,7 +294,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Return rounds since last release
+   * @dev Return rounds since last release *typo*
    */
   function roundsSincleLast() public view returns (uint256) {
     return roundNum() - lastRound;
