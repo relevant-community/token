@@ -1,7 +1,7 @@
 
-testName='RelevantToken'
+testName='Relevant'
 testDecimals=18
-testSymbol='RVT'
+testSymbol='REL'
 testVersion='v1'
 testDevFundAddress='0xffcf8fdee72ac11b5c542428b35eef5769c409f0'
 initRoundReward=2500
