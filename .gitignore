@@ -1,4 +1,6 @@
 node_modules
+# truffle build directory
+build/
 
 # local env variables
 .env

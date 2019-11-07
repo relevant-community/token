@@ -23,15 +23,15 @@ contract RelevantTokenMock is RelevantToken{
    * @dev Artificially sets the last release round // auxiliary function for testing (simulating reward release)
    */
   function setLastRound(
-    uint256 _roundNum, 
-    uint256 _lastRoundReward, 
-    uint256 _totalReleased, 
+    uint256 _roundNum,
+    uint256 _lastRoundReward,
+    uint256 _totalReleased,
     uint256 _totalAirdrops,
     uint256 _lastRoundAirdrop,
     uint256 _totalRewardReserve
-  ) public 
-    onlyOwner 
-    returns (uint256) 
+  ) public
+    onlyOwner
+    returns (uint256)
   {
     require(_roundNum < currentRound, "Last release must be before current round");
     lastRound = _roundNum;

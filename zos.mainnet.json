@@ -1,7 +1,7 @@
 {
   "contracts": {
     "RelevantToken": {
-      "address": "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab",
+      "address": "0xd05e0e497a570Ad0a1402375561293Bd01e9cb73",
       "constructorCode": "608060405234801561001057600080fd5b50613c8c806100206000396000f3fe",
       "bodyBytecodeHash": "b8a1cb48c394a7c623bd278ee9431897d399024a385a61c47af3acd26af94741",
       "localBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
@@ -368,31 +368,7 @@
         "hasSelfDestruct": false,
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": [],
-        "storageUncheckedVars": [
-          {
-            "contract": "MinterRole",
-            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
-            "label": "_minters",
-            "astId": 2546,
-            "type": "t_struct<Roles.Role>",
-            "src": "271:27:6"
-          }
-        ],
-        "storageDiff": [
-          {
-            "action": "insert",
-            "updated": {
-              "index": 32,
-              "contract": "RelevantToken",
-              "path": "contracts/RelevantToken.sol",
-              "label": "reserveFund",
-              "astId": 1611,
-              "type": "t_uint256",
-              "src": "1725:26:3"
-            }
-          }
-        ]
+        "uninitializedBaseContracts": []
       }
     }
   },
@@ -400,34 +376,9 @@
   "proxies": {
     "inflationary-token/RelevantToken": [
       {
-        "address": "0xD8eFF32B3Fa436A3904851A0e95A8cD965c245a5",
+        "address": "0xb6c4267C4877BB0D6b1685Cfd85b0FBe82F105ec",
         "version": "0.1.0",
-        "implementation": "0x321DD22870b5DF733a30498763a2A43FEda8A5F4"
-      },
-      {
-        "address": "0xb592244aa6477eBDDc14475aaeF921cdDcC0170f",
-        "version": "0.1.0",
-        "implementation": "0x321DD22870b5DF733a30498763a2A43FEda8A5F4"
-      },
-      {
-        "address": "0x2407502574D7d31404CFA2b004E3c1512E3414fc",
-        "version": "0.1.0",
-        "implementation": "0xca766AC2a16469Eec6d14198c942F9899CF71ADA"
-      },
-      {
-        "address": "0xa55063e6c2F4aD68a4C9cEAC148627a84aCfaA11",
-        "version": "0.1.0",
-        "implementation": "0x1e227f2F0e55055F4e07Eb12c8AD5Da5B42bFCd2"
-      },
-      {
-        "address": "0xF165dA055a3f6AcF232AB248485f3a54846B2E93",
-        "version": "0.1.0",
-        "implementation": "0x1e227f2F0e55055F4e07Eb12c8AD5Da5B42bFCd2"
-      },
-      {
-        "address": "0x5b1869D9A4C187F2EAa108f3062412ecf0526b24",
-        "version": "0.1.0",
-        "implementation": "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab"
+        "implementation": "0xd05e0e497a570Ad0a1402375561293Bd01e9cb73"
       }
     ]
   },
@@ -435,12 +386,11 @@
   "version": "0.1.0",
   "dependencies": {
     "openzeppelin-eth": {
-      "package": "0x07a457d878BF363E0Bb5aa0B096092f941e19962",
-      "version": "2.1.3",
-      "customDeploy": true
+      "package": "0x778dddf23ec1b5cb18394c6c110480caadb3b0f6",
+      "version": "2.1.3"
     }
   },
   "proxyAdmin": {
-    "address": "0x0741fB496E58A1Fbc8cb9Ef9E096393e62582613"
+    "address": "0x6E9cA4514744E177E354613F9c0Df0BFBCa407d1"
   }
 }
