@@ -18,12 +18,17 @@ contract('token', accounts => {
   let retContractBalance;
   let retCurationRewards;
   let retAirdropRewards;
+  let retReserveFund;
   let retDevFund;
   let retDevFundBalance;
   let retTotalReleased;
   let retTotalSupply;
   let inflationRewards;
+  let airdropFund;
+  let reserveFund;
+  let curationRewardFund;
   let totalReleased;
+  let totalAirdrops;
   let lastRoundRewardDecay;
   let devFundBalance;
   let allocatedAirdrops;
@@ -39,11 +44,17 @@ contract('token', accounts => {
   const halfLife = 8760; // # of rounds to decay by half
   let timeConstant = (halfLife / Math.LN2) * p;
   const targetInflation = 10880216701148;
-  let initRoundReward = 2500 * p;
+  let initRoundReward = 25000 * p;
   const roundLength = 1; // 240;
   let roundDecay = 999920876739935000;
   const targetRound = 26704;
-  let totalPremint = 27777044629743800000000000;
+  let totalPremint = 277770446297438000000000000;
+
+  // parameters added in airdrop-reward-split upgrade:
+
+  let airdropSwitchRound = 8352;
+  let airdropRoundDecay = 999762649000782000;
+  let firstNewAirdrop = 3442799625893100000000;
 
   // transform big number parameters for contract initialization
   // (ugh is there a better way to do this?)
@@ -57,6 +68,13 @@ contract('token', accounts => {
     .toFixed(0)
     .toString();
   let roundDecayBNString = new BN(roundDecay.toString()).toFixed(0).toString();
+
+  let airdropRoundDecayBNString = new BN(airdropRoundDecay.toString())
+    .toFixed(0)
+    .toString();
+  let firstNewAirdropBNString = new BN(firstNewAirdrop.toString())
+    .toFixed(0)
+    .toString();
 
   // compute total rewards accumulated until roundNum using loops with discrete decay factor
   const calcTotalRewards = roundNum => {
@@ -78,6 +96,26 @@ contract('token', accounts => {
       }
     }
     return rewardsSum / p;
+  };
+
+  // compute total airdrops accumulated until roundNum using loops with discrete decay factor
+  const calcTotalAirdrops = roundNum => {
+    let roundAirdrop;
+    let airdropSum;
+    if (roundNum < airdropSwitchRound) {
+      airdropSum = (((calcTotalRewards(roundNum) * 4) / 5) * 1) / 3;
+    } else {
+      roundAirdrop = firstNewAirdrop / p;
+      let roundsPassedSinceSwitch = roundNum - airdropSwitchRound;
+      airdropSum = (((calcTotalRewards(airdropSwitchRound - 1) * 4) / 5) * 1) / 3
+        + firstNewAirdrop / p;
+      for (let i = 0; i < roundsPassedSinceSwitch; i++) {
+        roundAirdrop *= airdropRoundDecay / p;
+        airdropSum += roundAirdrop;
+      }
+    }
+    return airdropSum; // don't need to divide by p because
+    // calcTotalRewards and calcTotalAirdrops already do so.
   };
 
   // calculate total premint
@@ -118,66 +156,71 @@ contract('token', accounts => {
   });
 
   it('Computes total rewards correctly at the start of decay phase', async () => {
-    totalReleased = await testForRounds(0, 1);
-    await testForRounds(0, 24);
-    await testForRounds(0, 100);
-    await testForRounds(0, 500);
+    totalReleased = await testRewardsForRounds(0, 1);
+    await testRewardsForRounds(0, 24);
+    await testRewardsForRounds(0, 100);
+    await testRewardsForRounds(0, 200);
   });
 
   it('Computes total rewards correctly in the middle and end of the decay phase', async () => {
     const decayMiddleCheck = Math.round(targetRound / 2);
     const decayEndCheck = targetRound - 300;
-    await testForRounds(decayMiddleCheck, decayMiddleCheck + 1);
-    await testForRounds(decayMiddleCheck, decayMiddleCheck + 100);
-    await testForRounds(decayMiddleCheck, decayMiddleCheck + 500);
-    await testForRounds(decayEndCheck, decayEndCheck + 5);
-    await testForRounds(decayEndCheck, decayEndCheck + 100);
+    await testRewardsForRounds(decayMiddleCheck, decayMiddleCheck + 1);
+    await testRewardsForRounds(decayMiddleCheck, decayMiddleCheck + 100);
+    await testRewardsForRounds(decayMiddleCheck, decayMiddleCheck + 200);
+    await testRewardsForRounds(decayEndCheck, decayEndCheck + 5);
+    await testRewardsForRounds(decayEndCheck, decayEndCheck + 100);
   });
 
   it('Computes total rewards correctly when crossing from decay to constant phase', async () => {
-    await testForRounds(targetRound - 1, targetRound);
-    await testForRounds(targetRound - 1, targetRound + 10);
-    await testForRounds(targetRound - 5, targetRound + 5);
+    await testRewardsForRounds(targetRound - 1, targetRound);
+    await testRewardsForRounds(targetRound - 1, targetRound + 10);
+    await testRewardsForRounds(targetRound - 5, targetRound + 5);
   });
 
   it('Computes total rewards correctly in the constant inflation phase', async () => {
     const constMiddleCheck = targetRound + 500;
-    await testForRounds(targetRound, targetRound + 1);
-    await testForRounds(constMiddleCheck, constMiddleCheck + 100);
+    await testRewardsForRounds(targetRound, targetRound + 1);
+    await testRewardsForRounds(constMiddleCheck, constMiddleCheck + 100);
   });
 
-  it('Splits rewards into curation and airdrop buckets', async () => {
-    await testForRounds(0, 100);
-    totalReleased = await getReleasedTokens();
-    console.log('totalReleased', totalReleased);
-    const curationRewards = await getValue('rewardFund');
-    const airdropRewards = await getValue('airdropFund');
-    const reserveFund = await getValue('reserveFund');
+  it('Splits rewards into curation rewards, airdrops and reserve buckets', async () => {
+    await token.initializeRewardSplit(
+      airdropSwitchRound,
+      airdropRoundDecayBNString,
+      firstNewAirdropBNString
+    ); // feature was added in contract upgrade
 
-    // for now the contract splits user rewards 50/50 into curation and aidrops
-    // (together 4/5th of total)
-    const rewardFund = 4 / 5;
-    const split = 1 / 3;
+    // in the beginning / under old airdrops schedule
+    await testRewardsSplitForRounds(0, 24);
+    await testRewardsSplitForRounds(0, 100);
+    await testRewardsSplitForRounds(0, 200);
+    await testRewardsSplitForRounds(100, 300);
 
-    expect(curationRewards).to.be.bignumber.below(
-      totalReleased * split * rewardFund + 0.00001
+    // before new airdrop schedule:
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 100,
+      airdropSwitchRound - 1
     );
-    expect(curationRewards).to.be.bignumber.above(
-      totalReleased * split * rewardFund - 0.00001
-    );
-    expect(airdropRewards).to.be.bignumber.below(
-      totalReleased * split * rewardFund + 0.00001
-    );
-    expect(airdropRewards).to.be.bignumber.above(
-      totalReleased * split * rewardFund - 0.00001
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 10,
+      airdropSwitchRound - 1
     );
 
-    expect(reserveFund).to.be.bignumber.below(
-      totalReleased * split * rewardFund + 0.00001
+    // under new airdrop schedule:
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 1,
+      airdropSwitchRound + 24
     );
-    expect(reserveFund).to.be.bignumber.above(
-      totalReleased * split * rewardFund - 0.00001
+    await testRewardsSplitForRounds(
+      airdropSwitchRound - 1,
+      airdropSwitchRound + 100
     );
+
+    // CAUTION: We must not do a release at or right after airdropSwitchRound that covers too many
+    // of the previous rounds (because all those previous rounds will be considered under the
+    // new airdrop schedule, as long as the current release round is >= airdropSwitchRound).
+    // For perfect precision, do a release right before the switch, i.e. airdropSwitchRound-1
   });
 
   it('Transfers devFund to devFundAddress', async () => {
@@ -195,7 +238,7 @@ contract('token', accounts => {
     devFundBalance = await getDevFundBalance();
     expect(devFundBalance).to.be.bignumber.equal(0);
     // simulate some rounds
-    await testForRounds(0, 100);
+    await testRewardsForRounds(0, 100);
     totalReleased = await getReleasedTokens();
     devFundBalance = await getDevFundBalance();
     // devFundAddress should get 1/5th of all rewards
@@ -203,7 +246,7 @@ contract('token', accounts => {
     expect(devFundBalance).to.be.bignumber.above(totalReleased / 5 - 0.00001);
   });
 
-  it('Allocates user and airdrop rewards', async () => {
+  it('Allocates curation and airdrop rewards', async () => {
     // allocated rewards should be 0 since we have not allocated yet
     allocatedRewards = await token.allocatedRewards();
     allocatedAirdrops = await token.allocatedAirdrops();
@@ -289,8 +332,10 @@ contract('token', accounts => {
   };
 
   // compute rewards from ]lastRound, currentRound] and compare to released
-  const testForRounds = async (lastRound, currentRound) => {
-    console.log(`COMPARING FOR ROUNDS ]${lastRound}, ${currentRound}]`);
+  const testRewardsForRounds = async (lastRound, currentRound) => {
+    console.log(
+      `TESTING TOTAL REWARDS FOR ROUNDS ]${lastRound}, ${currentRound}]`
+    );
     await token.setRoundNum(currentRound);
     // compute the last release data to simulate contract state at current release
     lastRoundRewardDecay = new BN(
@@ -301,18 +346,101 @@ contract('token', accounts => {
     totalReleased = new BN((calcTotalRewards(lastRound) * p).toString())
       .toFixed(0)
       .toString();
+
+    totalAirdrops = new BN((calcTotalAirdrops(lastRound) * p).toString())
+      .toFixed(0)
+      .toString();
+
+    let lastRoundAirdropDecay = new BN(
+      (initRoundReward * (airdropRoundDecay / p) ** lastRound).toString()
+    )
+      .toFixed(0)
+      .toString(); // this assumes that initRoundAirdrop is set equal
+    // to initRoundReward (i.e. all token rewards in the very first round are airdrops)
+
+    let totalRewardReserve = new BN(
+      (
+        (calcTotalRewards(lastRound) * p * 4) / 5
+        - calcTotalAirdrops(lastRound) * p
+      ).toString()
+    )
+      .toFixed(0)
+      .toString();
+
     if (lastRound === 0) {
       // Usually the rewards from lastRound have already been released. Round 0 is an exception.
       totalReleased = 0;
+      totalAirdrops = 0;
+      totalRewardReserve = 0;
     }
-    await token.setLastRound(lastRound, lastRoundRewardDecay, totalReleased);
+    console.log(
+      'Contract initialized to:',
+      'total tokens released-',
+      totalReleased,
+      'total airdrops-',
+      totalAirdrops,
+      'rewards+reserve-',
+      totalRewardReserve
+    );
+
+    await token.setLastRound(
+      lastRound,
+      lastRoundRewardDecay,
+      totalReleased,
+      totalAirdrops,
+      lastRoundAirdropDecay,
+      totalRewardReserve
+    );
     await token.releaseTokens();
     totalReleased = await getReleasedTokens();
     inflationRewards = calcTotalRewards(currentRound);
-    console.log('computed: ', inflationRewards.toString());
-    console.log('released: ', totalReleased.toString());
+    console.log('computed total rewards: ', inflationRewards.toString());
+    console.log('released total rewards: ', totalReleased.toString());
     expect(totalReleased).to.be.bignumber.above(inflationRewards - 0.00001);
     expect(totalReleased).to.be.bignumber.below(inflationRewards + 0.00001);
+  };
+
+  const testRewardsSplitForRounds = async (lastRound, currentRound) => {
+    console.log(
+      `TESTING REWARDS SPLIT FOR ROUNDS ]${lastRound}, ${currentRound}]`
+    );
+    await testRewardsForRounds(lastRound, currentRound);
+    totalReleased = await getReleasedTokens();
+
+    retCurationRewards = await getValue('rewardFund');
+    retAirdropRewards = await getValue('airdropFund');
+    retReserveFund = await getValue('reserveFund');
+
+    // all user rewards together should make up for 80% of the released rewards
+    const userRewardsShare = 4 / 5;
+    const userRewardsSum = +retCurationRewards + +retAirdropRewards + +retReserveFund;
+    expect(userRewardsSum).to.be.bignumber.below(
+      totalReleased * userRewardsShare + 0.00001
+    );
+    expect(userRewardsSum).to.be.bignumber.above(
+      totalReleased * userRewardsShare - 0.00001
+    );
+
+    airdropFund = calcTotalAirdrops(currentRound);
+    // the remaining user rewards are split equally into curation rewards and reserve fund
+    curationRewardFund = 0.5 * (userRewardsSum - airdropFund);
+    reserveFund = curationRewardFund;
+
+    console.log('computed airdrops: ', airdropFund.toString());
+    console.log('released airdrops: ', retAirdropRewards.toString());
+
+    // TODO: FIX PRECISION ISSUE OR SLIGHT CALCULATION ERROR HERE:
+    expect(retAirdropRewards).to.be.bignumber.below(airdropFund + 0.00001);
+    expect(retAirdropRewards).to.be.bignumber.above(airdropFund - 0.00001);
+
+    expect(retCurationRewards).to.be.bignumber.below(
+      curationRewardFund + 0.00001
+    );
+    expect(retCurationRewards).to.be.bignumber.above(
+      curationRewardFund - 0.00001
+    );
+    expect(retReserveFund).to.be.bignumber.below(reserveFund + 0.00001);
+    expect(retReserveFund).to.be.bignumber.above(reserveFund - 0.00001);
   };
 });
 

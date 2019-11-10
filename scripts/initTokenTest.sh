@@ -16,4 +16,4 @@ totalPremintBNString=27777044629743800000000000
 
 args=$(echo $testName,$testDecimals,$testSymbol,$testVersion,$testDevFundAddress,$initRoundRewardBNString,$timeConstantBNString,$targetInflation,$targetRound,$roundLength,$roundDecayBNString,$totalPremintBNString)
 echo $args
-npx zos create RelevantToken --init initialize --args $args --network local
+npx oz create RelevantToken --init initialize --args $args --network local

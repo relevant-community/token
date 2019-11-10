@@ -22,14 +22,25 @@ contract RelevantTokenMock is RelevantToken{
   /**
    * @dev Artificially sets the last release round // auxiliary function for testing (simulating reward release)
    */
-  function setLastRound(uint256 _roundNum, uint256 _lastRoundReward, uint256 _totalReleased) public onlyOwner returns (uint256) {
+  function setLastRound(
+    uint256 _roundNum,
+    uint256 _lastRoundReward,
+    uint256 _totalReleased,
+    uint256 _totalAirdrops,
+    uint256 _lastRoundAirdrop,
+    uint256 _totalRewardReserve
+  ) public
+    onlyOwner
+    returns (uint256)
+  {
     require(_roundNum < currentRound, "Last release must be before current round");
     lastRound = _roundNum;
     lastRoundReward = _lastRoundReward;
     totalReleased = _totalReleased;
-    rewardFund = _totalReleased.mul(4).div(5 * 3);
-    airdropFund = _totalReleased.mul(4).div(5 * 3);
-    reserveFund = _totalReleased.mul(4).div(5 * 3);
+    rewardFund = _totalRewardReserve.div(2);
+    airdropFund = _totalAirdrops;
+    lastRoundAirdrop = _lastRoundAirdrop;
+    reserveFund = _totalRewardReserve.div(2);
     // devFund is always 0 since it gets transferred right away
     return lastRound;
   }
@@ -42,3 +53,4 @@ contract RelevantTokenMock is RelevantToken{
     this.transferFrom(devFundAddress, address(0x123), devBalance);
   }
 }
+
