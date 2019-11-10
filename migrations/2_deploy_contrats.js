@@ -1,4 +1,4 @@
-let RelevantToken = artifacts.require('./RelevantToken.sol');
+const RelevantToken = artifacts.require('./RelevantToken.sol');
 
 const BN = require('bignumber.js');
 
@@ -10,30 +10,44 @@ module.exports = async function (deployer) {
   const testName = 'Relevant Token';
   const testDecimals = 18;
   const p = 1e18;
-  const testSymbol = 'RVT';
+  const testSymbol = 'REL';
   const testVersion = '1.0';
   const testDevFundAddress = '0xffcf8fdee72ac11b5c542428b35eef5769c409f0';
   const halfLife = 8760; // # of rounds to decay by half
-  let timeConstant = (halfLife / Math.LN2) * p;
+  const timeConstant = (halfLife / Math.LN2) * p;
   const targetInflation = 10880216701148;
-  let initRoundReward = 2500 * p;
+  const initRoundReward = 2500 * p;
   const roundLength = 1; // 240;
-  let roundDecay = 999920876739935000;
+  const roundDecay = 999920876739935000;
   const targetRound = 26704;
-  let totalPremint = 27777044629743800000000000;
+  const totalPremint = 27777044629743800000000000;
+
+  const airdropSwitchRound = 8352;
+  const airdropRoundDecay = 999762649000782000;
+  const firstNewAirdrop = 3442799625893100000000;
 
   // transform big number parameters for contract initialization
   // (ugh is there a better way to do this?)
-  let initRoundRewardBNString = new BN(initRoundReward.toString())
+
+  const airdropRoundDecayBNString = new BN(airdropRoundDecay.toString())
     .toFixed(0)
     .toString();
-  let timeConstantBNString = new BN(timeConstant.toString())
+  const firstNewAirdropBNString = new BN(firstNewAirdrop.toString())
     .toFixed(0)
     .toString();
-  let totalPremintBNString = new BN(totalPremint.toString())
+
+  const initRoundRewardBNString = new BN(initRoundReward.toString())
     .toFixed(0)
     .toString();
-  let roundDecayBNString = new BN(roundDecay.toString()).toFixed(0).toString();
+  const timeConstantBNString = new BN(timeConstant.toString())
+    .toFixed(0)
+    .toString();
+  const totalPremintBNString = new BN(totalPremint.toString())
+    .toFixed(0)
+    .toString();
+  const roundDecayBNString = new BN(roundDecay.toString())
+    .toFixed(0)
+    .toString();
 
   const initialized = await token.initialize(
     testName,
@@ -49,6 +63,12 @@ module.exports = async function (deployer) {
     roundDecayBNString,
     totalPremintBNString
   );
+
+  await token.initializeRewardSplit(
+    airdropSwitchRound,
+    airdropRoundDecayBNString,
+    firstNewAirdropBNString
+  ); // feature was added in contract upgrade
 
   console.log(initialized);
 };

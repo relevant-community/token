@@ -12,7 +12,7 @@ import "zos-lib/contracts/Initializable.sol";
  * @title An Inflationary Token with premint, gradual release, exponential decay of inflationary rewards, and a target inflation rate
  */
 
-contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
+contract RelevantTokenPrev is Initializable, ERC20, Ownable, ERC20Mintable {
 
   event Released(uint256 releasableTokens, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
 
@@ -43,14 +43,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public allocatedAirdrops; // Bucket of airdrop reward tokens reserved/'spoken for' but not yet claimed by users
 
   mapping(address => uint256) nonces;
-
-  // added in RewardSplit upgrade
-  uint256 public initRoundAirdrop; // Initial airdrop amount -- will be hardcoded to equal initRoundReward
-  // (initRoundAirdrop should be <= initRoundReward, since roundAirdrop + roundCurationRewards = roundReward)
-  uint256 public airdropSwitchRound; // Round at which we switch to exponential airdrop decay
-  uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round in new airdrop schedule
-  uint256 public lastRoundAirdrop; // Airdrop of the last round from which tokens were released
-
 
   /**
    * @dev ContPreInflationaryToken constructor
@@ -102,19 +94,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     preMintTokens(_totalPremint);
   }
 
-  // * @dev Initialize new storage variables added in airdrop-reward-split upgrade
-  // * @param _airdropRoundDecay      Decay factor for the airdrops reduction during one round -
-  //                                  (should be much higher than roundDecay => airdrops decrease faster)
-  // * @param _airdropSwitchRound     Round at which airdrops from previous calculation and exponentially decaying airdrops are the same
-  //                                  (assumed to be below targetRound, so we can solve for this by setting old airdrops equal to new airdrops)
-  function initializeRewardSplit(uint256 _airdropSwitchRound, uint256 _airdropRoundDecay, uint256 _firstNewAirdrop) public {
-    require(initRoundAirdrop == 0 && airdropSwitchRound == 0 && lastRoundAirdrop == 0 && airdropRoundDecay == 0, "Already initialized");
-    initRoundAirdrop = initRoundReward; // can change this to anything below initRoundReward (passing additional argument)
-    airdropSwitchRound = _airdropSwitchRound;
-    airdropRoundDecay = _airdropRoundDecay;
-    lastRoundAirdrop = _firstNewAirdrop; // the lastRoundAirdrop will be needed for the recursive calculation starting at airdropSwitchRound
-  }
-
   /**
    * @dev Mint the number of inflationary tokens until constant inflation/target round is reached
    */
@@ -151,11 +130,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       }
     }
 
-    splitRewards(releasableTokens, roundsPassed, currentRound); // split into different buckets (rewardFund, airdrop, devFund)
-
+    splitRewards(releasableTokens); // split into different buckets (rewardFund, airdrop, devFund)
+    toDevFund(); // transfer devFund out immediately
     lastRound = currentRound; // Set current round as last release
     totalReleased = totalReleased.add(releasableTokens); // Increase totalReleased count
-    toDevFund(); // transfer devFund out immediately
     emit Released(releasableTokens, rewardFund, airdropFund, developmentFund);
     return true;
   }
@@ -226,29 +204,14 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Put new rewards into the different buckets (userRewards: [airdrop, rewardFund], developmentFund)
    * @param _releasableTokens Amount of tokens that needs to be split up
    */
-  function splitRewards(uint256 _releasableTokens, uint256 _roundsPassed, uint256 _currentRound) internal {
+  function splitRewards(uint256 _releasableTokens) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
+    airdropFund = airdropFund.add(userRewards.div(3));
+    rewardFund = rewardFund.add(userRewards.div(3));
+    reserveFund = reserveFund.add(userRewards.div(3));
+    // For now half of the user rewards are curation rewards and half are signup/referral/airdrop rewards
+    // @Proposal for later: Formula for calculating airdrop vs curation reward split: airdrops = user rewards * airdrop base share ^ (roundNumber)
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
-    if (_currentRound < airdropSwitchRound) {
-      airdropFund = airdropFund.add(userRewards.div(3));
-      rewardFund = rewardFund.add(userRewards.div(3));
-      reserveFund = reserveFund.add(userRewards.div(3));
-    } else {
-      uint256 airdrops;
-      uint256 roundAirdrop;
-
-      for (uint j = 0; j < _roundsPassed; j++) {
-        roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
-        airdrops = airdrops.add(roundAirdrop);
-        lastRoundAirdrop = roundAirdrop;
-      }
-
-      airdropFund = airdropFund.add(airdrops);
-      // remaining rewards are divided equally between rewardFund and reserveFund:
-      rewardFund = rewardFund.add((userRewards.sub(airdrops)).div(2));
-      reserveFund = reserveFund.add((userRewards.sub(airdrops)).div(2));
-    }
-
   }
 
   /**
@@ -266,9 +229,8 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Transfer eligible tokens from devFund bucket to devFundAddress
    */
   function toDevFund() internal returns(bool) {
-    uint256 amount = developmentFund;
+    require(this.transfer(devFundAddress, developmentFund), "Transfer to devFundAddress failed");
     developmentFund = 0;
-    require(this.transfer(devFundAddress, amount), "Transfer to devFundAddress failed");
     return true;
   }
 
@@ -301,7 +263,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   */
   function claimTokens(uint256 _amount, bytes memory _sig) public returns(bool) {
     // check _amount + account matches hash
-    require(allocatedRewards >= _amount, "Not enought allocated rewarads");
+    require(allocatedRewards >= _amount);
     bytes32 hash = keccak256(abi.encodePacked(_amount, msg.sender, nonces[msg.sender]));
     hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
 
@@ -331,7 +293,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-   * @dev Return rounds since last release *typo*
+   * @dev Return rounds since last release
    */
   function roundsSincleLast() public view returns (uint256) {
     return roundNum() - lastRound;
