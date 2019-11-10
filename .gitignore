@@ -12,3 +12,7 @@ build/
 coverage
 coverage.json
 coverageEnv
+
+# ZeppelinOS
+.openzeppelin/dev-*.json
+.openzeppelin/.session
