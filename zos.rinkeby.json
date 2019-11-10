@@ -1,11 +1,11 @@
 {
   "contracts": {
     "RelevantToken": {
-      "address": "0xF27C843aA9bc8a1c3e317B52D52e521c7ea5AecE",
-      "constructorCode": "608060405234801561001057600080fd5b50613c8c806100206000396000f3fe",
-      "bodyBytecodeHash": "b8a1cb48c394a7c623bd278ee9431897d399024a385a61c47af3acd26af94741",
-      "localBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
-      "deployedBytecodeHash": "fe33b25f3c7f9212eed70c980aab568c64b2652a6c0eabafd73711a57658edb3",
+      "address": "0x988b89a36c66380dF8ea342b93b249770f3780e6",
+      "constructorCode": "608060405234801561001057600080fd5b5061408b806100206000396000f3fe",
+      "bodyBytecodeHash": "69bb1f2a671e77822650b595652173291ee042f88847723b76e4ff735d0a711e",
+      "localBytecodeHash": "f600200c30e77b07d9cf6b8465af730bd11d69b4cb91fca61b676227a9245241",
+      "deployedBytecodeHash": "f600200c30e77b07d9cf6b8465af730bd11d69b4cb91fca61b676227a9245241",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -42,9 +42,9 @@
           "members": [
             {
               "label": "bearer",
-              "astId": 2439,
+              "astId": 3349,
               "type": "t_mapping<t_bool>",
-              "src": "150:32:5"
+              "src": "150:32:6"
             }
           ]
         },
@@ -70,97 +70,97 @@
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 3535,
+          "astId": 4445,
           "type": "t_bool",
-          "src": "757:24:13"
+          "src": "757:24:14"
         },
         {
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 3537,
+          "astId": 4447,
           "type": "t_bool",
-          "src": "876:25:13"
+          "src": "876:25:14"
         },
         {
           "contract": "Initializable",
           "path": "zos-lib/contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 3586,
+          "astId": 4503,
           "type": "t_array:50<t_uint256>",
-          "src": "1891:29:13"
+          "src": "1951:29:14"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "_balances",
-          "astId": 2990,
+          "astId": 3900,
           "type": "t_mapping<t_uint256>",
-          "src": "774:46:10"
+          "src": "774:46:11"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "_allowed",
-          "astId": 2996,
+          "astId": 3906,
           "type": "t_mapping<t_uint256>",
-          "src": "827:66:10"
+          "src": "827:66:11"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "_totalSupply",
-          "astId": 2998,
+          "astId": 3908,
           "type": "t_uint256",
-          "src": "900:28:10"
+          "src": "900:28:11"
         },
         {
           "contract": "ERC20",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
           "label": "______gap",
-          "astId": 3412,
+          "astId": 4322,
           "type": "t_array:50<t_uint256>",
-          "src": "7661:29:10"
+          "src": "7661:29:11"
         },
         {
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "_owner",
-          "astId": 2862,
+          "astId": 3772,
           "type": "t_address",
-          "src": "302:22:9"
+          "src": "302:22:10"
         },
         {
           "contract": "Ownable",
           "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
           "label": "______gap",
-          "astId": 2973,
+          "astId": 3883,
           "type": "t_array:50<t_uint256>",
-          "src": "2186:29:9"
+          "src": "2186:29:10"
         },
         {
           "contract": "MinterRole",
           "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
           "label": "_minters",
-          "astId": 2546,
+          "astId": 3456,
           "type": "t_struct<Roles.Role>",
-          "src": "271:27:6"
+          "src": "271:27:7"
         },
         {
           "contract": "MinterRole",
           "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
           "label": "______gap",
-          "astId": 2645,
+          "astId": 3555,
           "type": "t_array:50<t_uint256>",
-          "src": "1081:29:6"
+          "src": "1081:29:7"
         },
         {
           "contract": "ERC20Mintable",
           "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
           "label": "______gap",
-          "astId": 3461,
+          "astId": 4371,
           "type": "t_array:50<t_uint256>",
-          "src": "745:29:11"
+          "src": "745:29:12"
         },
         {
           "contract": "RelevantToken",
@@ -361,6 +361,38 @@
           "astId": 1621,
           "type": "t_mapping<t_uint256>",
           "src": "2213:34:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "initRoundAirdrop",
+          "astId": 1623,
+          "type": "t_uint256",
+          "src": "2286:31:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "airdropSwitchRound",
+          "astId": 1625,
+          "type": "t_uint256",
+          "src": "2503:33:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "airdropRoundDecay",
+          "astId": 1627,
+          "type": "t_uint256",
+          "src": "2597:32:3"
+        },
+        {
+          "contract": "RelevantToken",
+          "path": "contracts/RelevantToken.sol",
+          "label": "lastRoundAirdrop",
+          "astId": 1629,
+          "type": "t_uint256",
+          "src": "2715:31:3"
         }
       ],
       "warnings": {
@@ -368,7 +400,67 @@
         "hasSelfDestruct": false,
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": []
+        "uninitializedBaseContracts": [],
+        "storageUncheckedVars": [
+          {
+            "contract": "MinterRole",
+            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+            "label": "_minters",
+            "astId": 3456,
+            "type": "t_struct<Roles.Role>",
+            "src": "271:27:7"
+          }
+        ],
+        "storageDiff": [
+          {
+            "action": "append",
+            "updated": {
+              "index": 37,
+              "contract": "RelevantToken",
+              "path": "contracts/RelevantToken.sol",
+              "label": "initRoundAirdrop",
+              "astId": 1623,
+              "type": "t_uint256",
+              "src": "2286:31:3"
+            }
+          },
+          {
+            "action": "append",
+            "updated": {
+              "index": 38,
+              "contract": "RelevantToken",
+              "path": "contracts/RelevantToken.sol",
+              "label": "airdropSwitchRound",
+              "astId": 1625,
+              "type": "t_uint256",
+              "src": "2503:33:3"
+            }
+          },
+          {
+            "action": "append",
+            "updated": {
+              "index": 39,
+              "contract": "RelevantToken",
+              "path": "contracts/RelevantToken.sol",
+              "label": "airdropRoundDecay",
+              "astId": 1627,
+              "type": "t_uint256",
+              "src": "2597:32:3"
+            }
+          },
+          {
+            "action": "append",
+            "updated": {
+              "index": 40,
+              "contract": "RelevantToken",
+              "path": "contracts/RelevantToken.sol",
+              "label": "lastRoundAirdrop",
+              "astId": 1629,
+              "type": "t_uint256",
+              "src": "2715:31:3"
+            }
+          }
+        ]
       }
     }
   },
@@ -376,29 +468,14 @@
   "proxies": {
     "inflationary-token/RelevantToken": [
       {
-        "address": "0xB5e45e52fbdeA57AC051700f75d7F66Fed637b9E",
-        "version": "0.1.0",
-        "implementation": "0xF27C843aA9bc8a1c3e317B52D52e521c7ea5AecE"
-      },
-      {
-        "address": "0xf188659c28F5FB8f9465863CD53929771A5dF3D9",
-        "version": "0.1.0",
-        "implementation": "0x0000000000000000000000000000000000000000"
-      },
-      {
-        "address": "0x232ADBDb37B3BAaffc9B692a1a7AEf9940D1D65B",
-        "version": "0.1.0",
-        "implementation": "0xF27C843aA9bc8a1c3e317B52D52e521c7ea5AecE"
-      },
-      {
         "address": "0xd05e0e497a570Ad0a1402375561293Bd01e9cb73",
-        "version": "0.1.0",
-        "implementation": "0xF27C843aA9bc8a1c3e317B52D52e521c7ea5AecE"
+        "version": "0.2.0",
+        "implementation": "0x988b89a36c66380dF8ea342b93b249770f3780e6"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "dependencies": {
     "openzeppelin-eth": {
       "package": "0xa44bb80b290de8a465d17b14269df53cf0b9bf4f",
