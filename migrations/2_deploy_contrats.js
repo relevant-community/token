@@ -49,7 +49,7 @@ module.exports = async function (deployer) {
     .toFixed(0)
     .toString();
 
-  const initialized = await token.initialize(
+  await token.initialize(
     testName,
     testDecimals,
     testSymbol,
@@ -69,6 +69,4 @@ module.exports = async function (deployer) {
     airdropRoundDecayBNString,
     firstNewAirdropBNString
   ); // feature was added in contract upgrade
-
-  console.log(initialized);
 };

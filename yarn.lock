@@ -6690,7 +6690,7 @@ opencollective-postinstall@^2.0.2:
   resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.2.tgz#5657f1bede69b6e33a45939b061eb53d3c6c3a89"
   integrity sha512-pVOEP16TrAO2/fjej1IdOyupJY8KDUM1CvsaScRbw6oddvpQoOfGk4ywha0HKKVAD6RkW4x6Q+tNBwhf3Bgpuw==
 
-openzeppelin-eth@^2.1.3:
+openzeppelin-eth@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/openzeppelin-eth/-/openzeppelin-eth-2.2.0.tgz#a3bcb8ba8332f7fe72addd49539905989b18a07e"
   integrity sha512-q0lpl2oaY60sg1qFF74Ed/fQBf450tvpCxz1f9C+V+KHDg+EAlCf7umPrXOvI77fda3FTWuVFS0bXQp+8VA4xA==
@@ -8933,10 +8933,10 @@ truffle-provider@^0.1.12:
     truffle-interface-adapter "^0.2.5"
     web3 "1.2.1"
 
-truffle@^5.0.4:
-  version "5.0.44"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.0.44.tgz#791df87992e32cf87840d3a58450e9e0331ccc0c"
-  integrity sha512-nbJAu5P76AU7wZxbQl/yPhf8g8gXMkVQtWZGRec5lz6w4fc4cOLrbAD6G6IJYVJqK3s8FTIjox0YKsI/Az/O6w==
+truffle@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.1.0.tgz#670d6791a2a97c6bf852d28a978e6635fe3c883a"
+  integrity sha512-RKij9cFhHeAb8HuP8D/llpcbe+k40fg8Q2SAeR+mkvlz9tid/opYkrWs9XN8eRQKCC0SSygrKBZLG3CMsNbXwQ==
   dependencies:
     app-module-path "^2.2.0"
     mocha "5.2.0"
@@ -9794,9 +9794,9 @@ web3-net@1.2.2:
     web3-core-method "1.2.2"
     web3-utils "1.2.2"
 
-"web3-provider-engine@git+https://github.com/trufflesuite/provider-engine.git#web3-one":
+"web3-provider-engine@https://github.com/trufflesuite/provider-engine#web3-one":
   version "14.0.6"
-  resolved "git+https://github.com/trufflesuite/provider-engine.git#3538c60bc4836b73ccae1ac3f64c8fed8ef19c1a"
+  resolved "https://github.com/trufflesuite/provider-engine#3538c60bc4836b73ccae1ac3f64c8fed8ef19c1a"
   dependencies:
     async "^2.5.0"
     backoff "^2.5.0"

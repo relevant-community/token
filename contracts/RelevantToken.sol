@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 import "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
@@ -236,6 +236,8 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     } else {
       uint256 airdrops;
       uint256 roundAirdrop;
+      // fix the inital lastRoundAirdrop being too big
+      lastRoundAirdrop = lastRoundReward.mul(4).div(15) < lastRoundAirdrop ? lastRoundReward.mul(4).div(15) : lastRoundAirdrop;
 
       for (uint j = 0; j < _roundsPassed; j++) {
         roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
