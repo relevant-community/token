@@ -4,9 +4,11 @@
   "description": "An inflationary token.",
   "main": "index.js",
   "scripts": {
+    "dev": "yarn ganache -q * sleep 3 & yarn migrate",
     "test": "NODE_ENV=test truffle test --network local",
     "watch": "npm-watch",
-    "ganache": "ganache-cli --port 9545 --deterministic --networkId 99",
+    "ganache": "ganache-cli --deterministic --networkId 99",
+    "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/7d2819de98bb46108cae44811facb5e0",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -23,7 +25,7 @@
     "@truffle/hdwallet-provider": "^1.0.24"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "^2.5.3",
+    "@openzeppelin/cli": "^2.8.0",
     "@openzeppelin/upgrades": "^2.5.3",
     "big-number": "^2.0.0",
     "bignumber.js": "^9.0.0",
@@ -41,7 +43,6 @@
     "prettier": "^1.19.1",
     "solidity-coverage": "^0.6.7",
     "truffle": "^5.1.0",
-    "web3": "^1.0.0-beta.46",
     "zos-lib": "^2.4.2"
   },
   "eslintIgnore": [
