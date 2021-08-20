@@ -1,10 +1,10 @@
 pragma solidity ^0.5.2;
 
-import "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-eth/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-eth/contracts/ownership/Ownable.sol";
-import "openzeppelin-eth/contracts/cryptography/ECDSA.sol";
-import "zos-lib/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 // import "./Power.sol";
 
 

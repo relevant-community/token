@@ -10,8 +10,6 @@
     "ganache": "ganache-cli --deterministic --networkId 99",
     "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/7d2819de98bb46108cae44811facb5e0",
     "coverage": "./node_modules/.bin/solidity-coverage",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "lint:sol": "solium -d .",
     "lint:sol:fix": "solium -d . --fix",
     "migrate": "truffle migrate --reset --network local",
@@ -19,36 +17,31 @@
     "userinkeby": "npx oz session --network rinkeby --from 0x4Ff99Ad3f67C84CBC08b8Ab5a36dE17be1DB908f --expires 3600",
     "usemainnet": "npx oz session --network mainnet --from 0x4Ff99Ad3f67C84CBC08b8Ab5a36dE17be1DB908f --expires 3600"
   },
-  "author": "Achill Rudolph",
+  "author": "Relevant",
   "license": "ISC",
   "dependencies": {
-    "@truffle/hdwallet-provider": "^1.0.24"
-  },
-  "devDependencies": {
-    "@openzeppelin/cli": "^2.8.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-truffle5": "^2.0.0",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/cli": "^2.8.2",
+    "@openzeppelin/contracts-ethereum-package": "^2.2.0",
+    "@openzeppelin/hardhat-upgrades": "^1.9.0",
     "@openzeppelin/upgrades": "^2.5.3",
+    "@truffle/hdwallet-provider": "^1.4.3",
     "big-number": "^2.0.0",
     "bignumber.js": "^9.0.0",
     "chai": "^4.2.0",
     "chai-bignumber": "^3.0.0",
     "dotenv": "^8.2.0",
-    "eslint": "^6.6.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
+    "ethers": "^5.4.5",
     "ethlint": "^1.2.5",
+    "hardhat": "^2.6.1",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "npm-watch": "^0.6.0",
-    "openzeppelin-eth": "^2.2.0",
-    "prettier": "^1.19.1",
-    "solidity-coverage": "^0.6.7",
-    "truffle": "^5.1.0",
-    "zos-lib": "^2.4.2"
+    "solidity-coverage": "^0.7.16",
+    "web3": "^1.5.2"
   },
-  "eslintIgnore": [
-    "/coverage",
-    "/node_modules"
-  ],
   "watch": {
     "test": {
       "patterns": [
@@ -66,10 +59,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "prettier --write",
-      "eslint --fix",
-      "solium -d . --fix",
-      "git add"
+      "solium -d . --fix"
     ]
   }
 }

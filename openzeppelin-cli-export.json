@@ -1,0 +1,64 @@
+{
+  "networks": {
+    "dev-99": {
+      "proxies": {
+        "inflationary-token/RelevantToken": [
+          {
+            "address": "0x6f84742680311CEF5ba42bc10A71a4708b4561d1",
+            "version": "0.1.0",
+            "implementation": "0xC5aFE31AE505594B190AC71EA689B58139d1C354",
+            "admin": "0xFF5181e2210AB92a5c9db93729Bc47332555B9E9",
+            "kind": "Upgradeable"
+          }
+        ]
+      },
+      "dependencies": {
+        "@openzeppelin/contracts-ethereum-package": {
+          "package": "0xD13ebb5C39fB00C06122827E1cbD389930C9E0E3",
+          "version": "2.1.3",
+          "customDeploy": true
+        }
+      }
+    },
+    "mainnet": {
+      "proxies": {
+        "inflationary-token/RelevantToken": [
+          {
+            "address": "0xb6c4267C4877BB0D6b1685Cfd85b0FBe82F105ec",
+            "version": "0.2.0",
+            "implementation": "0x581340256ba7d361d0a26a96428548A8D3bcD12f"
+          }
+        ]
+      },
+      "dependencies": {
+        "@openzeppelin/contracts-ethereum-package": {
+          "package": "0x778dddf23ec1b5cb18394c6c110480caadb3b0f6",
+          "version": "2.1.3"
+        }
+      }
+    },
+    "rinkeby": {
+      "proxies": {
+        "inflationary-token/RelevantToken": [
+          {
+            "address": "0xd05e0e497a570Ad0a1402375561293Bd01e9cb73",
+            "version": "0.2.0",
+            "implementation": "0x988b89a36c66380dF8ea342b93b249770f3780e6"
+          }
+        ]
+      },
+      "dependencies": {
+        "@openzeppelin/contracts-ethereum-package": {
+          "package": "0xa44bb80b290de8a465d17b14269df53cf0b9bf4f",
+          "version": "2.1.3"
+        }
+      }
+    }
+  },
+  "compiler": {
+    "manager": "truffle",
+    "compilerSettings": {
+      "optimizer": {}
+    }
+  }
+}

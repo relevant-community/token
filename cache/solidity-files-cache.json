@@ -1,0 +1,583 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/slavab/local/token/contracts/MathUtils.sol": {
+      "lastModificationDate": 1629482457963,
+      "contentHash": "1e56ebba6b426f44533841df399a3d7a",
+      "sourceName": "contracts/MathUtils.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "MathUtils"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol": {
+      "lastModificationDate": 1629486478166,
+      "contentHash": "d208da96b6f6c1d204ee8248087cf2d7",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1629486478249,
+      "contentHash": "22076986300063e63abd95b123a0e773",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/upgrades/contracts/Initializable.sol",
+        "../../GSN/Context.sol",
+        "./IERC20.sol",
+        "../../math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/upgrades/contracts/Initializable.sol": {
+      "lastModificationDate": 1596402902336,
+      "contentHash": "402d88f041ed1754339d60ae70077cd9",
+      "sourceName": "@openzeppelin/upgrades/contracts/Initializable.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24 <0.7.0"
+      ],
+      "artifacts": [
+        "Initializable"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol": {
+      "lastModificationDate": 1629486478167,
+      "contentHash": "eab2f9561946bf87eb5bc14b02faeeab",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/upgrades/contracts/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1629486478249,
+      "contentHash": "183ff1f5e5f04bcfa85cee597bcb0236",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/slavab/local/token/contracts/RelevantTokenPrev.sol": {
+      "lastModificationDate": 1629482457964,
+      "contentHash": "6e51246a18bab25dc79b1aeac694bc20",
+      "sourceName": "contracts/RelevantTokenPrev.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol",
+        "@openzeppelin/upgrades/contracts/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "RelevantTokenPrev"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol": {
+      "lastModificationDate": 1629486478248,
+      "contentHash": "a5f8722d746dc9c37bc951af43a9a6fd",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/upgrades/contracts/Initializable.sol",
+        "./ERC20.sol",
+        "../../access/roles/MinterRole.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC20Mintable"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol": {
+      "lastModificationDate": 1629486478166,
+      "contentHash": "3c68a657fce962342c3a6071850959f4",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/upgrades/contracts/Initializable.sol",
+        "../GSN/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol": {
+      "lastModificationDate": 1629486478166,
+      "contentHash": "eb9f2a0bde674643d72cfa71dcbc4eb9",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ECDSA"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol": {
+      "lastModificationDate": 1629486478248,
+      "contentHash": "7103c681f055d453431b16d1b54349ee",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/upgrades/contracts/Initializable.sol",
+        "../../GSN/Context.sol",
+        "../Roles.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "MinterRole"
+      ]
+    },
+    "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/access/Roles.sol": {
+      "lastModificationDate": 1629486478166,
+      "contentHash": "118d44aa29245b854a8785a01af0c4e9",
+      "sourceName": "@openzeppelin/contracts-ethereum-package/contracts/access/Roles.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Roles"
+      ]
+    },
+    "/Users/slavab/local/token/contracts/RelevantToken.sol": {
+      "lastModificationDate": 1629486498529,
+      "contentHash": "167475869c63d0f8682565daa8bfee9b",
+      "sourceName": "contracts/RelevantToken.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol",
+        "@openzeppelin/upgrades/contracts/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "RelevantToken"
+      ]
+    },
+    "/Users/slavab/local/token/contracts/mocks/RelevantTokenMock.sol": {
+      "lastModificationDate": 1595826894916,
+      "contentHash": "cee9739568c3f398758289dd67f7f42e",
+      "sourceName": "contracts/mocks/RelevantTokenMock.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../RelevantToken.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "RelevantTokenMock"
+      ]
+    },
+    "/Users/slavab/local/token/contracts/Migrations.sol": {
+      "lastModificationDate": 1595826894916,
+      "contentHash": "f5528c8f92c865439deb7f2a70cb8d58",
+      "sourceName": "contracts/Migrations.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.6.0"
+      ],
+      "artifacts": [
+        "Migrations"
+      ]
+    },
+    "/Users/slavab/local/token/contracts/Power.sol": {
+      "lastModificationDate": 1595826894916,
+      "contentHash": "231234b0bf6b8d4365ac6424b7f00dc2",
+      "sourceName": "contracts/Power.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "Power"
+      ]
+    }
+  }
+}
