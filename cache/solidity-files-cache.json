@@ -214,10 +214,10 @@
         "IERC20"
       ]
     },
-    "/Users/slavab/local/token/contracts/RelevantTokenPrev.sol": {
-      "lastModificationDate": 1629482457964,
-      "contentHash": "6e51246a18bab25dc79b1aeac694bc20",
-      "sourceName": "contracts/RelevantTokenPrev.sol",
+    "/Users/slavab/local/token/contracts/RelevantTokenV2.sol": {
+      "lastModificationDate": 1629490244059,
+      "contentHash": "c31d2978b3c1408c19fad1d5810df024",
+      "sourceName": "contracts/RelevantTokenV2.sol",
       "solcConfig": {
         "version": "0.5.2",
         "settings": {
@@ -251,7 +251,7 @@
         "^0.5.2"
       ],
       "artifacts": [
-        "RelevantTokenPrev"
+        "RelevantTokenV2"
       ]
     },
     "/Users/slavab/local/token/node_modules/@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol": {
@@ -435,9 +435,49 @@
         "Roles"
       ]
     },
+    "/Users/slavab/local/token/contracts/RelevantTokenPrev.sol": {
+      "lastModificationDate": 1629482457964,
+      "contentHash": "6e51246a18bab25dc79b1aeac694bc20",
+      "sourceName": "contracts/RelevantTokenPrev.sol",
+      "solcConfig": {
+        "version": "0.5.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol",
+        "@openzeppelin/upgrades/contracts/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "RelevantTokenPrev"
+      ]
+    },
     "/Users/slavab/local/token/contracts/RelevantToken.sol": {
-      "lastModificationDate": 1629486498529,
-      "contentHash": "167475869c63d0f8682565daa8bfee9b",
+      "lastModificationDate": 1629489699002,
+      "contentHash": "da6e556f322ef71725336e28795c3545",
       "sourceName": "contracts/RelevantToken.sol",
       "solcConfig": {
         "version": "0.5.2",

@@ -492,6 +492,1195 @@
         }
       },
       "RelevantToken": {
+        "src": "contracts/RelevantToken.sol:14",
+        "version": {
+          "withMetadata": "2745518ce0686fae74628722943162602ef3630782287a63b868b47d0c386de1",
+          "withoutMetadata": "4c4964a9781120dc864dd93dcc7bfee52adb161daf563df4c1de6c7ace7f6a49",
+          "linkedWithoutMetadata": "4c4964a9781120dc864dd93dcc7bfee52adb161daf563df4c1de6c7ace7f6a49"
+        },
+        "inherit": [
+          "ERC20Mintable",
+          "MinterRole",
+          "Ownable",
+          "ERC20",
+          "IERC20",
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [
+          "initialize(string,uint8,string,string,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+          "initializeRewardSplit(uint256,uint256,uint256)",
+          "releaseTokens()",
+          "partialSum(uint256)",
+          "allocateRewards(uint256)",
+          "allocateAirdrops(uint256)",
+          "claimTokens(uint256,bytes)",
+          "nonceOf(address)",
+          "roundNum()",
+          "roundsSincleLast()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "RelevantToken",
+              "label": "name",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantToken.sol:18"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "decimals",
+              "type": "t_uint8",
+              "src": "contracts/RelevantToken.sol:19"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "symbol",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantToken.sol:20"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "version",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantToken.sol:21"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "devFundAddress",
+              "type": "t_address",
+              "src": "contracts/RelevantToken.sol:22"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "initRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:23"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "currRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:24"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "timeConstant",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:25"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "targetInflation",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:26"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "targetRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:27"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "roundLength",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:28"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "roundDecay",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:29"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "totalPremint",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:30"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "currentRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:31"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "startBlock",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:32"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "lastRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:33"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "lastRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:34"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "totalReleased",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:35"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "rewardFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:37"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "airdropFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:38"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "reserveFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:39"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "developmentFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:40"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "allocatedRewards",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:41"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "allocatedAirdrops",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:42"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "nonces",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts/RelevantToken.sol:44"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "initRoundAirdrop",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:47"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "airdropSwitchRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:49"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "airdropRoundDecay",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:50"
+            },
+            {
+              "contract": "RelevantToken",
+              "label": "lastRoundAirdrop",
+              "type": "t_uint256",
+              "src": "contracts/RelevantToken.sol:51"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_uint8": {
+              "label": "uint8"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "RelevantTokenPrev": {
+        "src": "contracts/RelevantTokenPrev.sol:15",
+        "version": {
+          "withMetadata": "98e3503828a6ea9c61d29d6b62dd8f27a353cc0c59cdcc746c336f7e6ae42efd",
+          "withoutMetadata": "3e38626dff45a6b5c021c37ca9400ee792a8829d20d40cc1a3f5cdba06903174",
+          "linkedWithoutMetadata": "3e38626dff45a6b5c021c37ca9400ee792a8829d20d40cc1a3f5cdba06903174"
+        },
+        "inherit": [
+          "ERC20Mintable",
+          "MinterRole",
+          "Ownable",
+          "ERC20",
+          "IERC20",
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [
+          "initialize(string,uint8,string,string,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+          "releaseTokens()",
+          "partialSum(uint256)",
+          "allocateRewards(uint256)",
+          "allocateAirdrops(uint256)",
+          "claimTokens(uint256,bytes)",
+          "nonceOf(address)",
+          "roundNum()",
+          "roundsSincleLast()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "name",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantTokenPrev.sol:19"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "decimals",
+              "type": "t_uint8",
+              "src": "contracts/RelevantTokenPrev.sol:20"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "symbol",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantTokenPrev.sol:21"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "version",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantTokenPrev.sol:22"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "devFundAddress",
+              "type": "t_address",
+              "src": "contracts/RelevantTokenPrev.sol:23"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "initRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:24"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "currRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:25"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "timeConstant",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:26"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "targetInflation",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:27"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "targetRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:28"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "roundLength",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:29"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "roundDecay",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:30"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "totalPremint",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:31"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "currentRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:32"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "startBlock",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:33"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "lastRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:34"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "lastRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:35"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "totalReleased",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:36"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "rewardFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:38"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "airdropFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:39"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "reserveFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:40"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "developmentFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:41"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "allocatedRewards",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:42"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "allocatedAirdrops",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenPrev.sol:43"
+            },
+            {
+              "contract": "RelevantTokenPrev",
+              "label": "nonces",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts/RelevantTokenPrev.sol:45"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_uint8": {
+              "label": "uint8"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "RelevantTokenV2": {
+        "src": "contracts/RelevantTokenV2.sol:14",
+        "version": {
+          "withMetadata": "9e9667907ae3d1d205059b287ed3b2e849f3b6256e0d943affc9ef5433695446",
+          "withoutMetadata": "06684f3d53a6c5d238af178ca8924efabfd9cde58ab53a72aa47ef6ad1763db0",
+          "linkedWithoutMetadata": "06684f3d53a6c5d238af178ca8924efabfd9cde58ab53a72aa47ef6ad1763db0"
+        },
+        "inherit": [
+          "ERC20Mintable",
+          "MinterRole",
+          "Ownable",
+          "ERC20",
+          "IERC20",
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [
+          "initialize(string,uint8,string,string,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+          "initializeRewardSplit(uint256,uint256,uint256)",
+          "releaseTokens()",
+          "partialSum(uint256)",
+          "allocateRewards(uint256)",
+          "allocateAirdrops(uint256)",
+          "claimTokens(uint256,bytes)",
+          "nonceOf(address)",
+          "roundNum()",
+          "roundsSincleLast()",
+          "testUpgrade()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "RelevantTokenV2",
+              "label": "name",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantTokenV2.sol:18"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "decimals",
+              "type": "t_uint8",
+              "src": "contracts/RelevantTokenV2.sol:19"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "symbol",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantTokenV2.sol:20"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "version",
+              "type": "t_string_storage",
+              "src": "contracts/RelevantTokenV2.sol:21"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "devFundAddress",
+              "type": "t_address",
+              "src": "contracts/RelevantTokenV2.sol:22"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "initRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:23"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "currRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:24"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "timeConstant",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:25"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "targetInflation",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:26"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "targetRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:27"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "roundLength",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:28"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "roundDecay",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:29"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "totalPremint",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:30"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "currentRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:31"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "startBlock",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:32"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "lastRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:33"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "lastRoundReward",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:34"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "totalReleased",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:35"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "rewardFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:37"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "airdropFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:38"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "reserveFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:39"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "developmentFund",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:40"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "allocatedRewards",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:41"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "allocatedAirdrops",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:42"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "nonces",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts/RelevantTokenV2.sol:44"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "initRoundAirdrop",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:47"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "airdropSwitchRound",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:49"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "airdropRoundDecay",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:50"
+            },
+            {
+              "contract": "RelevantTokenV2",
+              "label": "lastRoundAirdrop",
+              "type": "t_uint256",
+              "src": "contracts/RelevantTokenV2.sol:51"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_uint8": {
+              "label": "uint8"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "RelevantTokenMock": {
+        "src": "contracts/mocks/RelevantTokenMock.sol:5",
+        "version": {
+          "withMetadata": "de603aa674f076ad6c84b9b5b95205069a834ac7ee37c69b4901b483e959b6e6",
+          "withoutMetadata": "52a91dbabd374dde63126aee6712e37066817d139ff91916a197cf2f54cfa66e",
+          "linkedWithoutMetadata": "52a91dbabd374dde63126aee6712e37066817d139ff91916a197cf2f54cfa66e"
+        },
+        "inherit": [
+          "RelevantToken",
+          "ERC20Mintable",
+          "MinterRole",
+          "Ownable",
+          "ERC20",
+          "IERC20",
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "roundNum()",
+          "setRoundNum(uint256)",
+          "setLastRound(uint256,uint256,uint256,uint256,uint256,uint256)",
+          "emptyDevBalance()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "Context": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol:15",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Roles": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Roles.sol:7",
+        "version": {
+          "withMetadata": "94bb06bfbf71806188984ec0d748cfd8c980357673ea571d50b5bb95d380e3b7",
+          "withoutMetadata": "24c6583df9609f81f64cb9d9d2c423fe43f9eae157b06e1a3aedf78fbd02d32c",
+          "linkedWithoutMetadata": "24c6583df9609f81f64cb9d9d2c423fe43f9eae157b06e1a3aedf78fbd02d32c"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "MinterRole": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol:8",
+        "version": {
+          "withMetadata": "5f7ceedd697b5fb8b92f02dec8123036bcefec64c72cc940bec68384a3d1fa45",
+          "withoutMetadata": "9c15b6a4999f59cc6071ef47f334ce169facdbe366333068ff95ea166cd792ae",
+          "linkedWithoutMetadata": "9c15b6a4999f59cc6071ef47f334ce169facdbe366333068ff95ea166cd792ae"
+        },
+        "inherit": [
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [
+          "Roles"
+        ],
+        "methods": [
+          "initialize(address)",
+          "isMinter(address)",
+          "addMinter(address)",
+          "renounceMinter()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "MinterRole",
+              "label": "_minters",
+              "type": "t_struct(Role)36_storage",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol:14"
+            },
+            {
+              "contract": "MinterRole",
+              "label": "______gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol:49"
+            }
+          ],
+          "types": {
+            "t_struct(Role)36_storage": {
+              "label": "struct Roles.Role",
+              "members": [
+                {
+                  "label": "bearer",
+                  "type": "t_mapping(t_address,t_bool)"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ECDSA": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol:9",
+        "version": {
+          "withMetadata": "40967ed35ef86b6f1cd8526f6130a38f17f4aa560d6ae4b203b588b63fb869c5",
+          "withoutMetadata": "24c6583df9609f81f64cb9d9d2c423fe43f9eae157b06e1a3aedf78fbd02d32c",
+          "linkedWithoutMetadata": "24c6583df9609f81f64cb9d9d2c423fe43f9eae157b06e1a3aedf78fbd02d32c"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SafeMath": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol:16",
+        "version": {
+          "withMetadata": "fd2751a6c7e63ec082ea80b47b0d6fa07a3ed29586eb25ed75bda8e637687581",
+          "withoutMetadata": "24c6583df9609f81f64cb9d9d2c423fe43f9eae157b06e1a3aedf78fbd02d32c",
+          "linkedWithoutMetadata": "24c6583df9609f81f64cb9d9d2c423fe43f9eae157b06e1a3aedf78fbd02d32c"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:16",
+        "version": {
+          "withMetadata": "7c3492282fe5e709ed90d26e7dae3d0b30f954ab1703277665231105d0a87fa0",
+          "withoutMetadata": "94ec29fe7f589724da077c302f2344940908b79db74347ce06fd2f69beaa4160",
+          "linkedWithoutMetadata": "94ec29fe7f589724da077c302f2344940908b79db74347ce06fd2f69beaa4160"
+        },
+        "inherit": [
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "initialize(address)",
+          "owner()",
+          "isOwner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:17"
+            },
+            {
+              "contract": "Ownable",
+              "label": "______gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol:80"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC20": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol:33",
+        "version": {
+          "withMetadata": "a7f04667286cd9227ba0b673814385d11d5018ff2624ddfbe01565886c319967",
+          "withoutMetadata": "7301a82dae19c4074bea3b626289f46e62e06fdb3cc11b07784c66c777a92b26",
+          "linkedWithoutMetadata": "7301a82dae19c4074bea3b626289f46e62e06fdb3cc11b07784c66c777a92b26"
+        },
+        "inherit": [
+          "IERC20",
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [
+          "SafeMath"
+        ],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "increaseAllowance(address,uint256)",
+          "decreaseAllowance(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol:36"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_allowances",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol:38"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_totalSupply",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol:40"
+            },
+            {
+              "contract": "ERC20",
+              "label": "______gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol:233"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+              "label": "mapping(address => mapping(address => uint256))"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC20Mintable": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol:13",
+        "version": {
+          "withMetadata": "1dc52e6cf9e8ea81b5cd3502c04678c3290cb1a4278e2bd2a4bced90e1c5de91",
+          "withoutMetadata": "84aca911b13f5e0bfca66b16cd38384530e01b76e84bb82b7111511521f066ea",
+          "linkedWithoutMetadata": "84aca911b13f5e0bfca66b16cd38384530e01b76e84bb82b7111511521f066ea"
+        },
+        "inherit": [
+          "MinterRole",
+          "ERC20",
+          "IERC20",
+          "Context",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "initialize(address)",
+          "mint(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20Mintable",
+              "label": "______gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC20": {
+        "src": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol:7",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin/upgrades/contracts/Initializable.sol:16",
+        "version": {
+          "withMetadata": "44c7ec9190836fade1313b9f2623ba7ab5df080a73dc77410a6cf985d430e92d",
+          "withoutMetadata": "92f1717632eb470b6bc25c303fe7e2aba8218faaf534ae84a3ac2f983d755495",
+          "linkedWithoutMetadata": "92f1717632eb470b6bc25c303fe7e2aba8218faaf534ae84a3ac2f983d755495"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin/upgrades/contracts/Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/upgrades/contracts/Initializable.sol:26"
+            },
+            {
+              "contract": "Initializable",
+              "label": "______gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin/upgrades/contracts/Initializable.sol:61"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "MathUtils": {
+        "src": "contracts/MathUtils.sol:6",
+        "version": {
+          "withMetadata": "f012a8c147b71a8c1ef755a836bb83587a0e61eaa5749143a8b5a521053e9930",
+          "withoutMetadata": "7af1fc557ef2658920d093647577ec00bdec23610bee8d6a753dbd389bb47038",
+          "linkedWithoutMetadata": "7af1fc557ef2658920d093647577ec00bdec23610bee8d6a753dbd389bb47038"
+        },
+        "inherit": [],
+        "libraries": [
+          "SafeMath"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Migrations": {
+        "src": "contracts/Migrations.sol:3",
+        "version": {
+          "withMetadata": "9ee48a720b3b1ce4068a7d7949b1f87f6ba6e405c2216b782088d456ed06b943",
+          "withoutMetadata": "fcfd037336501cf5bc8d5d33b376ec69ed8b2541ccce22fa7d9e82f18199751a",
+          "linkedWithoutMetadata": "fcfd037336501cf5bc8d5d33b376ec69ed8b2541ccce22fa7d9e82f18199751a"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "setCompleted(uint256)",
+          "upgrade(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Migrations",
+            "src": "contracts/Migrations.sol:7"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Migrations",
+              "label": "owner",
+              "type": "t_address",
+              "src": "contracts/Migrations.sol:4"
+            },
+            {
+              "contract": "Migrations",
+              "label": "last_completed_migration",
+              "type": "t_uint256",
+              "src": "contracts/Migrations.sol:5"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Power": {
+        "src": "contracts/Power.sol:12",
+        "version": {
+          "withMetadata": "184ee9f92630c3e723d29e6b3d815946f9e4920f3f1fea1c7b5a7db0bae63e08",
+          "withoutMetadata": "a368b4831355d9868f94a687fd414f18a833e17caf3a30df6c1447a4f97b815c",
+          "linkedWithoutMetadata": "a368b4831355d9868f94a687fd414f18a833e17caf3a30df6c1447a4f97b815c"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Power",
+            "src": "contracts/Power.sol:41"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "version",
+            "src": "contracts/Power.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Power",
+              "label": "version",
+              "type": "t_string_storage",
+              "src": "contracts/Power.sol:13"
+            },
+            {
+              "contract": "Power",
+              "label": "maxExpArray",
+              "type": "t_array(t_uint256)128_storage",
+              "src": "contracts/Power.sol:39"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_array(t_uint256)128_storage": {
+              "label": "uint256[128]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "RelevantToken": {
         "src": "contracts/RelevantToken.sol:15",
         "version": {
           "withMetadata": "5f959c518990a37d6bbbd898068bf6e963dc895aad06fe20bf72a72cf1991f4d",

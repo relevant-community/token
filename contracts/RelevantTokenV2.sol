@@ -11,7 +11,7 @@ import "@openzeppelin/upgrades/contracts/Initializable.sol";
  * @title An Inflationary Token with premint, gradual release, exponential decay of inflationary rewards, and a target inflation rate
  */
 
-contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
+contract RelevantTokenV2 is Initializable, ERC20, Ownable, ERC20Mintable {
 
   event Released(uint256 releasableTokens, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
 
@@ -336,6 +336,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    */
   function roundsSincleLast() public view returns (uint256) {
     return roundNum() - lastRound;
+  }
+
+  function testUpgrade() public pure returns (uint256) {
+    return 999;
   }
 }
 

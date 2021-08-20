@@ -8,7 +8,7 @@
     "test": "NODE_ENV=test truffle test --network local",
     "watch": "npm-watch",
     "ganache": "ganache-cli --deterministic --networkId 99",
-    "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/7d2819de98bb46108cae44811facb5e0",
+    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "lint:sol": "solium -d .",
     "lint:sol:fix": "solium -d . --fix",
@@ -39,6 +39,7 @@
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "npm-watch": "^0.6.0",
+    "openzeppelin-eth": "^2.2.0",
     "solidity-coverage": "^0.7.16",
     "web3": "^1.5.2"
   },
