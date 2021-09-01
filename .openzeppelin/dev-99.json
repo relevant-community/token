@@ -68,7 +68,7 @@
       "storage": [
         {
           "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
+          "path": "@openzeppelin/upgrades/contracts/Initializable.sol",
           "label": "initialized",
           "astId": 4445,
           "type": "t_bool",
@@ -76,7 +76,7 @@
         },
         {
           "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
+          "path": "@openzeppelin/upgrades/contracts/Initializable.sol",
           "label": "initializing",
           "astId": 4447,
           "type": "t_bool",
@@ -84,7 +84,7 @@
         },
         {
           "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
+          "path": "@openzeppelin/upgrades/contracts/Initializable.sol",
           "label": "______gap",
           "astId": 4503,
           "type": "t_array:50<t_uint256>",
@@ -92,7 +92,7 @@
         },
         {
           "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
           "label": "_balances",
           "astId": 3900,
           "type": "t_mapping<t_uint256>",
@@ -100,7 +100,7 @@
         },
         {
           "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
           "label": "_allowed",
           "astId": 3906,
           "type": "t_mapping<t_uint256>",
@@ -108,7 +108,7 @@
         },
         {
           "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
           "label": "_totalSupply",
           "astId": 3908,
           "type": "t_uint256",
@@ -116,7 +116,7 @@
         },
         {
           "contract": "ERC20",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol",
           "label": "______gap",
           "astId": 4322,
           "type": "t_array:50<t_uint256>",
@@ -124,7 +124,7 @@
         },
         {
           "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol",
           "label": "_owner",
           "astId": 3772,
           "type": "t_address",
@@ -132,7 +132,7 @@
         },
         {
           "contract": "Ownable",
-          "path": "openzeppelin-eth/contracts/ownership/Ownable.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol",
           "label": "______gap",
           "astId": 3883,
           "type": "t_array:50<t_uint256>",
@@ -140,7 +140,7 @@
         },
         {
           "contract": "MinterRole",
-          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol",
           "label": "_minters",
           "astId": 3456,
           "type": "t_struct<Roles.Role>",
@@ -148,7 +148,7 @@
         },
         {
           "contract": "MinterRole",
-          "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol",
           "label": "______gap",
           "astId": 3555,
           "type": "t_array:50<t_uint256>",
@@ -156,7 +156,7 @@
         },
         {
           "contract": "ERC20Mintable",
-          "path": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol",
+          "path": "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol",
           "label": "______gap",
           "astId": 4371,
           "type": "t_array:50<t_uint256>",
@@ -404,7 +404,7 @@
         "storageUncheckedVars": [
           {
             "contract": "MinterRole",
-            "path": "openzeppelin-eth/contracts/access/roles/MinterRole.sol",
+            "path": "@openzeppelin/contracts-ethereum-package/contracts/access/roles/MinterRole.sol",
             "label": "_minters",
             "astId": 3456,
             "type": "t_struct<Roles.Role>",
@@ -478,7 +478,7 @@
   },
   "manifestVersion": "2.2",
   "dependencies": {
-    "openzeppelin-eth": {
+    "@openzeppelin/contracts-ethereum-package": {
       "package": "0xD13ebb5C39fB00C06122827E1cbD389930C9E0E3",
       "version": "2.1.3",
       "customDeploy": true

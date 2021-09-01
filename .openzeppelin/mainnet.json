@@ -1,0 +1,183 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x6E9cA4514744E177E354613F9c0Df0BFBCa407d1"
+  },
+  "proxies": [],
+  "impls": {
+    "c52c14602143ff17fdcf618aa344a750ed604643e677cc5e3d824559dea7e956": {
+      "address": "0x59bFc294028bb839Ce9A0b9c6b3b89dCaf301645",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "zos-lib/contracts/Initializable.sol"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "zos-lib/contracts/Initializable.sol"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "zos-lib/contracts/Initializable.sol"
+          },
+          {
+            "contract": "ERC20",
+            "label": "_balances",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol"
+          },
+          {
+            "contract": "ERC20",
+            "label": "_allowed",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol"
+          },
+          {
+            "contract": "ERC20",
+            "label": "_totalSupply",
+            "type": "t_uint256",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol"
+          },
+          {
+            "contract": "ERC20",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol"
+          },
+          {
+            "contract": "Ownable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "openzeppelin-eth/contracts/ownership/Ownable.sol"
+          },
+          {
+            "contract": "Ownable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "openzeppelin-eth/contracts/ownership/Ownable.sol"
+          },
+          {
+            "contract": "ERC20Mintable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)101_storage",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "name",
+            "type": "t_string_storage",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "decimals",
+            "type": "t_uint8",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "symbol",
+            "type": "t_string_storage",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "version",
+            "type": "t_string_storage",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "devFundAddress",
+            "type": "t_address",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "initRoundReward",
+            "type": "t_uint256",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "currRoundReward",
+            "type": "t_uint256",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "______gap1",
+            "type": "t_array(t_uint256)15_storage",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "allocatedRewards",
+            "type": "t_uint256",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "allocatedAirdrops",
+            "type": "t_uint256",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "nonces",
+            "type": "t_mapping(unknown,t_uint256)",
+            "src": "contracts/RelevantToken.sol"
+          },
+          {
+            "contract": "RelevantToken",
+            "label": "______gap2",
+            "type": "t_array(t_uint256)4_storage",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_mapping(unknown,t_uint256)": {
+            "label": "mapping(key => uint256)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_struct(Role)5_storage": {
+            "label": "Role",
+            "members": [
+              {
+                "label": "bearer",
+                "type": "t_mapping(unknown,t_bool)"
+              }
+            ]
+          },
+          "t_mapping(unknown,t_bool)": {
+            "label": "mapping(key => bool)"
+          },
+          "t_string": {
+            "label": "string"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          }
+        }
+      }
+    }
+  }
+}
