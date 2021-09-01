@@ -3,10 +3,10 @@
  */
 require('@nomiclabs/hardhat-truffle5')
 require('@openzeppelin/hardhat-upgrades')
+require('@nomiclabs/hardhat-waffle')
 require('solidity-coverage')
 require('dotenv').config()
 
-const HDWalletProvider = require('@truffle/hdwallet-provider')
 const { PK, INFURA_API_KEY } = process.env
 
 module.exports = {
@@ -19,11 +19,10 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      accounts: [{ privateKey: PK, balance: '10000000000000000000' }],
+      // accounts: [{ privateKey: PK, balance: '10000000000000000000' }],
     },
     local: {
       url: 'http://127.0.0.1:8545',
-      gasPrice: 5e9,
     },
     forking: {
       url: 'https://mainnet.infura.io/v3/' + INFURA_API_KEY,

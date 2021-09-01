@@ -16,4 +16,3 @@ artifacts
 
 # ZeppelinOS
 .openzeppelin/dev-*.json
-.openzeppelin/.session

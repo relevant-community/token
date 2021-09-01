@@ -1,5 +1,9 @@
 {
   "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x6E9cA4514744E177E354613F9c0Df0BFBCa407d1"
+  },
+  "proxies": [],
   "impls": {
     "c52c14602143ff17fdcf618aa344a750ed604643e677cc5e3d824559dea7e956": {
       "address": "0x59bFc294028bb839Ce9A0b9c6b3b89dCaf301645",
@@ -32,7 +36,7 @@
           {
             "contract": "ERC20",
             "label": "_allowed",
-            "type": "t_mapping(unknown,t_uint256)",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
             "src": "openzeppelin-eth/contracts/token/ERC20/ERC20.sol"
           },
           {
@@ -60,27 +64,15 @@
             "src": "openzeppelin-eth/contracts/ownership/Ownable.sol"
           },
           {
-            "contract": "MinterRole",
-            "label": "_minters",
-            "type": "t_struct(Role)5_storage",
-            "src": "openzeppelin-eth/contracts/access/roles/MinterRole.sol"
-          },
-          {
-            "contract": "MinterRole",
-            "label": "______gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "openzeppelin-eth/contracts/access/roles/MinterRole.sol"
-          },
-          {
             "contract": "ERC20Mintable",
             "label": "______gap",
-            "type": "t_array(t_uint256)50_storage",
+            "type": "t_array(t_uint256)101_storage",
             "src": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol"
           },
           {
             "contract": "RelevantToken",
             "label": "name",
-            "type": "t_string",
+            "type": "t_string_storage",
             "src": "contracts/RelevantToken.sol"
           },
           {
@@ -92,13 +84,13 @@
           {
             "contract": "RelevantToken",
             "label": "symbol",
-            "type": "t_string",
+            "type": "t_string_storage",
             "src": "contracts/RelevantToken.sol"
           },
           {
             "contract": "RelevantToken",
             "label": "version",
-            "type": "t_string",
+            "type": "t_string_storage",
             "src": "contracts/RelevantToken.sol"
           },
           {
@@ -121,93 +113,9 @@
           },
           {
             "contract": "RelevantToken",
-            "label": "timeConstant",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "targetInflation",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "targetRound",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "roundLength",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "roundDecay",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "totalPremint",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "currentRound",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "startBlock",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "lastRound",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "lastRoundReward",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "totalReleased",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "rewardFund",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "airdropFund",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "reserveFund",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "developmentFund",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
+            "label": "______gap1",
+            "type": "t_array(t_uint256)15_storage",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol"
           },
           {
             "contract": "RelevantToken",
@@ -229,27 +137,9 @@
           },
           {
             "contract": "RelevantToken",
-            "label": "initRoundAirdrop",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "airdropSwitchRound",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "airdropRoundDecay",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
-          },
-          {
-            "contract": "RelevantToken",
-            "label": "lastRoundAirdrop",
-            "type": "t_uint256",
-            "src": "contracts/RelevantToken.sol"
+            "label": "______gap2",
+            "type": "t_array(t_uint256)4_storage",
+            "src": "openzeppelin-eth/contracts/token/ERC20/ERC20Mintable.sol"
           }
         ],
         "types": {
@@ -289,9 +179,5 @@
         }
       }
     }
-  },
-  "proxies": [],
-  "admin": {
-    "address": "0x6E9cA4514744E177E354613F9c0Df0BFBCa407d1"
   }
 }
