@@ -1,17 +1,13 @@
 {
-  "name": "inflationary-token",
+  "name": "rel",
   "version": "1.0.0",
-  "description": "An inflationary token.",
+  "description": "Relevant Token",
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
     "test:upgrade": "cp ./.openzeppelin/mainnet.json ./.openzeppelin/unknown-31337.json && hardhat test ./test/Upgrade.js",
-    "watch": "npm-watch",
     "cover": "hardhat coverage --testfiles ./test/RelevantV3.js",
-    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh",
-    "lint:sol": "solium -d .",
-    "lint:sol:fix": "solium -d . --fix",
-    "postinstall": "husky install"
+    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh"
   },
   "author": "Relevant",
   "license": "ISC",
@@ -30,30 +26,8 @@
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.5",
-    "ethlint": "^1.2.5",
     "hardhat": "^2.6.1",
-    "lint-staged": "^11.1.2",
-    "npm-watch": "^0.11.0",
     "solidity-coverage": "^0.7.16",
     "web3": "^1.5.2"
-  },
-  "watch": {
-    "test": {
-      "patterns": [
-        "test",
-        "contracts"
-      ],
-      "extensions": "js,json,sol"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "solium -d . --fix"
-    ]
   }
 }

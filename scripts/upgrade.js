@@ -4,7 +4,7 @@ const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 async function main() {
   const [owner] = await ethers.getSigners()
   const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
-    'inflationary-token/RelevantToken'
+    'REL/RelevantToken'
   ]
 
   const RelevantTokenV2 = await ethers.getContractFactory('RelevantTokenV2')

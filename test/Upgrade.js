@@ -42,7 +42,7 @@ describe('Upgrade', function () {
     const owner = await setupAccount(ADMIN)
 
     const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
-      'inflationary-token/RelevantToken'
+      'REL/RelevantToken'
     ]
 
     const RelevantTokenV3 = await ethers.getContractFactory(

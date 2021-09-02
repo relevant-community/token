@@ -2,7 +2,7 @@
   "networks": {
     "dev-99": {
       "proxies": {
-        "inflationary-token/RelevantToken": [
+        "REL/RelevantToken": [
           {
             "address": "0x6f84742680311CEF5ba42bc10A71a4708b4561d1",
             "version": "0.1.0",
@@ -22,7 +22,7 @@
     },
     "mainnet": {
       "proxies": {
-        "inflationary-token/RelevantToken": [
+        "REL/RelevantToken": [
           {
             "address": "0xb6c4267C4877BB0D6b1685Cfd85b0FBe82F105ec",
             "version": "0.2.0",
@@ -39,7 +39,7 @@
     },
     "rinkeby": {
       "proxies": {
-        "inflationary-token/RelevantToken": [
+        "REL/RelevantToken": [
           {
             "address": "0xd05e0e497a570Ad0a1402375561293Bd01e9cb73",
             "version": "0.2.0",
