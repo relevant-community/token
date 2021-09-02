@@ -1,6 +1,8 @@
 const { ethers, upgrades } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 
+// const proxyAdminAbi = require('@openzeppelin/upgrades/build/contracts/ProxyAdmin.json).abi
+
 async function main() {
   const [owner] = await ethers.getSigners()
   const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
@@ -35,3 +37,8 @@ async function main() {
 }
 
 main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
