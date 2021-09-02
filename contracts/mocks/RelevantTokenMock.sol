@@ -1,11 +1,14 @@
 pragma solidity ^0.5.0;
 
-import "../RelevantToken.sol";
+import "../RelevantTokenV2.sol";
 
 contract RelevantTokenMock is RelevantToken{
   /**
    * @dev Return current round number // using the state variable set by setRoundNum, for testing
    */
+
+  uint currentRound;
+  
   function roundNum() public view returns (uint256) {
     // return (block.number.sub(startBlock)).div(roundLength);
     return currentRound;

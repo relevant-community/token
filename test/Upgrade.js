@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
-const { parseUnits, formatEther } = ethers.utils
+const { parseUnits, formatEther, solidityKeccak256, arrayify } = ethers.utils
 const { BigNumber } = ethers
 const { expect } = require('chai')
 require('dotenv').config()
@@ -21,6 +21,9 @@ const setupAccount = async (address) => {
 }
 
 describe('Upgrade', function () {
+  let signers
+  let rel
+
   before(async () => {
     await network.provider.request({
       method: 'hardhat_reset',
@@ -32,7 +35,9 @@ describe('Upgrade', function () {
         },
       ],
     })
+    signers = await ethers.getSigners()
   })
+
   it('should upgrade correctly', async function () {
     const owner = await setupAccount(ADMIN)
 
@@ -46,7 +51,6 @@ describe('Upgrade', function () {
     )
 
     await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
-      // unsafeAllow: ['missing-public-upgradeto'],
       unsafeAllowRenames: true,
     })
 
@@ -78,35 +82,18 @@ describe('Upgrade', function () {
     expect(allowance.gt('0')).to.be.true
     expect(nonce.gt('0')).to.be.true
     expect(await rel.initializedV3()).to.be.false
-
-    this.rel = rel
   })
+
   it('should initialize new version', async function () {
+    const owner = await setupAccount(REL_OWNER)
+
     const timestamp = Math.round(Date.now() / 1000)
     await network.provider.send('evm_setNextBlockTimestamp', [timestamp])
-    const tx = await this.rel.initV3()
+    const tx = await rel.connect(owner).initV3(REL_OWNER)
     await tx.wait()
-    expect(await this.rel.initializedV3()).to.be.true
-    expect(await this.rel.version()).to.equal('v3')
-    expect((await this.rel.inflation()).toNumber()).to.equal(0)
-    expect((await this.rel.lastReward()).toNumber()).to.equal(timestamp)
-  })
-
-  it('should set new inflation rate', async function () {
-    const start = await this.rel.balanceOf(this.rel.address)
-    const owner = await setupAccount(REL_OWNER)
-    await this.rel.connect(owner).setInflation(BigNumber.from(500)) // 5% inflation
-    expect((await this.rel.inflation()).toNumber()).to.equal(500)
-
-    const timestamp = Math.round(Date.now() / 1000) + 60 * 60 * 60
-    await network.provider.send('evm_setNextBlockTimestamp', [timestamp])
-    const tx = await this.rel.releaseTokens()
-    const res = await tx.wait()
-    const end = await this.rel.balanceOf(this.rel.address)
-    const log = res.events.find((e) => e.event == 'Released')
-    expect(log.args.hoursSinceLast).to.equal(60)
-    expect(end.sub(start)).to.equal(0)
-    // expect(end.sub(start)).to.equal(log.args.amount)
-    console.log('minting', formatEther(log.args.amount), 'in 60 hours')
+    expect(await rel.initializedV3()).to.be.true
+    expect(await rel.version()).to.equal('v3')
+    expect((await rel.inflation()).toNumber()).to.equal(0)
+    expect((await rel.lastReward()).toNumber()).to.equal(timestamp)
   })
 })

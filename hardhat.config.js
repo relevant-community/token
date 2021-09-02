@@ -10,11 +10,13 @@ require('dotenv').config()
 const { PK, INFURA_API_KEY } = process.env
 
 module.exports = {
-  solidity: '0.5.2',
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 200,
+  solidity: {
+    version: '0.5.2',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
     },
   },
   networks: {
@@ -29,12 +31,12 @@ module.exports = {
     },
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/' + INFURA_API_KEY,
-      accounts: [PK],
+      accounts: PK ? [PK] : undefined,
       chainId: 4,
       gasPrice: 3.1e9,
     },
     mainnet: {
-      accounts: [PK],
+      accounts: PK ? [PK] : undefined,
       url: 'https://mainnet.infura.io/v3/' + INFURA_API_KEY,
       gasPrice: 2.1e9,
       chainId: 1,

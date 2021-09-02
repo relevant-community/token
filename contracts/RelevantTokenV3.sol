@@ -40,11 +40,12 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
   /**
    * @dev Initialize the current version
    */
-  function initV3() public {
+  function initV3(address _admin) public onlyOwner {
     require(initializedV3 == false, "Relevant: this version has already been initialized");
     lastReward = block.timestamp;
     version = "v3";
     initializedV3 = true;
+    admin = _admin;
     // initialize inflation at 0 to avoid accidentaly reading previous values
     inflation = 0;
   }
@@ -79,9 +80,8 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     allocatedRewards = newAllocatedRewards;
   }
 
-  /**
-   * @dev send allocated tokens to vesting contract
-   */
+  // send allocated tokens to vesting contract
+  // should we hardcode vestingContract ?
   function vestAllocatedTokens(address vestingContract, uint256 amount) public onlyOwner {
     require(allocatedRewards >= amount, "Relevant: there aren't enough tokens in the contract");
     _transfer(address(this), vestingContract, amount);
@@ -119,7 +119,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
   * @param  amount amount to be transferred to user
   * @param  signature signature by admin authorizing the transaction
   */
-  function claimTokens(uint256 amount, bytes memory signature) public returns(bool) {
+  function claimTokens(uint256 amount, bytes memory signature) public {
     require(allocatedRewards >= amount, "Relevant: there aren't enough tokens in the contract");
     bytes32 hash = keccak256(abi.encodePacked(amount, msg.sender, nonces[msg.sender]));
     hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
@@ -129,8 +129,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     require(admin == signer, "Relevant: claim not authorized");
     nonces[msg.sender] += 1;
     allocatedRewards = allocatedRewards.sub(amount);
-    require(this.transfer(msg.sender, amount), "Relevant: transfer to claimant failed");
-    return true;
+    this.transfer(msg.sender, amount);
   }
 
   /**

@@ -27,7 +27,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public roundLength;
   uint256 public roundDecay;
   uint256 public totalPremint;
-  uint256 public currentRound; // only for testing to simulate block progression
+  uint256 public _gap; // only for testing to simulate block progression
   uint256 public startBlock; // Block number at which the contract is deployed
   uint256 public lastRound; // Round at which the last release was made
   uint256 public lastRoundReward; // Reward of the round where tokens were last released (only computed during decay phase)
@@ -255,12 +255,12 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Calculates total number of tokens to be minted during the decay phase until _round
    * @param _round Round until which the partial sum is taken
    */
-  function partialSum(uint256 _round) public view returns (uint256) {
+  // function partialSum(uint256 _round) public view returns (uint256) {
     // TODO: this needs to be worked out! with https://user-images.githubusercontent.com/337721/52804952-7e3f3080-3053-11e9-8bb2-9bc1c3df19ee.jpg
     // and using Bancor's Power formula for e^x
     // alternatively use the integral of the reward function:
     // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward));
-  }
+  // }
 
   /**
    * @dev Transfer eligible tokens from devFund bucket to devFundAddress
