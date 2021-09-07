@@ -1,39 +1,18 @@
 const { ethers, upgrades } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
-const { parseUnits } = ethers.utils
 const { expect } = require('chai')
+const { setupAccount, setupLocalNetwork } = require('./utils')
+
 require('dotenv').config()
 
-const { INFURA_API_KEY, ADMIN, REL_OWNER } = process.env
-
-const setupAccount = async (address) => {
-  await hre.network.provider.request({
-    method: 'hardhat_impersonateAccount',
-    params: [address],
-  })
-
-  await network.provider.send('hardhat_setBalance', [
-    address,
-    parseUnits('99').toHexString().replace('0x0', '0x'),
-  ])
-  return await ethers.getSigner(address)
-}
+const { ADMIN, REL_OWNER, TEST_ACC, TEST_ACC2 } = process.env
 
 describe('Upgrade', function () {
   let signers
   let rel
 
   before(async () => {
-    await network.provider.request({
-      method: 'hardhat_reset',
-      params: [
-        {
-          forking: {
-            jsonRpcUrl: 'https://mainnet.infura.io/v3/' + INFURA_API_KEY,
-          },
-        },
-      ],
-    })
+    await setupLocalNetwork()
     signers = await ethers.getSigners()
   })
 
@@ -55,12 +34,12 @@ describe('Upgrade', function () {
     )
 
     relV2 = RelevantTokenV2.attach(RelevantToken.address)
-    const balance = await relV2.balanceOf(owner.address)
+    const balance = await relV2.balanceOf(TEST_ACC)
     const allowance = await relV2.allowance(
-      owner.address,
+      TEST_ACC,
       '0x3e4ef00b7c7c8b8f913ecd0f66023c3948d152db',
     )
-    const nonce = await relV2.nonceOf(owner.address)
+    const nonce = await relV2.nonceOf(TEST_ACC)
 
     await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
       unsafeAllowRenames: true,
@@ -74,14 +53,9 @@ describe('Upgrade', function () {
     expect(symbol).to.be.equal('REL')
     expect(name).to.be.equal('Relevant')
     expect(version).to.be.equal('v1')
-    expect(await rel.balanceOf(owner.address)).to.equal(balance)
-    expect(
-      await rel.allowance(
-        owner.address,
-        '0x3e4ef00b7c7c8b8f913ecd0f66023c3948d152db',
-      ),
-    ).to.equal(allowance)
-    expect(await rel.nonceOf(owner.address)).to.equal(nonce)
+    expect(await rel.balanceOf(TEST_ACC)).to.equal(balance)
+    expect(await rel.allowance(TEST_ACC, TEST_ACC1)).to.equal(allowance)
+    expect(await rel.nonceOf(TEST_ACC)).to.equal(nonce)
     expect(await rel.initializedV3()).to.be.false
   })
 

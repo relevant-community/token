@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
-    "test:upgrade": "cp ./.openzeppelin/mainnet.json ./.openzeppelin/unknown-31337.json && hardhat test ./test/Upgrade.js",
+    "deploy:local": "hardhat run ./scripts/deployLocal.js --network local",
     "cover": "hardhat coverage --testfiles ./test/RelevantV3.js",
     "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh"
   },
