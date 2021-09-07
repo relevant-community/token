@@ -1,7 +1,6 @@
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-require('@nomiclabs/hardhat-truffle5')
 require('@openzeppelin/hardhat-upgrades')
 require('@nomiclabs/hardhat-waffle')
 require('solidity-coverage')
