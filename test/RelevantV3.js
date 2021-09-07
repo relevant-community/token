@@ -74,9 +74,9 @@ describe('Relevant V3', function () {
       const sig = await admin.signMessage(arrayify(hash))
 
       // wrong amounts should fail
-      // await expect(
-      //   rel.connect(s2).claimTokens(parseUnits('1'), sig),
-      // ).to.be.revertedWith('Relevant: claim not authorized')
+      await expect(
+        rel.connect(s2).claimTokens(parseUnits('1'), sig),
+      ).to.be.revertedWith('Relevant: claim not authorized')
 
       const tx = await rel.connect(s2).claimTokens(amount, sig)
       const res = await tx.wait()
