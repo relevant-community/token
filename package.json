@@ -14,6 +14,7 @@
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.3.0",
     "@openzeppelin/contracts-ethereum-package": "^2.5.0",
     "@openzeppelin/hardhat-upgrades": "^1.9.0",
     "@openzeppelin/upgrades": "^2.5.3",
@@ -22,6 +23,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.5",
     "hardhat": "^2.6.1",
+    "hardhat-contract-sizer": "^2.0.3",
     "solidity-coverage": "^0.7.16"
   }
 }
