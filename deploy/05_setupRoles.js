@@ -26,7 +26,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   // REL OWNER
   const relTokenOwner = await rel.owner()
-  if (relTokenOwner !== timelock.addres) {
+  if (relTokenOwner !== timelock.address) {
     console.log('setting Timelock as owner of Rel', timelock.address)
     await rel.transferOwnership(timelock.address)
   } else {
@@ -35,7 +35,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   // sREL OWNER
   const sRelOwner = await sRel.owner()
-  if (sRelOwner !== timelock.addres) {
+  if (sRelOwner !== timelock.address) {
     console.log('setting Timelock as owner of sRel', timelock.address)
     await sRel.transferOwnership(timelock.address)
   } else {

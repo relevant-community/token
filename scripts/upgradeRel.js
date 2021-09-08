@@ -1,8 +1,6 @@
-const { ethers, upgrades } = require('hardhat')
+const { ethers, upgrades, getNamedAccounts } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
-require('dotenv').config()
 
-const { TEST_ACC, TEST_ACC2 } = process.env
 // const proxyAdminAbi = require('@openzeppelin/upgrades/build/contracts/ProxyAdmin.json')
 //   .abi
 
@@ -18,30 +16,38 @@ const getRelContract = async (signer) => {
 }
 
 const upgradeRel = async (proxyAdmin) => {
+  const { testAddr1, testAddr2 } = await getNamedAccounts()
   const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
     'REL/RelevantToken'
   ]
   const RelevantTokenV2 = await ethers.getContractFactory('RelevantToken')
   const relv2 = RelevantTokenV2.attach(RelevantToken.address)
 
-  const initialBalance = await relv2.balanceOf(TEST_ACC)
-  const initialAllowance = await relv2.allowance(TEST_ACC, TEST_ACC2)
+  const initialBalance = await relv2.balanceOf(testAddr1)
+  const initialAllowance = await relv2.allowance(testAddr1, testAddr2)
 
   const RelevantTokenV3 = await ethers.getContractFactory(
     'RelevantTokenV3',
     proxyAdmin,
   )
 
+  const rel = RelevantTokenV3.attach(RelevantToken.address)
+
+  const currentVersion = await rel.version()
+  if (currentVersion == 'v3') {
+    console.log('Already upgraded to V3!')
+    return
+  }
+
   await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
     unsafeAllowRenames: true,
   })
-  const rel = RelevantTokenV3.attach(RelevantToken.address)
 
   // some sanity checks
   const symbol = await rel.symbol()
   const name = await rel.name()
-  const balance = await rel.balanceOf(TEST_ACC)
-  const allowance = await rel.allowance(TEST_ACC, TEST_ACC2)
+  const balance = await rel.balanceOf(testAddr1)
+  const allowance = await rel.allowance(testAddr1, testAddr2)
 
   if (!balance.eq(initialBalance) || !allowance.eq(initialAllowance))
     throw new Error("Updgrade error: balance and allowance don't match")
@@ -53,6 +59,11 @@ const upgradeRel = async (proxyAdmin) => {
 
 const initV3 = async (ownerSigner, adminAddr) => {
   const rel = await getRelContract(ownerSigner)
+  const initialized = await rel.initializedV3()
+  if (initialized) {
+    console.log('Already Initialized V3!')
+    return
+  }
   await rel.initV3(adminAddr)
   const version = await rel.version()
   console.log('INITIALIZED: ', version)

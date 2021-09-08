@@ -2,6 +2,8 @@ const { network } = require('hardhat')
 const { setupAccount } = require('../test/utils')
 const { upgradeRel, initV3 } = require('../scripts/upgradeRel')
 
+// upgrades of Rel are managed via the openzepellin plugin
+// mainnet upgrade should run first
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { proxyAdmin, relOwner, relAdmin } = await getNamedAccounts()
 

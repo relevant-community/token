@@ -1,19 +1,15 @@
-const { setupLocalNetwork } = require('../test/utils')
 const { upgradeRel, initV3 } = require('./upgradeRel')
 const { setupAccount } = require('../test/utils')
-
-require('dotenv').config()
-
-const { REL_OWNER, PROXY_ADMIN, REL_ADMIN } = process.env
+const { getNamedAccounts } = require('hardhat')
 
 async function main() {
-  await setupLocalNetwork()
+  const { relOwner, proxyAdmin, relAdmin } = await getNamedAccounts()
 
-  const proxyAdmin = await setupAccount(PROXY_ADMIN)
-  await upgradeRel(proxyAdmin)
+  const proxyAdminSigner = await setupAccount(proxyAdmin)
+  await upgradeRel(proxyAdminSigner)
 
-  const owner = await setupAccount(REL_OWNER)
-  await initV3(owner, REL_ADMIN)
+  const relOwnerSigner = await setupAccount(relOwner)
+  await initV3(relOwnerSigner, relAdmin)
 }
 
 main()

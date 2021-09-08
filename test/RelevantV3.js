@@ -1,7 +1,6 @@
-const { constants, utils, BigNumber } = require('ethers')
+const { utils, BigNumber } = require('ethers')
 const { parseUnits, formatEther, solidityKeccak256, arrayify } = utils
 const { expect } = require('chai')
-require('dotenv').config()
 
 describe('Relevant V3', function () {
   let signers
