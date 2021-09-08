@@ -1,0 +1,107 @@
+{
+  "address": "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "unlockAmnt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "unlockTime",
+              "type": "uint256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct Utils.Unlock",
+          "name": "unlockData",
+          "type": "tuple"
+        }
+      ],
+      "name": "lockUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "shortAmnt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "longAmnt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastUpdate",
+              "type": "uint256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct Utils.Vest",
+          "name": "vestData",
+          "type": "tuple"
+        }
+      ],
+      "name": "vestUpdated",
+      "type": "event"
+    }
+  ],
+  "transactionHash": "0xfdae765b68da6b47113e476a62eb9a103ae22bde35c00079a752542a0fd6ab74",
+  "receipt": {
+    "to": null,
+    "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "contractAddress": "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
+    "transactionIndex": 0,
+    "gasUsed": "365756",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x77e373f079c005f489f0ed7c1e84b3e81eadb818c7bb3766ef96f5cb11f6d96e",
+    "transactionHash": "0xfdae765b68da6b47113e476a62eb9a103ae22bde35c00079a752542a0fd6ab74",
+    "logs": [],
+    "blockNumber": 13187391,
+    "cumulativeGasUsed": "365756",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "15bc099063462943900f081628d8658d",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.6+commit.11564f7e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"unlockAmnt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unlockTime\",\"type\":\"uint256\"}],\"indexed\":false,\"internalType\":\"struct Utils.Unlock\",\"name\":\"unlockData\",\"type\":\"tuple\"}],\"name\":\"lockUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"shortAmnt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"longAmnt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastUpdate\",\"type\":\"uint256\"}],\"indexed\":false,\"internalType\":\"struct Utils.Vest\",\"name\":\"vestData\",\"type\":\"tuple\"}],\"name\":\"vestUpdated\",\"type\":\"event\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/libraries/Utils.sol\":\"Utils\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"contracts/libraries/Utils.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.2;\\n\\nlibrary Utils {\\n  using Utils for Unlock;\\n  using Utils for Vest;\\n\\n  event lockUpdated(address indexed account, Unlock unlockData); // staking events\\n  event vestUpdated(address indexed account, Vest vestData); // vesting events\\n\\n  struct Vest {\\n    uint shortAmnt;\\n    uint longAmnt;\\n    uint lastUpdate;\\n  }\\n\\n  struct Unlock {\\n    uint unlockAmnt;\\n    uint unlockTime;\\n  }\\n\\n  // note: we should be able to unlock all tokens (including vested tokens)\\n  function unlock(Unlock storage self, uint amount , uint lockTime) internal {\\n    self.unlockAmnt = amount;\\n    self.unlockTime = block.timestamp + lockTime;\\n    emit lockUpdated(msg.sender, self);\\n  }\\n\\n  function useUnlocked(Unlock storage self, uint amount) internal {\\n    require(self.unlockTime <= block.timestamp, \\\"sRel Utils: tokens are not unlocked yet\\\");\\n    require(self.unlockAmnt >= amount, \\\"sRel Utils: tokens should be unlocked before transfer\\\");\\n\\n    self.unlockAmnt -= amount;  // update locked amount;\\n    emit lockUpdated(msg.sender, self);\\n  }\\n\\n  function resetLock(Unlock storage self) internal {\\n    self.unlockAmnt = 0;\\n    self.unlockTime = 0;\\n    emit lockUpdated(msg.sender, self);\\n  }\\n\\n\\n  function transferVestedTokens(Vest storage self, Vest storage vestTo, address to) internal {\\n    require(self.vested() > 0, \\\"sRel Utils: nothing to transfer\\\");\\n    require(vestTo.vested() == 0, \\\"sRel Utils: cannot transfer to account with vested tokens\\\");\\n\\n    vestTo.shortAmnt = self.shortAmnt;\\n    vestTo.longAmnt = self.longAmnt;\\n    vestTo.lastUpdate = self.lastUpdate;\\n    \\n    // reset initial vest\\n    self.shortAmnt = 0;\\n    self.longAmnt = 0;\\n    self.lastUpdate = 0;\\n\\n    emit vestUpdated(msg.sender, self);\\n    emit vestUpdated(to, vestTo);\\n  }\\n\\n  function setVestedAmount(Vest storage self, uint shortAmnt, uint longAmnt) public {\\n    require(self.shortAmnt + self.longAmnt == 0, \\\"sRel Utils: this account already has vested tokens\\\");\\n    if (shortAmnt > 0)\\n      self.shortAmnt = shortAmnt;\\n\\n    if (longAmnt > 0)\\n      self.longAmnt = longAmnt;\\n    \\n    self.lastUpdate = 0;\\n    emit vestUpdated(msg.sender, self);\\n  }\\n\\n  function vested(Vest storage self) internal view returns (uint) {\\n    return self.shortAmnt + self.longAmnt;\\n  }\\n\\n  // this method updates long and short vesting amounts\\n  function updateVestedAmount(Vest storage self, uint vestShort, uint vestLong, uint vestBegin) public returns (uint) {\\n    require(block.timestamp > vestBegin, \\\"sRel Utils: Vesting has't started yet\\\");\\n    uint amount = 0;\\n    uint shortAmnt = self.shortAmnt;\\n    uint longAmnt = self.longAmnt;\\n    uint last = self.lastUpdate < vestBegin ? vestBegin : self.lastUpdate;\\n    \\n    if(shortAmnt > 0 && last < vestShort) {\\n      uint currentTime = block.timestamp < vestShort ? block.timestamp : vestShort;\\n      uint sAmnt = shortAmnt * (currentTime - last) / (vestShort - last);\\n      self.shortAmnt -= sAmnt;\\n      amount += sAmnt;\\n    }\\n\\n    if(longAmnt > 0 && last < vestLong) {\\n      uint currentTime = block.timestamp < vestLong ? block.timestamp : vestLong;\\n      uint lAmnt = longAmnt * (currentTime - last) / (vestLong - last);\\n      self.longAmnt -= lAmnt;\\n      amount += lAmnt;\\n    }\\n\\n    require(amount > 0, \\\"sRel Utils: There are no vested tokens to claim\\\");\\n    self.lastUpdate = block.timestamp;\\n    emit vestUpdated(msg.sender, self);\\n\\n    return amount;\\n  }\\n}\",\"keccak256\":\"0xb3c4ec04bef2ceb743e14f36562accbbf187b3e74c714378fae02d22953088bd\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x6105b161003a600b82828239805160001a60731461002d57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600436106100405760003560e01c8063997665ea14610045578063b300181414610077575b600080fd5b81801561005157600080fd5b50610065610060366004610473565b610099565b60405190815260200160405180910390f35b81801561008357600080fd5b50610097610092366004610447565b61033b565b005b600081421161012f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602560248201527f7352656c205574696c733a2056657374696e672068617327742073746172746560448201527f642079657400000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b845460018601546002870154600092919083908611610152578860020154610154565b855b905060008311801561016557508781105b156101d2576000884210610179578861017b565b425b90506000610189838b610535565b6101938484610535565b61019d90876104f8565b6101a791906104bd565b9050808b60000160008282546101bd9190610535565b909155506101cd905081876104a5565b955050505b6000821180156101e157508681105b1561024e5760008742106101f557876101f7565b425b90506000610205838a610535565b61020f8484610535565b61021990866104f8565b61022391906104bd565b9050808b60010160008282546102399190610535565b90915550610249905081876104a5565b955050505b600084116102de576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602f60248201527f7352656c205574696c733a20546865726520617265206e6f207665737465642060448201527f746f6b656e7320746f20636c61696d00000000000000000000000000000000006064820152608401610126565b4260028a01819055604080518b54815260018c015460208201529081019190915233907fdf52a1412082881a0be0c3dc590839d5d2ded9d7f45ebb2acf23ec46a77eef749060600160405180910390a25091979650505050505050565b6001830154835461034c91906104a5565b156103d9576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603260248201527f7352656c205574696c733a2074686973206163636f756e7420616c726561647960448201527f206861732076657374656420746f6b656e7300000000000000000000000000006064820152608401610126565b81156103e3578183555b80156103f157600183018190555b6000600284018190556040805185548152600186015460208201529081019190915233907fdf52a1412082881a0be0c3dc590839d5d2ded9d7f45ebb2acf23ec46a77eef749060600160405180910390a2505050565b60008060006060848603121561045c57600080fd5b505081359360208301359350604090920135919050565b6000806000806080858703121561048957600080fd5b5050823594602084013594506040840135936060013592509050565b600082198211156104b8576104b861054c565b500190565b6000826104f3577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b6000817fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff04831182151516156105305761053061054c565b500290565b6000828210156105475761054761054c565b500390565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fdfea2646970667358221220a343f8bd5b89c2318e5ab1acc2ca529d13a4a76f0bde3dd4679f65b4ff145d7364736f6c63430008060033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600436106100405760003560e01c8063997665ea14610045578063b300181414610077575b600080fd5b81801561005157600080fd5b50610065610060366004610473565b610099565b60405190815260200160405180910390f35b81801561008357600080fd5b50610097610092366004610447565b61033b565b005b600081421161012f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602560248201527f7352656c205574696c733a2056657374696e672068617327742073746172746560448201527f642079657400000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b845460018601546002870154600092919083908611610152578860020154610154565b855b905060008311801561016557508781105b156101d2576000884210610179578861017b565b425b90506000610189838b610535565b6101938484610535565b61019d90876104f8565b6101a791906104bd565b9050808b60000160008282546101bd9190610535565b909155506101cd905081876104a5565b955050505b6000821180156101e157508681105b1561024e5760008742106101f557876101f7565b425b90506000610205838a610535565b61020f8484610535565b61021990866104f8565b61022391906104bd565b9050808b60010160008282546102399190610535565b90915550610249905081876104a5565b955050505b600084116102de576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602f60248201527f7352656c205574696c733a20546865726520617265206e6f207665737465642060448201527f746f6b656e7320746f20636c61696d00000000000000000000000000000000006064820152608401610126565b4260028a01819055604080518b54815260018c015460208201529081019190915233907fdf52a1412082881a0be0c3dc590839d5d2ded9d7f45ebb2acf23ec46a77eef749060600160405180910390a25091979650505050505050565b6001830154835461034c91906104a5565b156103d9576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603260248201527f7352656c205574696c733a2074686973206163636f756e7420616c726561647960448201527f206861732076657374656420746f6b656e7300000000000000000000000000006064820152608401610126565b81156103e3578183555b80156103f157600183018190555b6000600284018190556040805185548152600186015460208201529081019190915233907fdf52a1412082881a0be0c3dc590839d5d2ded9d7f45ebb2acf23ec46a77eef749060600160405180910390a2505050565b60008060006060848603121561045c57600080fd5b505081359360208301359350604090920135919050565b6000806000806080858703121561048957600080fd5b5050823594602084013594506040840135936060013592509050565b600082198211156104b8576104b861054c565b500190565b6000826104f3577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b6000817fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff04831182151516156105305761053061054c565b500290565b6000828210156105475761054761054c565b500390565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fdfea2646970667358221220a343f8bd5b89c2318e5ab1acc2ca529d13a4a76f0bde3dd4679f65b4ff145d7364736f6c63430008060033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}

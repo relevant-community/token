@@ -1,3 +1,5 @@
+const { getNamedAccounts } = require('hardhat')
+
 const getVestingParams = (timestamp) => {
   const vestBegin = timestamp + 3 * 24 * 60 * 60
   const vestShort = timestamp + 200 * 24 * 60 * 60
@@ -6,6 +8,7 @@ const getVestingParams = (timestamp) => {
 }
 
 const deploySRel = async () => {
+  const { vestAdmin } = await getNamedAccounts()
   const Utils = await ethers.getContractFactory('Utils')
   const utils = await Utils.deploy()
 
@@ -22,7 +25,7 @@ const deploySRel = async () => {
     false,
   ])
   vestingParams = getVestingParams(parseInt(block.timestamp, 16))
-  sRel = await SRel.deploy(rel.address, ...vestingParams)
+  sRel = await SRel.deploy(rel.address, vestAdmin, ...vestingParams)
   await sRel.deployed()
   return { sRel, vestingParams, rel }
 }

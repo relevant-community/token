@@ -42,29 +42,17 @@ describe('Governance', function () {
     relGov = await RelGov.deploy(sRel.address, timelock.address)
 
     // setup ownership
-    const relOwnerTx = await rel.transferOwnership(timelock.address)
-    relOwnerTx.wait()
-
-    const sRelOwnerTx = await sRel.transferOwnership(timelock.address)
-    sRelOwnerTx.wait()
-
-    const proposerTx = await timelock.grantRole(PROPOSER_ROLE, relGov.address)
-    proposerTx.wait()
-
-    const timelockAdminTx = await timelock.renounceRole(
-      TIMELOCK_ADMIN_ROLE,
-      owner,
-    )
-    timelockAdminTx.wait()
+    await rel.transferOwnership(timelock.address)
+    await sRel.transferOwnership(timelock.address)
+    await timelock.grantRole(PROPOSER_ROLE, relGov.address)
+    await timelock.renounceRole(TIMELOCK_ADMIN_ROLE, owner)
 
     // setup stake
-    const approveTx = await rel.approve(sRel.address, constants.MaxUint256)
-    await approveTx.wait()
-    const depositTx = await sRel.stakeRel(parseUnits('10000'))
-    await depositTx.wait()
+    await rel.approve(sRel.address, constants.MaxUint256)
+    await sRel.stakeRel(parseUnits('10000'))
 
-    const delegateTx = await sRel.delegate(owner)
-    await delegateTx.wait()
+    // self-delegate
+    await sRel.delegate(owner)
 
     await network.provider.send('evm_mine')
   }
@@ -77,6 +65,7 @@ describe('Governance', function () {
       expect(await timelock.hasRole(PROPOSER_ROLE, relGov.address)).to.equal(
         true,
       )
+      expect(await timelock.hasRole(PROPOSER_ROLE, owner)).to.equal(false)
       expect(await timelock.hasRole(TIMELOCK_ADMIN_ROLE, owner)).to.equal(false)
       expect(await timelock.hasRole(EXECUTOR_ROLE, AddressZero)).to.equal(true)
     })

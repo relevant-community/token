@@ -27,7 +27,7 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
   mapping(address => Utils.Unlock) public unlocks;
   mapping(address => Utils.Vest) public vest;
 
-  constructor(address _r3l, uint _vestBegin, uint _vestShort, uint _vestLong)
+  constructor(address _r3l, address _vestAdmin, uint _vestBegin, uint _vestShort, uint _vestLong)
     ERC20("Staked REL", "sREL")
     ERC20Permit("Staked REL") 
   {
@@ -35,6 +35,7 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
     vestBegin = _vestBegin;
     vestShort = _vestShort;
     vestLong = _vestLong;
+    vestAdmin = _vestAdmin;
   }
 
   // The functions below are overrides required by Solidity.
