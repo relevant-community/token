@@ -2,15 +2,20 @@ require('@openzeppelin/hardhat-upgrades')
 require('@nomiclabs/hardhat-waffle')
 require('solidity-coverage')
 require('hardhat-deploy')
-
+require('hardhat-gas-reporter')
 require('dotenv').config()
 
-const { PK, INFURA_API_KEY } = process.env
+const { PK, INFURA_API_KEY, CMC_API } = process.env
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  gasReporter: {
+    currency: 'USD',
+    gasPrice: 80,
+    coinmarketcap: CMC_API,
+  },
   solidity: {
     compilers: [
       {
@@ -18,7 +23,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10000,
+            runs: 200,
           },
         },
       },
@@ -27,7 +32,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10000,
+            runs: 200,
           },
         },
       },

@@ -5,9 +5,6 @@ library Utils {
   using Utils for Unlock;
   using Utils for Vest;
 
-  event lockUpdated(address indexed account, Unlock unlockData); // staking events
-  event vestUpdated(address indexed account, Vest vestData); // vesting events
-
   struct Vest {
     uint shortAmnt;
     uint longAmnt;
@@ -23,7 +20,6 @@ library Utils {
   function unlock(Unlock storage self, uint amount , uint lockTime) internal {
     self.unlockAmnt = amount;
     self.unlockTime = block.timestamp + lockTime;
-    emit lockUpdated(msg.sender, self);
   }
 
   function useUnlocked(Unlock storage self, uint amount) internal {
@@ -31,17 +27,15 @@ library Utils {
     require(self.unlockAmnt >= amount, "sRel Utils: tokens should be unlocked before transfer");
 
     self.unlockAmnt -= amount;  // update locked amount;
-    emit lockUpdated(msg.sender, self);
   }
 
   function resetLock(Unlock storage self) internal {
     self.unlockAmnt = 0;
     self.unlockTime = 0;
-    emit lockUpdated(msg.sender, self);
   }
 
 
-  function transferVestedTokens(Vest storage self, Vest storage vestTo, address to) internal {
+  function transferVestedTokens(Vest storage self, Vest storage vestTo) internal {
     require(self.vested() > 0, "sRel Utils: nothing to transfer");
     require(vestTo.vested() == 0, "sRel Utils: cannot transfer to account with vested tokens");
 
@@ -53,9 +47,6 @@ library Utils {
     self.shortAmnt = 0;
     self.longAmnt = 0;
     self.lastUpdate = 0;
-
-    emit vestUpdated(msg.sender, self);
-    emit vestUpdated(to, vestTo);
   }
 
   function setVestedAmount(Vest storage self, uint shortAmnt, uint longAmnt) public {
@@ -67,7 +58,6 @@ library Utils {
       self.longAmnt = longAmnt;
     
     self.lastUpdate = 0;
-    emit vestUpdated(msg.sender, self);
   }
 
   function vested(Vest storage self) internal view returns (uint) {
@@ -98,7 +88,6 @@ library Utils {
 
     require(amount > 0, "sRel Utils: There are no vested tokens to claim");
     self.lastUpdate = block.timestamp;
-    emit vestUpdated(msg.sender, self);
 
     return amount;
   }

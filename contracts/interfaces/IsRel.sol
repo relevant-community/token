@@ -5,13 +5,10 @@ import "../libraries/Utils.sol";
 
 // Relevant Governance Token
 interface IsRel {
+  event lockUpdated(address indexed account, Utils.Unlock unlockData); // staking events
+  event vestUpdated(address indexed account, address sender, Utils.Vest vestData); // vesting events
 
-  // staking events
-  event lockUpdated(address indexed account, Utils.Unlock unlockData);
-  // vesting events
-  event vestUpdated(address indexed account, Utils.Vest vestData);
-
-  // governance events (contract size is too large for these)
+  // governance events
   event lockPeriodUpdated(uint newLockPeriod);
   event vestAdminUpdated(address newVestAdmin);
 

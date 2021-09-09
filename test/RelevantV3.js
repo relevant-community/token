@@ -79,7 +79,6 @@ describe('Relevant V3', function () {
 
       const tx = await rel.connect(s2).claimTokens(amount, sig)
       const res = await tx.wait()
-      console.log('Claim Gas', res.gasUsed.toString())
       expect(await rel.balanceOf(s2.address)).to.equal(amount)
 
       // replay should fail

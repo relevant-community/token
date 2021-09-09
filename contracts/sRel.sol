@@ -75,6 +75,7 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
       require(amount <= unvestedBalance, "sRel: you cannot transfer vested tokens");
       
       unlocks[from].useUnlocked(amount); // only unlocked tokens can be transferred
+      emit lockUpdated(from, unlocks[from]);
   }
 
   // ---- STAKING METHODS ----
@@ -82,11 +83,13 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
   // unlock sRel - after lockPeriod tokens can be transferred or withdrawn
   function unlock(uint256 amount) external override(IsRel) {
     unlocks[msg.sender].unlock(amount, lockPeriod);
+    emit lockUpdated(msg.sender, unlocks[msg.sender]);
   }
 
    // re-lock tokens
   function resetLock() external override(IsRel) {
     unlocks[msg.sender].resetLock();
+    emit lockUpdated(msg.sender, unlocks[msg.sender]);
   }
 
   // deposit REL in exchange for sREL
@@ -128,19 +131,23 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
     vest[account].setVestedAmount(shortAmnt, longAmnt);
     require(totalSupply() + shortAmnt + longAmnt <= IERC20(r3l).balanceOf(address(this)), "sRel: Not enought REL in contract");
     _mint(account, shortAmnt + longAmnt);
+    emit vestUpdated(account, msg.sender, vest[account]);
   }
 
   // unvest and unlock tokens
   function claimVestedRel() external override(IsRel) {
     uint amount = vest[msg.sender].updateVestedAmount(vestShort, vestLong, vestBegin);
     unlocks[msg.sender].unlock(amount, lockPeriod);
+    emit vestUpdated(msg.sender, msg.sender, vest[msg.sender]);
   }
 
   // transfer all vested tokens to a new address
   function transferVestedTokens(address to) external override(IsRel) {
     uint amount = vest[msg.sender].vested();
-    vest[msg.sender].transferVestedTokens(vest[to], to);
+    vest[msg.sender].transferVestedTokens(vest[to]);
     transfer(to, amount);
+    emit vestUpdated(msg.sender, msg.sender, vest[msg.sender]);
+    emit vestUpdated(to, msg.sender, vest[msg.sender]);
   }
   
   // ---- GOVERNANCE ----

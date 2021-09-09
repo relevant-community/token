@@ -164,11 +164,8 @@ describe('sRel', function () {
       await fastForwardToUnlock(addr2)
 
       const startBal = await sRel.balanceOf(addr1)
-      const transferVestTx = await sRel
-        .connect(addr2S)
-        .transferVestedTokens(addr1)
+      await sRel.connect(addr2S).transferVestedTokens(addr1)
 
-      await transferVestTx.wait()
       expect(await sRel.vested(addr2)).to.equal('0')
       expect(await sRel.vested(addr1)).to.equal(vested)
       expect(await sRel.balanceOf(addr1)).to.equal(startBal.add(vested))
