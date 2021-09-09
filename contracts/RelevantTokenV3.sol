@@ -7,6 +7,7 @@ import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
 contract RelevantTokenV3 is Initializable, ERC20, Ownable {
   event Released(uint256 amount, uint256 hoursSinceLast);
+  event Claimed(address indexed account, uint256 amount);
   
   uint256[101] private ______gap; // ERC20Minter gaps
 
@@ -59,6 +60,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
 
   function updateAllocatedRewards(uint256 newAllocatedRewards) public onlyOwner {
     require(newAllocatedRewards <= balanceOf(address(this)), "Relevant: there aren't enough tokens in the contract");
+    require(newAllocatedRewards >= allocatedRewards, "Relevant: amount of allocated tokens cannot be reduced");
     allocatedRewards = newAllocatedRewards;
   }
 
@@ -105,6 +107,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     nonces[msg.sender] += 1;
     allocatedRewards = allocatedRewards.sub(amount);
     _transfer(address(this), msg.sender, amount);
+    emit Claimed(msg.sender, amount);
   }
 
   function nonceOf(address account) public view returns(uint256) {
