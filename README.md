@@ -63,7 +63,7 @@ Openzeppelin Governor contract that can self-modify the `votingPeriod`, `proposa
 Openzeppelin Timelock that adds a delay to all governance decisions.
 
 ## Final Ownership Structure
-Governor is a Timelock `propser`
-Timelock is REL `owner`
-Timelock is sREL `owner`
-Timelock is REL `proxyAdmin` `owner`
+ - Governor is a Timelock `propser`
+ - Timelock is REL `owner`
+ - Timelock is sREL `owner`
+ - Timelock is REL `proxyAdmin` `owner`
