@@ -21,7 +21,7 @@ const setupAccount = async (address) => {
 const setupLocalNetwork = async () => {
   await copyFile(
     '.openzeppelin/mainnet.json',
-    '.openzeppelin/unknown-31337.json',
+    '.openzeppelin/unknown-1337.json',
   )
 
   await network.provider.request({

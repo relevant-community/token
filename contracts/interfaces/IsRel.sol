@@ -26,7 +26,9 @@ interface IsRel {
   function updateLockPeriod(uint newLockPeriod) external;
   function setVestAdmin(address newAdmin) external;
   // view
+  function nonceOf(address account) external view returns (uint);
   function unstaked(address account) external view returns (uint);
+  function staked(address account) external view returns (uint);
   function unlockTime(address account) external view returns (uint);
   function vested(address account) external view returns (uint);
   function vestData(address account) external view returns (Utils.Vest memory);

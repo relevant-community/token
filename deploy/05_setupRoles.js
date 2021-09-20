@@ -1,6 +1,12 @@
 const { ethers } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 
+const { Contract, utils } = ethers
+const { parseUnits } = utils
+
+const proxyAdminAbi = require('@openzeppelin/upgrades/build/contracts/ProxyAdmin.json')
+  .abi
+
 const TIMELOCK_ADMIN_ROLE =
   '0x5f58e3a2316349923ce3780f8d587db2d72378aed66a8261c916544fa6846ca5'
 const PROPOSER_ROLE =
@@ -13,7 +19,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     'REL/RelevantToken'
   ]
 
-  const { deployer, relOwner } = await getNamedAccounts()
+  const { deployer, relOwner, proxyAdmin } = await getNamedAccounts()
   const RelevantTokenV3 = await ethers.getContractFactory(
     'RelevantTokenV3',
     await ethers.getSigner(relOwner),
@@ -23,6 +29,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const timelock = await ethers.getContract('RelTimelock', deployer)
   const relGov = await ethers.getContract('RelGovernor', deployer)
   const sRel = await ethers.getContract('sRel', deployer)
+
+  // setup vesting amounts on local network (for testing)
+  if (network.name == 'hardhat') {
+    await rel.vestAllocatedTokens(sRel.address, parseUnits('500000'))
+  }
 
   // REL OWNER
   const relTokenOwner = await rel.owner()
@@ -58,6 +69,19 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     await timelock.renounceRole(TIMELOCK_ADMIN_ROLE, deployer)
   } else {
     console.log('Deployer is not Admin')
+  }
+
+  // Governor should be the new proxy admin
+  const proxyAdminContract = new Contract(
+    RelevantToken.admin,
+    proxyAdminAbi,
+    await ethers.getSigner(proxyAdmin),
+  )
+  if ((await proxyAdminContract.owner()) !== relGov.address) {
+    console.log('Setting RelGovernor as proxyAdmin owner')
+    await proxyAdminContract.transferOwnership(relGov.address)
+  } else {
+    console.log('RelGovernor is proxyAdmin owner')
   }
 }
 

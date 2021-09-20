@@ -61,7 +61,7 @@ describe('Upgrade', function () {
     await tx.wait()
     expect(await rel.initializedV3()).to.be.true
     expect(await rel.version()).to.equal('v3')
-    expect((await rel.inflation()).toNumber()).to.equal(0)
+    expect((await rel.inflation()).toNumber()).to.equal(500)
     expect((await rel.lastReward()).toNumber()).to.equal(timestamp)
   })
 })

@@ -50,12 +50,9 @@ describe('sRel', function () {
     it('should unlock', async function () {
       const unlockTx = await sRel.unlock(parseUnits('50'))
       const res = await unlockTx.wait()
-      console.log(
-        'ulock gas',
-        res.gasUsed.toNumber(),
-        (80 * (res.gasUsed.toNumber() * 3400)) / 1e9,
-      )
+      const balance = await sRel.balanceOf(owner)
       expect(await sRel.unstaked(owner)).to.equal(parseUnits('50'))
+      expect(await sRel.staked(owner)).to.equal(balance.sub(parseUnits('50')))
     })
     it('premature transfer should fail', async function () {
       await expect(sRel.transfer(addr1, parseUnits('50'))).to.be.revertedWith(
@@ -210,7 +207,7 @@ describe('sRel', function () {
       const sendRelTx = await rel.transfer(sRel.address, total)
       await sendRelTx.wait()
 
-      const nonce = await sRel.vestNonce(addr2)
+      const nonce = await sRel.nonceOf(addr2)
       const hash = solidityKeccak256(
         ['uint256', 'uint256', 'address', 'uint256'],
         [...amounts, addr2, nonce],

@@ -41,7 +41,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     version = "v3";
     initializedV3 = true;
     admin = _admin;
-    inflation = 0;  // initialize inflation at 0 to avoid accidentaly reading previous values
+    inflation = 500;  // default init to 5% (can be adjusted later)
   }
 
   function setInflation(uint256 _inflation) public onlyOwner {

@@ -45,6 +45,7 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      chainId: 1337,
       // accounts: [{ privateKey: PK, balance: '10000000000000000000' }],
     },
     local: {
@@ -78,9 +79,11 @@ module.exports = {
       default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51',
     },
     relAdmin: {
+      1337: 1,
       default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51', // hot wallet
     },
     vestAdmin: {
+      1337: 1,
       default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51', // hot wallet
     },
     testAddr1: {

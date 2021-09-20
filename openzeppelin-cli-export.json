@@ -26,7 +26,8 @@
           {
             "address": "0xb6c4267C4877BB0D6b1685Cfd85b0FBe82F105ec",
             "version": "0.2.0",
-            "implementation": "0x59bFc294028bb839Ce9A0b9c6b3b89dCaf301645"
+            "implementation": "0x59bFc294028bb839Ce9A0b9c6b3b89dCaf301645",
+            "admin": "0x6E9cA4514744E177E354613F9c0Df0BFBCa407d1"
           }
         ]
       },

@@ -33,6 +33,7 @@ describe('Relevant V3', function () {
     })
 
     it('releaseTokens should fail if inflation rate is not set', async function () {
+      await rel.setInflation('0') // 0% inflation
       await expect(rel.releaseTokens()).to.be.revertedWith(
         'Relevant: inflation rate has not been set',
       )

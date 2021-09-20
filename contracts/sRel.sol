@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./interfaces/IsRel.sol";
 import "./libraries/Utils.sol";
 
-contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
+contract sRel is IsRel, ERC20Votes, Ownable {
   using Utils for Utils.Vest;
   using Utils for Utils.Unlock;
 
@@ -23,9 +21,9 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
   uint public immutable vestShort; // short vesting period
   uint public immutable vestLong; // long vesting period
 
-  mapping(address => uint256) public vestNonce;
-  mapping(address => Utils.Unlock) public unlocks;
-  mapping(address => Utils.Vest) public vest;
+  mapping(address => uint256) private vestNonce;
+  mapping(address => Utils.Unlock) private unlocks;
+  mapping(address => Utils.Vest) private vest;
 
   constructor(address _r3l, address _vestAdmin, uint _vestBegin, uint _vestShort, uint _vestLong)
     ERC20("Staked REL", "sREL")
@@ -36,28 +34,6 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
     vestShort = _vestShort;
     vestLong = _vestLong;
     vestAdmin = _vestAdmin;
-  }
-
-  // The functions below are overrides required by Solidity.
-  function _afterTokenTransfer(address from, address to, uint256 amount)
-      internal
-      override(ERC20, ERC20Votes)
-  {
-      super._afterTokenTransfer(from, to, amount);
-  }
-
-  function _mint(address to, uint256 amount)
-      internal
-      override(ERC20, ERC20Votes)
-  {
-      super._mint(to, amount);
-  }
-
-  function _burn(address account, uint256 amount)
-      internal
-      override(ERC20, ERC20Votes)
-  {
-      super._burn(account, amount);
   }
 
   // only unlocked & unvested tokens can be transferred
@@ -163,6 +139,13 @@ contract sRel is IsRel, ERC20, ERC20Permit, ERC20Votes, Ownable {
   }
 
   // ---- VIEW --------
+  function nonceOf(address account) external view override(IsRel) returns (uint) {
+    return vestNonce[account];
+  }
+
+  function staked(address account) external view override(IsRel) returns (uint) {
+    return balanceOf(account) - unlocks[account].unlockAmnt;
+  }
 
   function unstaked(address account) external view override(IsRel) returns (uint) {
     return unlocks[account].unlockAmnt;
