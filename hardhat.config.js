@@ -13,7 +13,7 @@ const { PK, INFURA_API_KEY, CMC_API } = process.env
 module.exports = {
   gasReporter: {
     currency: 'USD',
-    gasPrice: 80,
+    gasPrice: 129,
     coinmarketcap: CMC_API,
   },
   solidity: {

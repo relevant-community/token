@@ -1,5 +1,6 @@
 const { ethers, upgrades, getNamedAccounts } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
+const { INITIAL_INFLATION } = require('../test/utils')
 
 // const proxyAdminAbi = require('@openzeppelin/upgrades/build/contracts/ProxyAdmin.json')
 //   .abi
@@ -64,7 +65,7 @@ const initV3 = async (ownerSigner, adminAddr) => {
     console.log('Already Initialized V3!')
     return
   }
-  await rel.initV3(adminAddr)
+  await rel.initV3(adminAddr, INITIAL_INFLATION)
   const version = await rel.version()
   console.log('INITIALIZED: ', version)
 }

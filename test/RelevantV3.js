@@ -1,6 +1,13 @@
 const { utils, BigNumber } = require('ethers')
 const { parseUnits, formatEther, solidityKeccak256, arrayify } = utils
 const { expect } = require('chai')
+const {
+  INITIAL_INFLATION,
+  printClaimRelHash,
+  getTypedClaimRelMsg,
+} = require('./utils')
+
+// printClaimRelHash();
 
 describe('Relevant V3', function () {
   let signers
@@ -16,7 +23,7 @@ describe('Relevant V3', function () {
     rel = await Rel.deploy()
     await rel.deployed()
     await rel['initialize()']()
-    await rel.initV3(admin.address)
+    await rel.initV3(admin.address, INITIAL_INFLATION)
   }
 
   describe('Core functionality', () => {
@@ -27,15 +34,15 @@ describe('Relevant V3', function () {
     })
 
     it('should not allow re-init', async function () {
-      await expect(rel.initV3(admin.address)).to.be.revertedWith(
-        'Relevant: this version has already been initialized',
-      )
+      await expect(
+        rel.initV3(admin.address, INITIAL_INFLATION),
+      ).to.be.revertedWith('Rel: v3 already initialized')
     })
 
     it('releaseTokens should fail if inflation rate is not set', async function () {
       await rel.setInflation('0') // 0% inflation
       await expect(rel.releaseTokens()).to.be.revertedWith(
-        'Relevant: inflation rate has not been set',
+        'Rel: inflation is 0',
       )
     })
 
@@ -51,14 +58,14 @@ describe('Relevant V3', function () {
       const res = await tx.wait()
       const end = await rel.balanceOf(rel.address)
       const log = res.events.find((e) => e.event == 'Released')
-      expect(log.args.hoursSinceLast).to.equal(60)
+      // expect(log.args.secondsSinceLast.div(60 * 60)).to.equal(60)
       expect(end.sub(start)).to.equal(0)
       console.log('minting', formatEther(log.args.amount), 'in 60 hours')
     })
 
     it('should not releaseTokens more than once a day', async function () {
       await expect(rel.releaseTokens()).to.be.revertedWith(
-        'Relevant: less than one day from last reward',
+        'Rel: less than one day from last reward',
       )
     })
 
@@ -66,17 +73,24 @@ describe('Relevant V3', function () {
       const amount = parseUnits('10')
 
       const nonce = await rel.nonceOf(s2.address)
-      const hash = solidityKeccak256(
-        ['uint256', 'address', 'uint256'],
-        [amount, s2.address, nonce],
+
+      const data = getTypedClaimRelMsg(
+        s2.address,
+        amount.toString(),
+        nonce.toString(),
+        rel.address,
       )
 
-      const sig = await admin.signMessage(arrayify(hash))
+      const sig = await admin._signTypedData(
+        data.domain,
+        data.types,
+        data.message,
+      )
 
       // wrong amounts should fail
       await expect(
         rel.connect(s2).claimTokens(parseUnits('1'), sig),
-      ).to.be.revertedWith('Relevant: claim not authorized')
+      ).to.be.revertedWith('Rel: claim not authorized')
 
       const tx = await rel.connect(s2).claimTokens(amount, sig)
       const res = await tx.wait()
@@ -84,7 +98,7 @@ describe('Relevant V3', function () {
 
       // replay should fail
       await expect(rel.connect(s2).claimTokens(amount, sig)).to.be.revertedWith(
-        'Relevant: claim not authorized',
+        'Rel: claim not authorized',
       )
     })
 
@@ -101,7 +115,7 @@ describe('Relevant V3', function () {
 
       // wrong amounts should fail
       await expect(rel.connect(s2).claimTokens(amount, sig)).to.be.revertedWith(
-        "Relevant: there aren't enough tokens in the contract",
+        'Rel: not enough allocated tokens',
       )
     })
   })
@@ -116,9 +130,7 @@ describe('Relevant V3', function () {
       const balance = await rel.balanceOf(rel.address)
       await expect(
         rel.updateAllocatedRewards(balance.add(1)),
-      ).to.be.revertedWith(
-        "Relevant: there aren't enough tokens in the contract",
-      )
+      ).to.be.revertedWith('Rel: not enough tokens in contract')
       await rel.updateAllocatedRewards(balance)
       expect(await rel.allocatedRewards()).to.equal(balance)
     })
@@ -132,7 +144,7 @@ describe('Relevant V3', function () {
       await rel.burn(balance.sub(allocatedRewards))
       await expect(await rel.balanceOf(rel.address)).to.equal(allocatedRewards)
       await expect(rel.burn('10')).to.be.revertedWith(
-        'Relevant: cannot burn allocated tokens',
+        'Rel: cannot burn allocated tokens',
       )
     })
     it('releaseTokens should mint tokens when allocatedRewards is maxed out', async function () {
@@ -158,9 +170,7 @@ describe('Relevant V3', function () {
       const allocatedRewards = await rel.allocatedRewards()
       await expect(
         rel.vestAllocatedTokens(s2.address, allocatedRewards.add('1')),
-      ).to.be.revertedWith(
-        "Relevant: there aren't enough tokens in the contract",
-      )
+      ).to.be.revertedWith('Rel: not enough allocated tokens')
       await rel.vestAllocatedTokens(s2.address, allocatedRewards)
 
       await expect(await rel.balanceOf(s2.address)).to.equal(allocatedRewards)

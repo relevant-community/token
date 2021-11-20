@@ -179,9 +179,9 @@
         }
       }
     },
-    "5f35f7899c5f73db45c6f58e12af436d3a6e1fc9d7f91cb577552d0a970aa1ec": {
-      "address": "0x1E4e7F4234aA24f0fFeEc94fDD72A9bBebBb71ac",
-      "txHash": "0xd0a07603ae3fad314747fbefc66952b06addb2af0987b60f47e532cedbc15944",
+    "579288de4aaaa7c66234f57985377d75028335d9ef4a24e305f3b008bf09c6b9": {
+      "address": "0x9f18428d1662d5736d43cf1f9AA29b8C8249C0f0",
+      "txHash": "0xae2f52b29301e3b49fb3d946efe312c809df4208f0110b4a67cad3b3b3c29b42",
       "layout": {
         "storage": [
           {
@@ -242,85 +242,91 @@
             "contract": "RelevantTokenV3",
             "label": "______gap",
             "type": "t_array(t_uint256)101_storage",
-            "src": "contracts/RelevantTokenV3.sol:12"
+            "src": "contracts/RelevantTokenV3.sol:15"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "name",
             "type": "t_string_storage",
-            "src": "contracts/RelevantTokenV3.sol:14"
+            "src": "contracts/RelevantTokenV3.sol:17"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "decimals",
             "type": "t_uint8",
-            "src": "contracts/RelevantTokenV3.sol:15"
+            "src": "contracts/RelevantTokenV3.sol:18"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "symbol",
             "type": "t_string_storage",
-            "src": "contracts/RelevantTokenV3.sol:16"
+            "src": "contracts/RelevantTokenV3.sol:19"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "version",
             "type": "t_string_storage",
-            "src": "contracts/RelevantTokenV3.sol:17"
+            "src": "contracts/RelevantTokenV3.sol:20"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "admin",
             "type": "t_address",
-            "src": "contracts/RelevantTokenV3.sol:18"
+            "src": "contracts/RelevantTokenV3.sol:21"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "inflation",
             "type": "t_uint256",
-            "src": "contracts/RelevantTokenV3.sol:20"
+            "src": "contracts/RelevantTokenV3.sol:23"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "lastReward",
             "type": "t_uint256",
-            "src": "contracts/RelevantTokenV3.sol:21"
+            "src": "contracts/RelevantTokenV3.sol:24"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "______gap1",
             "type": "t_array(t_uint256)15_storage",
-            "src": "contracts/RelevantTokenV3.sol:23"
+            "src": "contracts/RelevantTokenV3.sol:26"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "allocatedRewards",
             "type": "t_uint256",
-            "src": "contracts/RelevantTokenV3.sol:26"
+            "src": "contracts/RelevantTokenV3.sol:28"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "______gap2",
             "type": "t_uint256",
-            "src": "contracts/RelevantTokenV3.sol:29"
+            "src": "contracts/RelevantTokenV3.sol:30"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "nonces",
             "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/RelevantTokenV3.sol:31"
+            "src": "contracts/RelevantTokenV3.sol:32"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "______gap3",
             "type": "t_array(t_uint256)4_storage",
-            "src": "contracts/RelevantTokenV3.sol:33"
+            "src": "contracts/RelevantTokenV3.sol:34"
           },
           {
             "contract": "RelevantTokenV3",
             "label": "initializedV3",
             "type": "t_bool",
-            "src": "contracts/RelevantTokenV3.sol:35"
+            "src": "contracts/RelevantTokenV3.sol:36"
+          },
+          {
+            "contract": "RelevantTokenV3",
+            "label": "DOMAIN_SEPARATOR",
+            "type": "t_bytes32",
+            "src": "contracts/RelevantTokenV3.sol:44"
           }
         ],
         "types": {
@@ -350,6 +356,9 @@
           },
           "t_bool": {
             "label": "bool"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
