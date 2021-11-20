@@ -7,8 +7,6 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./interfaces/IsRel.sol";
 import "./libraries/Utils.sol";
 
-import "hardhat/console.sol";
-
 contract sRel is IsRel, ERC20Votes, Ownable {
 	using Utils for Utils.Vest;
 	using Utils for Utils.Unlock;
@@ -120,6 +118,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
 			abi.encode(CLAIM_HASH, msg.sender, _shortAmount, _longAmount, nonce)
 		);
 
+		// _domainSeparatorV4 comes from EIP712 which is a base contract of ERC20Votes
 		bytes32 digest = ECDSA.toTypedDataHash(_domainSeparatorV4(), structHash);
 		address signer = ECDSA.recover(digest, _sig);
 
