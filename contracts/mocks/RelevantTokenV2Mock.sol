@@ -2,13 +2,15 @@ pragma solidity ^0.5.0;
 
 import "../RelevantTokenV2.sol";
 
-contract RelevantTokenMock is RelevantToken{
+//s
+
+contract RelevantTokenMock is RelevantToken {
   /**
    * @dev Return current round number // using the state variable set by setRoundNum, for testing
    */
 
-  uint currentRound;
-  
+  uint256 currentRound;
+
   function roundNum() public view returns (uint256) {
     // return (block.number.sub(startBlock)).div(roundLength);
     return currentRound;
@@ -32,10 +34,7 @@ contract RelevantTokenMock is RelevantToken{
     uint256 _totalAirdrops,
     uint256 _lastRoundAirdrop,
     uint256 _totalRewardReserve
-  ) public
-    onlyOwner
-    returns (uint256)
-  {
+  ) public onlyOwner returns (uint256) {
     require(_roundNum < currentRound, "Last release must be before current round");
     lastRound = _roundNum;
     lastRoundReward = _lastRoundReward;
@@ -52,8 +51,7 @@ contract RelevantTokenMock is RelevantToken{
    * @dev Artificially empties the devFund account of all accumulated tokens // auxiliary function for testing
    */
   function emptyDevBalance() public {
-    uint devBalance = balanceOf(devFundAddress);
+    uint256 devBalance = balanceOf(devFundAddress);
     this.transferFrom(devFundAddress, address(0x123), devBalance);
   }
 }
-
