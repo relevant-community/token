@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20Mintable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -11,8 +11,12 @@ import "@openzeppelin/upgrades/contracts/Initializable.sol";
  */
 
 contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
-
-  event Released(uint256 releasableTokens, uint256 rewardFund, uint256 airdropFund, uint256 developmentFund);
+  event Released(
+    uint256 releasableTokens,
+    uint256 rewardFund,
+    uint256 airdropFund,
+    uint256 developmentFund
+  );
 
   string public name;
   uint8 public decimals;
@@ -49,7 +53,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   uint256 public airdropRoundDecay; // Decay factor by which airdrops decrease during 1 round in new airdrop schedule
   uint256 public lastRoundAirdrop; // Airdrop of the last round from which tokens were released
 
-
   /**
    * @dev ContPreInflationaryToken constructor
    * @param _devFundAddress         Address that receives and manages newly minted tokens for development fund
@@ -74,9 +77,7 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     uint256 _roundLength,
     uint256 _roundDecay,
     uint256 _totalPremint
-  )   public
-    initializer
-  {
+  ) public initializer {
     Ownable.initialize(msg.sender);
     ERC20Mintable.initialize(msg.sender);
 
@@ -105,8 +106,18 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   //                                  (should be much higher than roundDecay => airdrops decrease faster)
   // * @param _airdropSwitchRound     Round at which airdrops from previous calculation and exponentially decaying airdrops are the same
   //                                  (assumed to be below targetRound, so we can solve for this by setting old airdrops equal to new airdrops)
-  function initializeRewardSplit(uint256 _airdropSwitchRound, uint256 _airdropRoundDecay, uint256 _firstNewAirdrop) public {
-    require(initRoundAirdrop == 0 && airdropSwitchRound == 0 && lastRoundAirdrop == 0 && airdropRoundDecay == 0, "Already initialized");
+  function initializeRewardSplit(
+    uint256 _airdropSwitchRound,
+    uint256 _airdropRoundDecay,
+    uint256 _firstNewAirdrop
+  ) public {
+    require(
+      initRoundAirdrop == 0 &&
+        airdropSwitchRound == 0 &&
+        lastRoundAirdrop == 0 &&
+        airdropRoundDecay == 0,
+      "Already initialized"
+    );
     initRoundAirdrop = initRoundReward; // can change this to anything below initRoundReward (passing additional argument)
     airdropSwitchRound = _airdropSwitchRound;
     airdropRoundDecay = _airdropRoundDecay;
@@ -163,10 +174,14 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @param _totalTokens Number of tokens in supply at the beginning of the phase for which the rewards are being calculated
    * @param _roundsPassed Number of rounds since last release
    */
-  function newTokensForConstantPhase(uint256 _totalTokens, uint256 _roundsPassed) internal view returns (uint256) {
+  function newTokensForConstantPhase(uint256 _totalTokens, uint256 _roundsPassed)
+    internal
+    view
+    returns (uint256)
+  {
     uint256 totalTokens = _totalTokens;
     uint256 releasableTokens;
-    for (uint i = 0; i < _roundsPassed; i++) {
+    for (uint256 i = 0; i < _roundsPassed; i++) {
       uint256 toBeMintedInRound = targetInflation.mul(totalTokens).div(10**uint256(decimals));
       releasableTokens = releasableTokens.add(toBeMintedInRound);
       totalTokens = totalTokens.add(toBeMintedInRound);
@@ -184,19 +199,20 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     if (lastRound == 0) {
       releasableTokens = initRoundReward;
     }
-    if (_roundsPassed < 100000) { // this threshold needs to be optimized - for now we always (virtually) use the loop method
-    // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
+    if (_roundsPassed < 100000) {
+      // this threshold needs to be optimized - for now we always (virtually) use the loop method
+      // If the last release was made less than X rounds ago, we use the discrete loop method to add up all new tokens applying roundDecay after each round.
       uint256 roundReward;
-      for (uint j = 0; j < _roundsPassed; j++) {
+      for (uint256 j = 0; j < _roundsPassed; j++) {
         roundReward = roundDecay.mul(lastRoundReward).div(10**uint256(decimals));
         releasableTokens = releasableTokens.add(roundReward);
         lastRoundReward = roundReward;
       }
     } else {
-    // If more rounds have passed we don't want to loop that many times
-    // and therefore use integration using the partial sum formula
-    // releasableTokens = initReward.add(partialSum(currentRound)).sub(totalReleased);
-    // (then still need to set lastRoundReward using A_0*e^(-round/τ))
+      // If more rounds have passed we don't want to loop that many times
+      // and therefore use integration using the partial sum formula
+      // releasableTokens = initReward.add(partialSum(currentRound)).sub(totalReleased);
+      // (then still need to set lastRoundReward using A_0*e^(-round/τ))
     }
     return releasableTokens;
   }
@@ -216,7 +232,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   function newTokensForCrossingConst(uint256 _currentRound) internal view returns (uint256) {
     uint256 constStartTotalTokens = totalPremint;
     uint256 roundsSinceConstInflation = _currentRound.sub(targetRound).add(1); // including the mint for target and for current round
-    uint256 toBeMinted = newTokensForConstantPhase(constStartTotalTokens, roundsSinceConstInflation);
+    uint256 toBeMinted = newTokensForConstantPhase(
+      constStartTotalTokens,
+      roundsSinceConstInflation
+    );
     return toBeMinted;
   }
 
@@ -224,7 +243,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @dev Put new rewards into the different buckets (userRewards: [airdrop, rewardFund], developmentFund)
    * @param _releasableTokens Amount of tokens that needs to be split up
    */
-  function splitRewards(uint256 _releasableTokens, uint256 _roundsPassed, uint256 _currentRound) internal {
+  function splitRewards(
+    uint256 _releasableTokens,
+    uint256 _roundsPassed,
+    uint256 _currentRound
+  ) internal {
     uint256 userRewards = _releasableTokens.mul(4).div(5); // 80% of inflation goes to the users
     developmentFund = developmentFund.add(_releasableTokens.div(5)); // 20% of inflation goes to devFund
     if (_currentRound < airdropSwitchRound) {
@@ -235,9 +258,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       uint256 airdrops;
       uint256 roundAirdrop;
       // fix the inital lastRoundAirdrop being too big
-      lastRoundAirdrop = lastRoundReward.mul(4).div(15) < lastRoundAirdrop ? lastRoundReward.mul(4).div(15) : lastRoundAirdrop;
+      lastRoundAirdrop = lastRoundReward.mul(4).div(15) < lastRoundAirdrop
+        ? lastRoundReward.mul(4).div(15)
+        : lastRoundAirdrop;
 
-      for (uint j = 0; j < _roundsPassed; j++) {
+      for (uint256 j = 0; j < _roundsPassed; j++) {
         roundAirdrop = airdropRoundDecay.mul(lastRoundAirdrop).div(10**uint256(decimals));
         airdrops = airdrops.add(roundAirdrop);
         lastRoundAirdrop = roundAirdrop;
@@ -248,7 +273,6 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
       rewardFund = rewardFund.add((userRewards.sub(airdrops)).div(2));
       reserveFund = reserveFund.add((userRewards.sub(airdrops)).div(2));
     }
-
   }
 
   /**
@@ -256,16 +280,16 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
    * @param _round Round until which the partial sum is taken
    */
   // function partialSum(uint256 _round) public view returns (uint256) {
-    // TODO: this needs to be worked out! with https://user-images.githubusercontent.com/337721/52804952-7e3f3080-3053-11e9-8bb2-9bc1c3df19ee.jpg
-    // and using Bancor's Power formula for e^x
-    // alternatively use the integral of the reward function:
-    // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward));
+  // TODO: this needs to be worked out! with https://user-images.githubusercontent.com/337721/52804952-7e3f3080-3053-11e9-8bb2-9bc1c3df19ee.jpg
+  // and using Bancor's Power formula for e^x
+  // alternatively use the integral of the reward function:
+  // return initRoundReward.mul(-timeConstant).mul(fixedExp(-_round/timeConstant, 18)).add(timeConstant.mul(initRoundReward));
   // }
 
   /**
    * @dev Transfer eligible tokens from devFund bucket to devFundAddress
    */
-  function toDevFund() internal returns(bool) {
+  function toDevFund() internal returns (bool) {
     uint256 amount = developmentFund;
     developmentFund = 0;
     require(this.transfer(devFundAddress, amount), "Transfer to devFundAddress failed");
@@ -273,10 +297,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-  * @dev Allocate curation rewards
-  * @param _rewards to be reserved for users claims
-  */
-  function allocateRewards(uint256 _rewards) public onlyOwner returns(bool) {
+   * @dev Allocate curation rewards
+   * @param _rewards to be reserved for users claims
+   */
+  function allocateRewards(uint256 _rewards) public onlyOwner returns (bool) {
     require(_rewards <= rewardFund, "Not enough curation rewards available");
     rewardFund = rewardFund.sub(_rewards);
     allocatedRewards = allocatedRewards.add(_rewards);
@@ -284,10 +308,10 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-  * @dev Allocate airdrop rewards
-  * @param _rewards to be reserved for user claims
-  */
-  function allocateAirdrops(uint256 _rewards) public onlyOwner returns(bool) {
+   * @dev Allocate airdrop rewards
+   * @param _rewards to be reserved for user claims
+   */
+  function allocateAirdrops(uint256 _rewards) public onlyOwner returns (bool) {
     require(_rewards <= airdropFund, "Not enough airdrop rewards available");
     airdropFund = airdropFund.sub(_rewards);
     allocatedAirdrops = allocatedAirdrops.add(_rewards);
@@ -295,11 +319,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-  * @dev Claim curation reward tokens (to be called by user)
-  * @param  _amount amount to be transferred to user
-  * @param  _sig Signature by contract owner authorizing the transaction
-  */
-  function claimTokens(uint256 _amount, bytes memory _sig) public returns(bool) {
+   * @dev Claim curation reward tokens (to be called by user)
+   * @param  _amount amount to be transferred to user
+   * @param  _sig Signature by contract owner authorizing the transaction
+   */
+  function claimTokens(uint256 _amount, bytes memory _sig) public returns (bool) {
     // check _amount + account matches hash
     require(allocatedRewards >= _amount, "Not enought allocated rewarads");
     bytes32 hash = keccak256(abi.encodePacked(_amount, msg.sender, nonces[msg.sender]));
@@ -315,11 +339,11 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
   }
 
   /**
-  * @dev Nonce of user
-  * @param _account User account address
-  * @return nonce of user
-  */
-  function nonceOf(address _account) public view returns(uint256) {
+   * @dev Nonce of user
+   * @param _account User account address
+   * @return nonce of user
+   */
+  function nonceOf(address _account) public view returns (uint256) {
     return nonces[_account];
   }
 
@@ -337,4 +361,3 @@ contract RelevantToken is Initializable, ERC20, Ownable, ERC20Mintable {
     return roundNum() - lastRound;
   }
 }
-

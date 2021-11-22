@@ -1,6 +1,8 @@
+const { network } = require('hardhat')
 const { constants, utils, BigNumber } = require('ethers')
 const { expect } = require('chai')
 const { deploySRel, toSec, addDays } = require('./common')
+const { getTypedClaimUnvestedMsg } = require('./utils')
 
 const { parseUnits, formatEther, solidityKeccak256, arrayify } = utils
 
@@ -56,7 +58,7 @@ describe('sRel', function () {
     })
     it('premature transfer should fail', async function () {
       await expect(sRel.transfer(addr1, parseUnits('50'))).to.be.revertedWith(
-        'sRel Utils: tokens are not unlocked yet',
+        'sRelU: tokens are not unlocked yet',
       )
     })
     it('premature withdraw should fail', async function () {
@@ -98,35 +100,35 @@ describe('sRel', function () {
 
   describe('Vest', () => {
     before(init)
-    it('set vesting without REL supply should fail', async function () {
+    it('set unvested amount without REL supply should fail', async function () {
       await expect(
-        sRel.setVestedAmount(addr2, parseUnits('10'), parseUnits('20')),
+        sRel.setUnvestedAmount(addr2, parseUnits('10'), parseUnits('20')),
       ).to.be.reverted
     })
-    it('owner can set vesting', async function () {
-      await addVestedTokens(10, 20, addr2)
-      expect(await sRel.vested(addr2)).to.equal(parseUnits('30'))
+    it('owner can add unvested tokens', async function () {
+      await addUnvestedTokens(10, 20, addr2)
+      expect(await sRel.unvested(addr2)).to.equal(parseUnits('30'))
       expect(await sRel.totalSupply()).to.equal(
         await rel.balanceOf(sRel.address),
       )
     })
-    it('additional vesting to same account should fail', async function () {
+    it('adding unvested tokens to same account should fail', async function () {
       await expect(
-        sRel.setVestedAmount(addr2, parseUnits('10'), parseUnits('20')),
-      ).to.be.revertedWith('sRel Utils: this account already has vested tokens')
+        sRel.setUnvestedAmount(addr2, parseUnits('10'), parseUnits('20')),
+      ).to.be.revertedWith('sRelU: account has unvested tokens')
     })
 
-    it('transfer w vested tokens should fail', async function () {
+    it('transfer w unvested tokens should fail', async function () {
       await expect(
         sRel.connect(addr2S).transfer(addr1, parseUnits('20')),
-      ).to.be.revertedWith('sRel: you cannot transfer vested tokens')
+      ).to.be.revertedWith('sRel: you cannot transfer unvested tokens')
     })
 
     it('rando cannot set vesting', async function () {
       await expect(
         sRel
           .connect(addr2S)
-          .setVestedAmount(addr1, parseUnits('10'), parseUnits('40')),
+          .setUnvestedAmount(addr1, parseUnits('10'), parseUnits('40')),
       ).to.be.revertedWith('Ownable: caller is not the owner')
     })
 
@@ -139,8 +141,8 @@ describe('sRel', function () {
         vestingParams,
       )
 
-      const claimVestTx = await sRel.connect(addr2S).claimVestedRel()
-      await claimVestTx.wait()
+      const claimUnvestedTx = await sRel.connect(addr2S).claimUnvestedRel()
+      await claimUnvestedTx.wait()
 
       expect(await sRel.unstaked(addr2)).to.equal(longAmnt.add(shortAmnt))
 
@@ -149,23 +151,23 @@ describe('sRel', function () {
     })
 
     it('transfer vest without unlock should fail', async function () {
-      await expect(sRel.connect(addr2S).transferVestedTokens(addr1)).to.be
+      await expect(sRel.connect(addr2S).transferUnvestedTokens(addr1)).to.be
         .reverted
     })
 
-    it('should transfer vest', async function () {
+    it('should transfer unvested balance', async function () {
       // should unlock tokens first
-      const vested = await sRel.vested(addr2)
-      const unlockTx = await sRel.connect(addr2S).unlock(vested)
+      const unvested = await sRel.unvested(addr2)
+      const unlockTx = await sRel.connect(addr2S).unlock(unvested)
       await unlockTx.wait()
       await fastForwardToUnlock(addr2)
 
       const startBal = await sRel.balanceOf(addr1)
-      await sRel.connect(addr2S).transferVestedTokens(addr1)
+      await sRel.connect(addr2S).transferUnvestedTokens(addr1)
 
-      expect(await sRel.vested(addr2)).to.equal('0')
-      expect(await sRel.vested(addr1)).to.equal(vested)
-      expect(await sRel.balanceOf(addr1)).to.equal(startBal.add(vested))
+      expect(await sRel.unvested(addr2)).to.equal('0')
+      expect(await sRel.unvested(addr1)).to.equal(unvested)
+      expect(await sRel.balanceOf(addr1)).to.equal(startBal.add(unvested))
     })
 
     it('should unvest full amount', async function () {
@@ -178,8 +180,8 @@ describe('sRel', function () {
         vestingParams,
       )
 
-      const claimVestTx = await sRel.connect(addr1S).claimVestedRel()
-      await claimVestTx.wait()
+      const claimUnvestedTx = await sRel.connect(addr1S).claimUnvestedRel()
+      await claimUnvestedTx.wait()
 
       expect(await sRel.unstaked(addr1)).to.equal(longAmnt.add(shortAmnt))
 
@@ -190,49 +192,58 @@ describe('sRel', function () {
     })
 
     it('unvest 0 should fail', async function () {
-      await expect(sRel.connect(addr1S).claimVestedRel()).to.be.revertedWith(
-        'sRel Utils: There are no vested tokens to claim',
+      await expect(sRel.connect(addr1S).claimUnvestedRel()).to.be.revertedWith(
+        'sRel: no unvested tokens to claim',
       )
     })
   })
 
-  describe('Self-Vest', () => {
+  describe('Self-vest', () => {
     before(init)
-    it('should vest via signed message', async () => {
+    it('should init unvest via signed message', async () => {
       // prep
       const amounts = [parseUnits('15'), parseUnits('34')]
       const total = amounts[0].add(amounts[1])
-      const setVestAdminTx = await sRel.setVestAdmin(addr1)
-      setVestAdminTx.wait()
       const sendRelTx = await rel.transfer(sRel.address, total)
       await sendRelTx.wait()
 
       const nonce = await sRel.nonceOf(addr2)
-      const hash = solidityKeccak256(
-        ['uint256', 'uint256', 'address', 'uint256'],
-        [...amounts, addr2, nonce],
+
+      const data = getTypedClaimUnvestedMsg(
+        addr2,
+        amounts[0].toString(),
+        amounts[1].toString(),
+        nonce.toString(),
+        sRel.address,
+        network.config.chainId,
       )
 
-      const sig = await addr1S.signMessage(arrayify(hash))
+      const sig = await addr1S._signTypedData(
+        data.domain,
+        data.types,
+        data.message,
+      )
 
       // wrong amounts should fail
       await expect(
-        sRel.connect(addr2S).vestTokens(parseUnits('1'), parseUnits('1'), sig),
+        sRel
+          .connect(addr2S)
+          .unvestTokens(parseUnits('1'), parseUnits('1'), sig),
       ).to.be.revertedWith('sRel: Claim not authorized')
 
-      const vestTx = await sRel.connect(addr2S).vestTokens(...amounts, sig)
-      await vestTx.wait()
-      expect(await sRel.vested(addr2)).to.equal(total)
+      const unvestTx = await sRel.connect(addr2S).unvestTokens(...amounts, sig)
+      await unvestTx.wait()
+      expect(await sRel.unvested(addr2)).to.equal(total)
 
       // replay should fail
       await expect(
-        sRel.connect(addr2S).vestTokens(...amounts, sig),
+        sRel.connect(addr2S).unvestTokens(...amounts, sig),
       ).to.be.revertedWith('sRel: Claim not authorized')
     })
-    it('transfer to account w vest should fail', async function () {
+    it('transfer from account w no unvested tokens should fail', async function () {
       await expect(
-        sRel.connect(addr1S).transferVestedTokens(addr2),
-      ).to.be.revertedWith('sRel Utils: nothing to transfer')
+        sRel.connect(addr1S).transferUnvestedTokens(addr2),
+      ).to.be.revertedWith('sRelU: nothing to transfer')
     })
   })
 
@@ -250,21 +261,21 @@ describe('sRel', function () {
     before(init)
     it('transfer 0 vest should fail', async function () {
       await expect(
-        sRel.connect(addr1S).transferVestedTokens(addr2),
-      ).to.be.revertedWith('sRel Utils: nothing to transfer')
+        sRel.connect(addr1S).transferUnvestedTokens(addr2),
+      ).to.be.revertedWith('sRelU: nothing to transfer')
     })
     it('trasfer to account w vest should fail', async () => {
-      await addVestedTokens(10, 0, addr1)
-      await addVestedTokens(0, 20, addr2)
+      await addUnvestedTokens(10, 0, addr1)
+      await addUnvestedTokens(0, 20, addr2)
       await expect(
-        sRel.connect(addr1S).transferVestedTokens(addr2),
+        sRel.connect(addr1S).transferUnvestedTokens(addr2),
       ).to.be.revertedWith(
-        'sRel Utils: cannot transfer to account with vested tokens',
+        'sRelU: cannot transfer to account with unvested tokens',
       )
     })
-    it('should not unvest before start of vesting', async () => {
-      await expect(sRel.connect(addr1S).claimVestedRel()).to.be.revertedWith(
-        "sRel Utils: Vesting has't started yet",
+    it('should not vest before start of vesting', async () => {
+      await expect(sRel.connect(addr1S).claimUnvestedRel()).to.be.revertedWith(
+        'sRel: no unvested tokens to claim',
       )
     })
   })
@@ -313,17 +324,17 @@ describe('sRel', function () {
     return [shortAmnt, longAmnt]
   }
 
-  async function addVestedTokens(amnt1, amnt2, account) {
+  async function addUnvestedTokens(amnt1, amnt2, account) {
     const sendRelTx = await rel.transfer(
       sRel.address,
       parseUnits((amnt1 + amnt2).toString()),
     )
     await sendRelTx.wait()
-    const setVestTx = await sRel.setVestedAmount(
+    const setUnvestTx = await sRel.setUnvestedAmount(
       account,
       parseUnits(amnt1.toString()),
       parseUnits(amnt2.toString()),
     )
-    await setVestTx.wait()
+    await setUnvestTx.wait()
   }
 })

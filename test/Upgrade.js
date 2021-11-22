@@ -1,7 +1,11 @@
 const { ethers, upgrades } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 const { expect } = require('chai')
-const { setupAccount, setupLocalNetwork } = require('./utils')
+const {
+  setupAccount,
+  setupLocalNetwork,
+  INITIAL_INFLATION,
+} = require('./utils')
 
 describe('Upgrade', function () {
   let rel
@@ -57,7 +61,7 @@ describe('Upgrade', function () {
     const owner = await setupAccount(relOwner)
     const timestamp = Math.round(Date.now() / 1000)
     await network.provider.send('evm_setNextBlockTimestamp', [timestamp])
-    const tx = await rel.connect(owner).initV3(relOwner)
+    const tx = await rel.connect(owner).initV3(relOwner, INITIAL_INFLATION)
     await tx.wait()
     expect(await rel.initializedV3()).to.be.true
     expect(await rel.version()).to.equal('v3')

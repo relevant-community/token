@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.0;
 
 import "../libraries/Utils.sol";
 
@@ -22,21 +22,21 @@ interface IsRel {
   function unstakeRel(uint256 amount) external;
 
   // vesting
-  function setVestedAmount(
+  function setUnvestedAmount(
     address account,
     uint256 amountShort,
     uint256 amountLong
   ) external;
 
-  function vestTokens(
+  function unvestTokens(
     uint256 _shortAmount,
     uint256 _longAmount,
     bytes memory _sig
   ) external;
 
-  function claimVestedRel() external;
+  function claimUnvestedRel() external;
 
-  function transferVestedTokens(address to) external;
+  function transferUnvestedTokens(address to) external;
 
   // governance
   function updateLockPeriod(uint256 newLockPeriod) external;
@@ -52,7 +52,7 @@ interface IsRel {
 
   function unlockTime(address account) external view returns (uint256);
 
-  function vested(address account) external view returns (uint256);
+  function unvested(address account) external view returns (uint256);
 
   function vestData(address account) external view returns (Utils.Vest memory);
 }

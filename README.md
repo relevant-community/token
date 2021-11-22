@@ -6,7 +6,7 @@ This repository contains smart contracts used by [Relevant APP](https://relevant
 
 Users of the Relevant App are able to earn REL tokens for curating content on the Relevant App. REL tokens are allocated for rewards via `releaseTokens`. REL token `admin` distributes the tokens as balances in the web2 database of the Relevant App. Users can then `claimTokens` by requesting an attestation by the `admin` account and submitting it to the REL smart contract.
 
-There is currently a limit to how many tokens can be claimed this way by any individual account. Balances over the limit can be claimed as vested `sRel` tokens. These tokens are not transferrable but can otherwise be used for governance and within the app.
+There is currently a limit to how many tokens can be claimed this way by any individual account. Balances over the limit can be claimed as unvested `sRel` tokens. These tokens are not transferrable but can otherwise be used for governance and within the app.
 
 ### Key Contract Parameters
 
@@ -48,11 +48,11 @@ sREL is governance wrapper for REL tokens and allows staking and vesting.
 
 ### Vesting
 
-- Vested tokens can be added by the `owner` of the contract or via a signature from the `vestAdmin'
+- Unvested tokens can be added by the `owner` of the contract or via a signature from the `vestAdmin'
 - There are two vesting schedules - short and long, exact params TBD, likely 4 and 16 years respectively
 - The params are global - meant to distribute a set amount of tokens to users
-- Vested tokens can be used to cast governance votes
-- The full amount of vested tokens can be transferred to a new account
+- Unested tokens can be used to cast governance votes
+- The full amount of unvested tokens can be transferred to a new account
 
 ## Governor
 
