@@ -48,7 +48,7 @@ const getTypedClaimRelMsg = (account, amount, nonce, contract) => {
     },
     domain: {
       name: 'Relevant',
-      version: 'v3',
+      version: '1',
       chainId: 1,
       verifyingContract: contract,
     },

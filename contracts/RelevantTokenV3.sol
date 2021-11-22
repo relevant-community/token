@@ -53,7 +53,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
 		setInflation(_inflation);
 
 		bytes32 nameHash = keccak256(bytes(name));
-		bytes32 versionHash = keccak256(bytes(version));
+		bytes32 versionHash = keccak256(bytes("1"));
 		bytes32 typeHash = keccak256(
 			"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
 		);
