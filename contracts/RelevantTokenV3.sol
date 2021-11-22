@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol
 import "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol";
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 
+// test
 contract RelevantTokenV3 is Initializable, ERC20, Ownable {
 	event Released(uint256 amount, uint256 secondsSinceLast, uint256 timestamp);
 	event Claimed(address indexed account, uint256 amount);
