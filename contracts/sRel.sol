@@ -118,7 +118,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
 			abi.encode(CLAIM_HASH, msg.sender, _shortAmount, _longAmount, nonce)
 		);
 
-		// _domainSeparatorV4 comes from EIP712 which is a base contract of ERC20Votes
+		// _domainSeparatorV4 is from EIP712 which is a base contract of ERC20Votes
 		bytes32 digest = ECDSA.toTypedDataHash(_domainSeparatorV4(), structHash);
 		address signer = ECDSA.recover(digest, _sig);
 
