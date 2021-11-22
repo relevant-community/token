@@ -7,8 +7,6 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./interfaces/IsRel.sol";
 import "./libraries/Utils.sol";
 
-//s
-
 contract sRel is IsRel, ERC20Votes, Ownable {
   using Utils for Utils.Vest;
   using Utils for Utils.Unlock;

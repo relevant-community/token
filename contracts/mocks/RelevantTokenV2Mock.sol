@@ -2,8 +2,6 @@ pragma solidity ^0.5.0;
 
 import "../RelevantTokenV2.sol";
 
-//s
-
 contract RelevantTokenMock is RelevantToken {
   /**
    * @dev Return current round number // using the state variable set by setRoundNum, for testing
