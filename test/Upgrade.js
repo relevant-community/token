@@ -37,6 +37,8 @@ describe('Upgrade', function () {
     const balance = await relV2.balanceOf(testAddr1)
     const allowance = await relV2.allowance(testAddr1, testAddr2)
     const nonce = await relV2.nonceOf(testAddr1)
+    const v2Owner = await relV2.owner()
+    
 
     await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
       unsafeAllowRenames: true,
@@ -46,7 +48,9 @@ describe('Upgrade', function () {
     const symbol = await rel.symbol()
     const name = await rel.name()
     const version = await rel.version()
+    const owner = await relV2.owner()
 
+    expect(owner).to.be.equal(v2Owner)
     expect(symbol).to.be.equal('REL')
     expect(name).to.be.equal('Relevant')
     expect(version).to.be.equal('v1')

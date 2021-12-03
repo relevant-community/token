@@ -28,7 +28,7 @@ interface IsRel {
     uint256 amountLong
   ) external;
 
-  function unvestTokens(
+  function initVesting(
     uint256 _shortAmount,
     uint256 _longAmount,
     bytes memory _sig

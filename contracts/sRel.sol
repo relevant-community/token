@@ -25,9 +25,9 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   mapping(address => Utils.Unlock) private unlocks;
   mapping(address => Utils.Vest) private vest;
 
-  // keccak256("UnvestTokens(address account,uint256 shortAmnt,uint256 longAmnt,uint256 nonce)")
+  // keccak256("InitVesting(address account,uint256 shortAmnt,uint256 longAmnt,uint256 nonce)")
   bytes32 public constant CLAIM_HASH =
-    0x04f814cda49f9ebe5bd3eddee7e8c680f4d220315bf32a05bc59094194506bd3;
+    0xaa930e3affe03e95a7e73cc03af79eab35ac3f46fe4ae69839f76986ecaa957d;
 
   constructor(
     IERC20 _r3l,
@@ -107,7 +107,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   }
 
   // Claim curation reward tokens (to be called by user from an app)
-  function unvestTokens(
+  function initVesting(
     uint256 _shortAmount,
     uint256 _longAmount,
     bytes memory _sig

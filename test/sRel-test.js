@@ -2,8 +2,9 @@ const { network } = require('hardhat')
 const { constants, utils, BigNumber } = require('ethers')
 const { expect } = require('chai')
 const { deploySRel, toSec, addDays } = require('./common')
-const { getTypedClaimUnvestedMsg } = require('./utils')
+const { getTypedClaimUnvestedMsg, printInitVestingHash } = require('./utils')
 
+printInitVestingHash()
 const { parseUnits, formatEther, solidityKeccak256, arrayify } = utils
 
 describe('sRel', function () {
@@ -226,18 +227,16 @@ describe('sRel', function () {
 
       // wrong amounts should fail
       await expect(
-        sRel
-          .connect(addr2S)
-          .unvestTokens(parseUnits('1'), parseUnits('1'), sig),
+        sRel.connect(addr2S).initVesting(parseUnits('1'), parseUnits('1'), sig),
       ).to.be.revertedWith('sRel: Claim not authorized')
 
-      const unvestTx = await sRel.connect(addr2S).unvestTokens(...amounts, sig)
+      const unvestTx = await sRel.connect(addr2S).initVesting(...amounts, sig)
       await unvestTx.wait()
       expect(await sRel.unvested(addr2)).to.equal(total)
 
       // replay should fail
       await expect(
-        sRel.connect(addr2S).unvestTokens(...amounts, sig),
+        sRel.connect(addr2S).initVesting(...amounts, sig),
       ).to.be.revertedWith('sRel: Claim not authorized')
     })
     it('transfer from account w no unvested tokens should fail', async function () {

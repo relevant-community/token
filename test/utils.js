@@ -70,7 +70,7 @@ const getTypedClaimUnvestedMsg = (
 ) => {
   return {
     types: {
-      UnvestTokens: [
+      InitVesting: [
         { name: 'account', type: 'address' },
         { name: 'shortAmnt', type: 'uint256' },
         { name: 'longAmnt', type: 'uint256' },
@@ -100,11 +100,11 @@ const printClaimRelHash = () => {
   )
 }
 
-const printClaimUnvestHash = () => {
+const printInitVestingHash = () => {
   console.log(
     keccak256(
       toUtf8Bytes(
-        'UnvestTokens(address account,uint256 shortAmnt,uint256 longAmnt,uint256 nonce)',
+        'InitVesting(address account,uint256 shortAmnt,uint256 longAmnt,uint256 nonce)',
       ),
     ),
   )
@@ -116,6 +116,6 @@ module.exports = {
   INITIAL_INFLATION,
   getTypedClaimRelMsg,
   getTypedClaimUnvestedMsg,
-  printClaimUnvestHash,
+  printInitVestingHash,
   printClaimRelHash,
 }
