@@ -2,6 +2,20 @@
 
 This repository contains smart contracts used by [Relevant APP](https://relevant.community) to reward content curation.
 
+## Dev
+
+install dependencies:
+```
+yarn
+```
+
+add an `INFURA_API_KEY` to your local .env file
+
+fork mainnet and deploy:
+```
+yarn fork
+```
+
 ## RelevantTokenV3.sol
 
 Users of the Relevant App are able to earn REL tokens for curating content on the Relevant App. REL tokens are allocated for rewards via `releaseTokens`. REL token `admin` distributes the tokens as balances in the web2 database of the Relevant App. Users can then `claimTokens` by requesting an attestation by the `admin` account and submitting it to the REL smart contract.
