@@ -5,7 +5,14 @@ require('hardhat-deploy')
 require('hardhat-gas-reporter')
 require('dotenv').config()
 
-const { PK, INFURA_API_KEY, CMC_API } = process.env
+const {
+  PK,
+  INFURA_API_KEY,
+  CMC_API,
+  OWNER,
+  REL_ADMIN,
+  VEST_ADMIN,
+} = process.env
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -69,23 +76,23 @@ module.exports = {
   },
   namedAccounts: {
     deployer: {
-      default: 0,
-      1: '0x4Ff99Ad3f67C84CBC08b8Ab5a36dE17be1DB908f',
+      default: OWNER,
     },
+    // this should stay fixed
     proxyAdmin: {
       default: '0x4Ff99Ad3f67C84CBC08b8Ab5a36dE17be1DB908f',
     },
+    // original owner
     relOwner: {
       default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51',
     },
     relAdmin: {
-      1337: 1,
-      default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51', // hot wallet
+      default: REL_ADMIN, // hot wallet
     },
     vestAdmin: {
-      1337: 1,
-      default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51', // hot wallet
+      default: VEST_ADMIN, // hot wallet
     },
+    // fixed address for testing REL balances
     testAddr1: {
       default: '0x4Ff99Ad3f67C84CBC08b8Ab5a36dE17be1DB908f',
     },

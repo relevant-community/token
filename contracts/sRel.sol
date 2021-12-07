@@ -170,13 +170,14 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   // ---- GOVERNANCE ----
 
   function updateLockPeriod(uint256 newLockPeriod) external override(IsRel) onlyOwner {
-    require(lockPeriod != newLockPeriod, "sRel: pointless update");
+    require(lockPeriod != newLockPeriod, "sRel: nothing to update");
     lockPeriod = newLockPeriod;
     emit lockPeriodUpdated(lockPeriod);
   }
 
-  function setVestAdmin(address newAdmin) external override(IsRel) onlyOwner {
-    require(vestAdmin != newAdmin, "sRel: pointless update");
+  function setVestAdmin(address newAdmin) external override(IsRel) {
+    require(msg.sender == owner() || msg.sender == vestAdmin);
+    require(vestAdmin != newAdmin, "sRel: nothing to update");
     vestAdmin = newAdmin;
     emit vestAdminUpdated(vestAdmin);
   }

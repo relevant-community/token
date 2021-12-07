@@ -73,4 +73,5 @@ const initV3 = async (ownerSigner, adminAddr) => {
 module.exports = {
   upgradeRel,
   initV3,
+  getRelContract,
 }

@@ -19,10 +19,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     'REL/RelevantToken'
   ]
 
-  const { deployer, relOwner, proxyAdmin } = await getNamedAccounts()
+  const { deployer, proxyAdmin } = await getNamedAccounts()
   const RelevantTokenV3 = await ethers.getContractFactory(
     'RelevantTokenV3',
-    await ethers.getSigner(relOwner),
+    await ethers.getSigner(deployer),
   )
   const rel = RelevantTokenV3.attach(RelevantToken.address)
 
@@ -85,5 +85,5 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   }
 }
 
-module.exports.tags = ['Governance']
+module.exports.tags = ['Ownership']
 module.exports.dependencies = ['RelGovernor', 'Rel']

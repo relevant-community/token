@@ -14,6 +14,30 @@ describe('Upgrade', function () {
     await setupLocalNetwork()
   })
 
+  it('test current REL bug', async function () {
+    const { relOwner } = await getNamedAccounts()
+
+    const owner = await setupAccount(relOwner)
+
+    const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
+      'REL/RelevantToken'
+    ]
+
+    const RelevantTokenV2 = await ethers.getContractFactory(
+      'RelevantToken',
+      relOwner,
+    )
+
+    relV2 = RelevantTokenV2.attach(RelevantToken.address)
+    const roundNum = await relV2.roundNum()
+    const lastRound = await relV2.lastRound()
+    const targetRound = await relV2.targetRound()
+    console.log('target', targetRound.toString())
+    console.log('current', roundNum.toString())
+    console.log('last', lastRound.toString())
+    await relV2.releaseTokens()
+  })
+
   it('should upgrade correctly', async function () {
     const { proxyAdmin, testAddr1, testAddr2 } = await getNamedAccounts()
 
@@ -38,7 +62,6 @@ describe('Upgrade', function () {
     const allowance = await relV2.allowance(testAddr1, testAddr2)
     const nonce = await relV2.nonceOf(testAddr1)
     const v2Owner = await relV2.owner()
-    
 
     await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
       unsafeAllowRenames: true,

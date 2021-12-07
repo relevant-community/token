@@ -9,7 +9,8 @@
     "deploy:local": "hardhat --network localhost deploy",
     "cover": "hardhat coverage --testfiles ./test/RelevantV3.js",
     "local": "hardhat node",
-    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh"
+    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Rel,sRel",
+    "fork:full": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh"
   },
   "author": "Relevant",
   "license": "ISC",

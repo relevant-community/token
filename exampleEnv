@@ -1,0 +1,9 @@
+# configure your infura api key (needed for forking mainnet)
+INFURA_API_KEY=
+
+CMC_API= (optional)
+
+# add your own accounts here:
+OWNER = 0xb0b
+REL_ADMIN = 0xded
+VEST_ADMIN = 0xfed
