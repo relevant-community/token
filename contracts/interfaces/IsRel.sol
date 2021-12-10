@@ -19,7 +19,7 @@ interface IsRel {
 
   function stakeRel(uint256 amount) external;
 
-  function unstakeRel(uint256 amount) external;
+  function withdrawRel(uint256 amount) external;
 
   // vesting
   function setUnvestedAmount(
@@ -34,7 +34,7 @@ interface IsRel {
     bytes memory _sig
   ) external;
 
-  function claimUnvestedRel() external;
+  function claimVestedRel() external;
 
   function transferUnvestedTokens(address to) external;
 

@@ -90,7 +90,11 @@ module.exports = {
       default: REL_ADMIN, // hot wallet
     },
     vestAdmin: {
+      // default: 3,
       default: VEST_ADMIN, // hot wallet
+    },
+    vestAdminTest: {
+      default: 3, // impoersonated accounts are unable to call _signTypedData
     },
     // fixed address for testing REL balances
     testAddr1: {

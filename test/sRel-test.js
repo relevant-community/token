@@ -1,8 +1,12 @@
-const { network } = require('hardhat')
-const { constants, utils, BigNumber } = require('ethers')
+const { network, getNamedAccounts, ethers } = require('hardhat')
 const { expect } = require('chai')
 const { deploySRel, toSec, addDays } = require('./common')
-const { getTypedClaimUnvestedMsg, printInitVestingHash } = require('./utils')
+const {
+  getTypedInitVestingMsg,
+  printInitVestingHash,
+  setupAccount,
+} = require('./utils')
+const { constants, utils, BigNumber } = ethers
 
 printInitVestingHash()
 const { parseUnits, formatEther, solidityKeccak256, arrayify } = utils
@@ -47,7 +51,7 @@ describe('sRel', function () {
       expect(await sRel.balanceOf(owner)).to.equal(parseUnits('100'))
     })
     it('withdraw before unlock should fail', async function () {
-      await expect(sRel.unstakeRel(parseUnits('100'))).to.be.reverted
+      await expect(sRel.withdrawRel(parseUnits('100'))).to.be.reverted
     })
 
     it('should unlock', async function () {
@@ -63,7 +67,7 @@ describe('sRel', function () {
       )
     })
     it('premature withdraw should fail', async function () {
-      await expect(sRel.unstakeRel()).to.be.reverted
+      await expect(sRel.withdrawRel()).to.be.reverted
     })
 
     it('withdraw after timeLock should work', async function () {
@@ -142,8 +146,8 @@ describe('sRel', function () {
         vestingParams,
       )
 
-      const claimUnvestedTx = await sRel.connect(addr2S).claimUnvestedRel()
-      await claimUnvestedTx.wait()
+      const claimVestedTx = await sRel.connect(addr2S).claimVestedRel()
+      await claimVestedTx.wait()
 
       expect(await sRel.unstaked(addr2)).to.equal(longAmnt.add(shortAmnt))
 
@@ -181,8 +185,8 @@ describe('sRel', function () {
         vestingParams,
       )
 
-      const claimUnvestedTx = await sRel.connect(addr1S).claimUnvestedRel()
-      await claimUnvestedTx.wait()
+      const claimVestedTx = await sRel.connect(addr1S).claimVestedRel()
+      await claimVestedTx.wait()
 
       expect(await sRel.unstaked(addr1)).to.equal(longAmnt.add(shortAmnt))
 
@@ -193,7 +197,7 @@ describe('sRel', function () {
     })
 
     it('unvest 0 should fail', async function () {
-      await expect(sRel.connect(addr1S).claimUnvestedRel()).to.be.revertedWith(
+      await expect(sRel.connect(addr1S).claimVestedRel()).to.be.revertedWith(
         'sRel: no unvested tokens to claim',
       )
     })
@@ -208,9 +212,13 @@ describe('sRel', function () {
       const sendRelTx = await rel.transfer(sRel.address, total)
       await sendRelTx.wait()
 
+      const vAdmin = await sRel.vestAdmin()
       const nonce = await sRel.nonceOf(addr2)
 
-      const data = getTypedClaimUnvestedMsg(
+      const { vestAdminTest } = await getNamedAccounts()
+      const vestAdminS = await ethers.getSigner(vestAdminTest)
+
+      const data = getTypedInitVestingMsg(
         addr2,
         amounts[0].toString(),
         amounts[1].toString(),
@@ -219,7 +227,7 @@ describe('sRel', function () {
         network.config.chainId,
       )
 
-      const sig = await addr1S._signTypedData(
+      const sig = await vestAdminS._signTypedData(
         data.domain,
         data.types,
         data.message,
@@ -273,7 +281,7 @@ describe('sRel', function () {
       )
     })
     it('should not vest before start of vesting', async () => {
-      await expect(sRel.connect(addr1S).claimUnvestedRel()).to.be.revertedWith(
+      await expect(sRel.connect(addr1S).claimVestedRel()).to.be.revertedWith(
         'sRel: no unvested tokens to claim',
       )
     })
@@ -284,7 +292,7 @@ describe('sRel', function () {
   async function withdrawAfterLock(signer) {
     await fastForwardToUnlock(signer.address)
     const unlocked = await sRel.unstaked(signer.address)
-    const withdrawTx = await sRel.connect(signer).unstakeRel(unlocked)
+    const withdrawTx = await sRel.connect(signer).withdrawRel(unlocked)
     await withdrawTx.wait()
   }
 

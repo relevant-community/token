@@ -66,7 +66,8 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     emit SetInflation(_inflation);
   }
 
-  function setAdmin(address _admin) public onlyOwner {
+  function setAdmin(address _admin) public {
+    require(msg.sender == owner() || msg.sender == admin);
     require(initializedV3, "Rel: v3 not initialized");
     admin = _admin;
     emit SetAdmin(admin);

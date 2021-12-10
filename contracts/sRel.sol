@@ -89,7 +89,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   }
 
   // withdraws all unlocked tokens
-  function unstakeRel(uint256 amount) external override(IsRel) {
+  function withdrawRel(uint256 amount) external override(IsRel) {
     _burn(msg.sender, amount);
     require(r3l.transfer(msg.sender, amount), "sRel: transfer failed");
   }
@@ -148,7 +148,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   }
 
   // unvest and unlock tokens
-  function claimUnvestedRel() external override(IsRel) {
+  function claimVestedRel() external override(IsRel) {
     Utils.Vest storage vesting = vest[msg.sender];
     uint256 amount = vesting.updateUnvestedAmount(vestShort, vestLong, vestBegin);
     require(amount > 0, "sRel: no unvested tokens to claim");

@@ -60,7 +60,7 @@ const getTypedClaimRelMsg = (account, amount, nonce, contract) => {
   }
 }
 
-const getTypedClaimUnvestedMsg = (
+const getTypedInitVestingMsg = (
   account,
   shortAmnt,
   longAmnt,
@@ -115,7 +115,7 @@ module.exports = {
   setupLocalNetwork,
   INITIAL_INFLATION,
   getTypedClaimRelMsg,
-  getTypedClaimUnvestedMsg,
+  getTypedInitVestingMsg,
   printInitVestingHash,
   printClaimRelHash,
 }

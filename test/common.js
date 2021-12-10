@@ -8,7 +8,7 @@ const getVestingParams = (timestamp) => {
 }
 
 const deploySRel = async () => {
-  const { vestAdmin } = await getNamedAccounts()
+  const { vestAdminTest } = await getNamedAccounts()
   const Utils = await ethers.getContractFactory('Utils')
   const utils = await Utils.deploy()
 
@@ -25,7 +25,7 @@ const deploySRel = async () => {
     false,
   ])
   vestingParams = getVestingParams(parseInt(block.timestamp, 16))
-  sRel = await SRel.deploy(rel.address, vestAdmin, ...vestingParams)
+  sRel = await SRel.deploy(rel.address, vestAdminTest, ...vestingParams)
   await sRel.deployed()
   return { sRel, vestingParams, rel }
 }

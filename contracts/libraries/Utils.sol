@@ -73,7 +73,7 @@ library Utils {
     return self.shortAmnt + self.longAmnt;
   }
 
-  // this method updates long and short unvested amounts
+  // this method updates long and short unvested amounts and returns vested amount
   function updateUnvestedAmount(
     Vest storage self,
     uint256 vestShort,
