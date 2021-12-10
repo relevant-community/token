@@ -10,7 +10,8 @@
     "cover": "hardhat coverage --testfiles ./test/RelevantV3.js",
     "local": "hardhat node",
     "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Rel,sRel",
-    "fork:full": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh"
+    "fork:full": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh",
+    "fastforward": "hardhat run ./scripts/fastForward.js"
   },
   "author": "Relevant",
   "license": "ISC",
