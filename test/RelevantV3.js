@@ -241,7 +241,7 @@ describe('Relevant V3', function () {
       await expect(
         rel.connect(s1).updateAllocatedRewards('1'),
       ).to.be.revertedWith('')
-      await expect(rel.connect(s2.sweep(re.address, '1'))).to.be.revertedWith(
+      await expect(rel.connect(s2.sweep(rel.address, '1'))).to.be.revertedWith(
         'Rel: not authorized',
       )
       await expect(rel.connect(s2).setAdmin(s2.address)).to.be.revertedWith(

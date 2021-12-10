@@ -44,7 +44,8 @@
           {
             "address": "0xd05e0e497a570Ad0a1402375561293Bd01e9cb73",
             "version": "0.2.0",
-            "implementation": "0x988b89a36c66380dF8ea342b93b249770f3780e6"
+            "implementation": "0x988b89a36c66380dF8ea342b93b249770f3780e6",
+            "admin": "0xe1E72Eb7207FC113BD37fc7c4C36CBbae40c420D"
           }
         ]
       },
