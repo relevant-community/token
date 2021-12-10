@@ -6,6 +6,7 @@ const {
   setupLocalNetwork,
   INITIAL_INFLATION,
 } = require('./utils')
+const { TASK_ETHERSCAN_VERIFY } = require('hardhat-deploy')
 
 describe('Upgrade', function () {
   let rel
@@ -60,15 +61,34 @@ describe('Upgrade', function () {
   })
 
   it('should initialize new version', async function () {
-    const { relOwner } = await getNamedAccounts()
+    const { relAdmin, relOwner } = await getNamedAccounts()
     const owner = await setupAccount(relOwner)
     const timestamp = Math.round(Date.now() / 1000)
     await network.provider.send('evm_setNextBlockTimestamp', [timestamp])
-    const tx = await rel.connect(owner).initV3(relOwner, INITIAL_INFLATION)
+    const tx = await rel.connect(owner).initV3(relAdmin, INITIAL_INFLATION)
     await tx.wait()
     expect(await rel.initializedV3()).to.be.true
+    expect(await rel.admin()).to.equal(relAdmin)
     expect(await rel.version()).to.equal('v3')
     expect((await rel.inflation()).toNumber()).to.equal(500)
     expect((await rel.lastReward()).toNumber()).to.equal(timestamp)
+  })
+
+  it('should sweep USDT', async function () {
+    const { relAdmin } = await getNamedAccounts()
+    const admin = await setupAccount(relAdmin)
+    const USDT = await ethers.getContractAt(
+      '@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20',
+      '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+    )
+    const ownerBal = await USDT.balanceOf(admin.address)
+    const balance = await USDT.balanceOf(rel.address)
+    const tx = await rel.connect(admin).sweep(USDT.address, balance)
+    const res = await tx.wait()
+    const newOwnerBal = await USDT.balanceOf(admin.address)
+    const newRelBal = await USDT.balanceOf(rel.address)
+
+    expect(newRelBal).to.equal('0')
+    expect(newOwnerBal.sub(ownerBal)).to.equal(balance)
   })
 })

@@ -19,7 +19,7 @@ const setupAccount = async (address) => {
   return await ethers.getSigner(address)
 }
 
-const setupLocalNetwork = async () => {
+const setupLocalNetwork = async (blockNumber) => {
   await copyFile(
     '.openzeppelin/mainnet.json',
     '.openzeppelin/unknown-1337.json',
@@ -31,6 +31,7 @@ const setupLocalNetwork = async () => {
       {
         forking: {
           jsonRpcUrl: 'https://mainnet.infura.io/v3/' + INFURA_API_KEY,
+          blockNumber,
         },
       },
     ],

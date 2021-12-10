@@ -4,6 +4,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol
 import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol";
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/SafeERC20.sol";
 
 contract RelevantTokenV3 is Initializable, ERC20, Ownable {
   event Released(uint256 amount, uint256 secondsSinceLast, uint256 timestamp);
@@ -11,6 +12,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
   event SetAdmin(address admin);
   event SetInflation(uint256 inflation);
   event UpdateAllocatedRewards(uint256 allocatedRewards);
+  event SetVestingContract(address vestingContract);
 
   uint256[101] private ______gap; // gap from prev version
 
@@ -43,6 +45,10 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
 
   bytes32 public DOMAIN_SEPARATOR;
 
+  address public vestingContract;
+
+  uint256 public constant MAX_INFLATION = 2_000; // inflation should not exceed 20%
+
   // Initialize the current version
   function initV3(address _admin, uint256 _inflation) public onlyOwner {
     require(!initializedV3, "Rel: v3 already initialized");
@@ -51,6 +57,7 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     initializedV3 = true;
     setAdmin(_admin);
     setInflation(_inflation);
+    setVestingContract(address(0));
 
     bytes32 nameHash = keccak256(bytes(name));
     bytes32 versionHash = keccak256(bytes("1"));
@@ -60,14 +67,21 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
     DOMAIN_SEPARATOR = keccak256(abi.encode(typeHash, nameHash, versionHash, 1, address(this)));
   }
 
+  function setVestingContract(address _vestingContract) public onlyOwner {
+    require(initializedV3, "Rel: v3 not initialized");
+    vestingContract = _vestingContract;
+    emit SetVestingContract(_vestingContract);
+  }
+
   function setInflation(uint256 _inflation) public onlyOwner {
     require(initializedV3, "Rel: v3 not initialized");
+    require(_inflation <= MAX_INFLATION, "Rel: inflation should not exceed max");
     inflation = _inflation;
     emit SetInflation(_inflation);
   }
 
   function setAdmin(address _admin) public {
-    require(msg.sender == owner() || msg.sender == admin);
+    require(msg.sender == admin || msg.sender == owner(), "Rel: not authorized");
     require(initializedV3, "Rel: v3 not initialized");
     admin = _admin;
     emit SetAdmin(admin);
@@ -88,8 +102,9 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
 
   // send allocated tokens to vesting contracs
   // should we hardcode vestingContract or make this a generic recover funds method?
-  function vestAllocatedTokens(address vestingContract, uint256 amount) public onlyOwner {
+  function vestAllocatedTokens(uint256 amount) public onlyOwner {
     require(allocatedRewards >= amount, "Rel: not enough allocated tokens");
+    require(vestingContract != address(0), "Rel: vestingContract not set");
     _transfer(address(this), vestingContract, amount);
     allocatedRewards = allocatedRewards.sub(amount);
   }
@@ -139,5 +154,21 @@ contract RelevantTokenV3 is Initializable, ERC20, Ownable {
 
   function nonceOf(address account) public view returns (uint256) {
     return nonces[account];
+  }
+
+  // sweep tokens accidentally sent to contract
+  function sweep(IERC20 token, uint256 amount) public {
+    require(msg.sender == admin || msg.sender == owner(), "Rel: not authorized");
+    if (token == IERC20(this))
+      require(
+        amount <= balanceOf(address(this)) - allocatedRewards,
+        "Rel: cannot sweep allocatedRewards"
+      );
+    SafeERC20.safeTransfer(token, msg.sender, amount);
+  }
+
+  // Prevent ETH from being sent to contract
+  function() external payable {
+    revert();
   }
 }
