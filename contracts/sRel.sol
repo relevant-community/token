@@ -176,7 +176,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   }
 
   function setVestAdmin(address newAdmin) external override(IsRel) {
-    require(msg.sender == owner() || msg.sender == vestAdmin);
+    require(msg.sender == owner() || msg.sender == vestAdmin, "sRel: not authorized");
     require(vestAdmin != newAdmin, "sRel: nothing to update");
     vestAdmin = newAdmin;
     emit vestAdminUpdated(vestAdmin);

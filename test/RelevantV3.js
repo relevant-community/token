@@ -46,6 +46,12 @@ describe('Relevant V3', function () {
       )
     })
 
+    it('should not be able to set inflation above max', async function () {
+      await expect(rel.setInflation('2500')).to.be.revertedWith(
+        'Rel: inflation should not exceed max',
+      )
+    })
+
     it('should set new inflation rate', async function () {
       await rel.setInflation(BigNumber.from(500)) // 5% inflation
       expect((await rel.inflation()).toNumber()).to.equal(500)
@@ -165,13 +171,24 @@ describe('Relevant V3', function () {
 
   describe('vestAllocatedTokens', () => {
     before(init)
+    it('fail if vesting contract is not set', async function () {
+      await expect(rel.vestAllocatedTokens('1')).to.be.revertedWith(
+        'Rel: vestingContract not set',
+      )
+    })
+
+    it('set vesting contract', async function () {
+      await rel.setVestingContract(s2.address)
+      expect(await rel.vestingContract()).to.equal(s2.address)
+    })
+
     it('vestAllocatedTokens', async function () {
       const balance = await rel.balanceOf(rel.address)
       const allocatedRewards = await rel.allocatedRewards()
       await expect(
-        rel.vestAllocatedTokens(s2.address, allocatedRewards.add('1')),
+        rel.vestAllocatedTokens(allocatedRewards.add('1')),
       ).to.be.revertedWith('Rel: not enough allocated tokens')
-      await rel.vestAllocatedTokens(s2.address, allocatedRewards)
+      await rel.vestAllocatedTokens(allocatedRewards)
 
       await expect(await rel.balanceOf(s2.address)).to.equal(allocatedRewards)
       await expect(await rel.allocatedRewards()).to.equal('0')
@@ -181,21 +198,61 @@ describe('Relevant V3', function () {
     })
   })
 
+  describe('Sweep', () => {
+    before(init)
+    it('sweep not sweep allocated rel', async function () {
+      const [owner] = signers
+      const balance = await rel.balanceOf(rel.address)
+      const allocatedRewards = await rel.allocatedRewards()
+      await expect(
+        rel.sweep(rel.address, balance.sub(allocatedRewards).add('1')),
+      ).to.be.revertedWith('Rel: cannot sweep allocatedRewards')
+    })
+
+    it('should sweep rel', async function () {
+      const [owner, admin] = signers
+      const ownerBal = await rel.balanceOf(owner.address)
+      const balance = await rel.balanceOf(rel.address)
+      const allocatedRewards = await rel.allocatedRewards()
+      const amount = balance.sub(allocatedRewards)
+      await rel.sweep(rel.address, amount)
+      const newOwnerBal = await rel.balanceOf(owner.address)
+      const newRelBal = await rel.balanceOf(rel.address)
+      expect(newOwnerBal.sub(ownerBal)).to.equal(amount)
+      expect(newRelBal).to.equal(allocatedRewards)
+    })
+  })
+
   describe('Error states', () => {
     before(init)
+    it('should revert when sending ETH', async function () {
+      const [owner] = signers
+      await expect(
+        owner.sendTransaction({
+          to: rel.address,
+          value: parseUnits('1.0'),
+        }),
+      ).to.be.reverted
+    })
+
     it('non-owner should not be able to call owner methods', async function () {
-      const [_, s1] = signers
+      const [_, s1, s2] = signers
 
       await expect(
         rel.connect(s1).updateAllocatedRewards('1'),
       ).to.be.revertedWith('')
-      await expect(rel.connect(s1).setAdmin(s1.address)).to.be.revertedWith('')
+      await expect(rel.connect(s2.sweep(re.address, '1'))).to.be.revertedWith(
+        'Rel: not authorized',
+      )
+      await expect(rel.connect(s2).setAdmin(s2.address)).to.be.revertedWith(
+        'Rel: not authorized',
+      )
       await expect(rel.connect(s1).setInflation('1000')).to.be.revertedWith('')
       await expect(rel.connect(s1).burn('1')).to.be.revertedWith('')
       await expect(rel.connect(s1).burn('1')).to.be.revertedWith('')
-      await expect(
-        rel.connect(s1).vestAllocatedTokens(s1.address, '1'),
-      ).to.be.revertedWith('')
+      await expect(rel.connect(s1).vestAllocatedTokens('1')).to.be.revertedWith(
+        '',
+      )
     })
   })
 })
