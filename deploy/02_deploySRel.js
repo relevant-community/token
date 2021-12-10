@@ -26,12 +26,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   })
 
+  // set sRel as vesting contract
+  const deployerS = await setupAccount(deployer)
+  const rel = await getRelContract(deployerS)
+  const sRel = await deployments.get('sRel')
+  await rel.setVestingContract(sRel.address)
+
   // transfer 1000 Rel into sRel to test vesting
   if (network.name == 'hardhat') {
-    const sRel = await deployments.get('sRel')
-    const deployerS = await setupAccount(deployer)
-    const rel = await getRelContract(deployerS)
-    await rel.vestAllocatedTokens(sRel.address, parseUnits('1000'))
+    await rel.vestAllocatedTokens(parseUnits('1000'))
   }
 }
 
