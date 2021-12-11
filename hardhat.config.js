@@ -6,7 +6,9 @@ require('hardhat-gas-reporter')
 require('dotenv').config()
 
 const {
-  PK,
+  DEPLOYER_PK,
+  PROXY_ADMIN_PK,
+  REL_OWNER_PK,
   INFURA_API_KEY,
   CMC_API,
   OWNER,
@@ -53,7 +55,6 @@ module.exports = {
   networks: {
     hardhat: {
       chainId: 1337,
-      // accounts: [{ privateKey: PK, balance: '10000000000000000000' }],
     },
     local: {
       url: 'http://127.0.0.1:8545',
@@ -63,12 +64,15 @@ module.exports = {
     },
     rinkeby: {
       url: 'https://rinkeby.infura.io/v3/' + INFURA_API_KEY,
-      accounts: PK ? [PK] : undefined,
+      accounts:
+        REL_OWNER_PK || DEPLOYER_PK || REL_OWNER_PK
+          ? [DEPLOYER_PK, PROXY_ADMIN_PK, REL_OWNER_PK].filter((k) => k != null)
+          : undefined,
       chainId: 4,
       gasPrice: 3.1e9,
     },
     mainnet: {
-      accounts: PK ? [PK] : undefined,
+      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : undefined,
       url: 'https://mainnet.infura.io/v3/' + INFURA_API_KEY,
       gasPrice: 2.1e9,
       chainId: 1,
@@ -76,6 +80,8 @@ module.exports = {
   },
   namedAccounts: {
     deployer: {
+      1: '0x6e1D15c98742d981E76fe3982027C48D8303C136',
+      4: '0x6e1D15c98742d981E76fe3982027C48D8303C136',
       default: OWNER,
     },
     // this should stay fixed
@@ -87,6 +93,8 @@ module.exports = {
       default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51',
     },
     relAdmin: {
+      1: '0x6DdF9DA4C37DF97CB2458F85050E09994Cbb9C2A',
+      4: '0x6DdF9DA4C37DF97CB2458F85050E09994Cbb9C2A',
       default: REL_ADMIN, // hot wallet
     },
     vestAdmin: {

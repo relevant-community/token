@@ -1,12 +1,11 @@
-const { ethers, upgrades, getNamedAccounts } = require('hardhat')
+const { ethers, upgrades, getNamedAccounts, network } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 const { INITIAL_INFLATION } = require('../test/utils')
-
-// const proxyAdminAbi = require('@openzeppelin/upgrades/build/contracts/ProxyAdmin.json')
-//   .abi
+const proxyAdminAbi = require('@openzeppelin/upgrades/build/contracts/ProxyAdmin.json')
+  .abi
 
 const getRelContract = async (signer) => {
-  const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
+  const [RelevantToken] = OZ_SDK_EXPORT.networks[network.name].proxies[
     'REL/RelevantToken'
   ]
   const RelevantTokenV3 = await ethers.getContractFactory(
@@ -18,7 +17,7 @@ const getRelContract = async (signer) => {
 
 const upgradeRel = async (proxyAdmin) => {
   const { testAddr1, testAddr2 } = await getNamedAccounts()
-  const [RelevantToken] = OZ_SDK_EXPORT.networks.mainnet.proxies[
+  const [RelevantToken] = OZ_SDK_EXPORT.networks[network.name].proxies[
     'REL/RelevantToken'
   ]
   const RelevantTokenV2 = await ethers.getContractFactory('RelevantToken')
@@ -39,6 +38,14 @@ const upgradeRel = async (proxyAdmin) => {
     console.log('Already upgraded to V3!')
     return
   }
+
+  const proxyAdminContract = await ethers.getContractAt(
+    proxyAdminAbi,
+    RelevantToken.admin,
+    proxyAdmin,
+  )
+  const admin = await proxyAdminContract.owner()
+  console.log('proxy admin owner', admin)
 
   await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
     unsafeAllowRenames: true,

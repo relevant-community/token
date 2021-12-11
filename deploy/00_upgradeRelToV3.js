@@ -1,7 +1,6 @@
-const { network } = require('hardhat')
+const { network, ethers } = require('hardhat')
 const { setupAccount } = require('../test/utils')
 const { upgradeRel, initV3, getRelContract } = require('../scripts/upgradeRel')
-const { ethers } = require('ethers')
 
 // upgrades of Rel are managed via the openzepellin plugin
 // mainnet upgrade should run first
@@ -23,9 +22,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     return true
   }
 
-  const proxyAdminSigner = await setupAccount(proxyAdmin)
-  await upgradeRel(proxyAdminSigner)
   const deployerS = await ethers.getSigner(deployer)
+  // console.log('dep', deployerS.address)
+  // await upgradeRel(deployerS)
   await initV3(deployerS, relAdmin)
   return true
 }

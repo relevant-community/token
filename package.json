@@ -9,6 +9,7 @@
     "deploy:local": "hardhat --network localhost deploy",
     "cover": "hardhat coverage --testfiles ./test/RelevantV3.js",
     "local": "hardhat node",
+    "fork:proxyOwner": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Proxy",
     "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Rel,sRel",
     "fork:full": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh",
     "fastforward": "hardhat run ./scripts/fastForward.js"
