@@ -21,6 +21,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   uint256 public immutable vestShort; // short vesting period
   uint256 public immutable vestLong; // long vesting period
 
+  uint256 public totalUnvested;
   mapping(address => uint256) private vestNonce;
   mapping(address => Utils.Unlock) private unlocks;
   mapping(address => Utils.Vest) private vest;
@@ -130,7 +131,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   }
 
   // helper function that initializes unvested amounts
-  // NOTE: REL must be sent to this contract before this method is called
+  // NOTE: REL must be sent to this contract *before* this method is called
   function _setUnvestedAmount(
     address account,
     uint256 shortAmnt,
@@ -144,6 +145,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
       "sRel: Not enought REL in contract"
     );
     _mint(account, totalUnvestedAmnt);
+    totalUnvested += totalUnvestedAmnt;
     emit vestUpdated(account, msg.sender, vesting);
   }
 
@@ -152,6 +154,7 @@ contract sRel is IsRel, ERC20Votes, Ownable {
     Utils.Vest storage vesting = vest[msg.sender];
     uint256 amount = vesting.updateUnvestedAmount(vestShort, vestLong, vestBegin);
     require(amount > 0, "sRel: no unvested tokens to claim");
+    totalUnvested -= amount;
     unlocks[msg.sender].unlock(amount, lockPeriod);
     emit vestUpdated(msg.sender, msg.sender, vesting);
   }

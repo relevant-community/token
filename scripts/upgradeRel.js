@@ -47,9 +47,16 @@ const upgradeRel = async (proxyAdmin) => {
   const admin = await proxyAdminContract.owner()
   console.log('proxy admin owner', admin)
 
-  await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
-    unsafeAllowRenames: true,
-  })
+  // const tx = await proxyAdminContract.upgrade(
+  //   rel.address,
+  //   '0x213af0d42a686aa2be5f6aff225df74fbe762997',
+  // )
+  // const res = await tx.wait()
+  // console.log(res)
+
+  // await upgrades.upgradeProxy(RelevantToken.address, RelevantTokenV3, {
+  //   unsafeAllowRenames: true,
+  // })
 
   // some sanity checks
   const symbol = await rel.symbol()
@@ -72,7 +79,9 @@ const initV3 = async (ownerSigner, adminAddr) => {
     console.log('Already Initialized V3!')
     return
   }
-  await rel.initV3(adminAddr, INITIAL_INFLATION)
+  const tx = await rel.initV3(adminAddr, INITIAL_INFLATION)
+  const res = await tx.wait()
+  console.log(res)
   const version = await rel.version()
   console.log('INITIALIZED: ', version)
 }

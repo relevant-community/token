@@ -18,15 +18,11 @@ describe('Governance', function () {
   let sRel
   let owner
   let addr1
-  let addr2
-  let ownerS
-  let addr1S
-  let addr2S
-  let vestingParams
+
   let timelock
   let relGov
-  let transferCalldata
-  let descriptionHash
+  let propArgs
+  let proposalId
 
   const init = async () => {
     const signers = await ethers.getSigners()
@@ -50,6 +46,9 @@ describe('Governance', function () {
     // setup stake
     await rel.approve(sRel.address, constants.MaxUint256)
     await sRel.stakeRel(parseUnits('10000'))
+
+    // send some rel to governor
+    await rel.transfer(timelock.address, parseUnits('1000'))
 
     // self-delegate
     await sRel.delegate(owner)
@@ -79,40 +78,70 @@ describe('Governance', function () {
       )
     })
     it('should make a proposal', async function () {
-      const stakeTx = await rel.transfer
       const transferCalldata = rel.interface.encodeFunctionData('mintTo', [
         addr1,
         parseUnits('100'),
       ])
-      const proposeTx = await relGov.propose(
-        [rel.address],
-        [0],
-        [transferCalldata],
-        'Proposal #1: Give grant to team',
+      const setProposalThreshold = relGov.interface.encodeFunctionData(
+        'setProposalThreshold',
+        [parseUnits('33000')],
       )
-      const tx = await proposeTx.wait()
-      expect(tx.status).to.equal(1)
-    })
-    it('should vote on proposal', async function () {
-      const stakeTx = await rel.transfer
-      transferCalldata = rel.interface.encodeFunctionData('mintTo', [
-        addr1,
-        parseUnits('100'),
+      const setVoteDelay = relGov.interface.encodeFunctionData(
+        'setVotingDelay',
+        ['3'],
+      )
+      const setVotingPeriod = relGov.interface.encodeFunctionData(
+        'setVotingPeriod',
+        ['1000'],
+      )
+
+      // IMPORTANT - TIMELOCK MUST MANAGE ALL FUNDS
+      const transferRel = rel.interface.encodeFunctionData('transfer', [
+        addr2,
+        parseUnits('1000'),
       ])
-      const description = 'Proposal #1: Give grant tokens'
-      descriptionHash = ethers.utils.id(description)
-      const proposeTx = await relGov.propose(
-        [rel.address],
-        [0],
-        [transferCalldata],
-        description,
+
+      const desc = 'Proposal #1: Give grant to team etc'
+      const descriptionHash = ethers.utils.id(desc)
+
+      propArgs = [
+        [
+          rel.address,
+          relGov.address,
+          relGov.address,
+          relGov.address,
+          rel.address,
+          // rel.address,
+        ],
+        [0, 0, 0, 0, 0], //, 0],
+        [
+          transferCalldata,
+          setProposalThreshold,
+          setVoteDelay,
+          setVotingPeriod,
+          // approveTimelock,
+          transferRel,
+        ],
+        descriptionHash,
+      ]
+
+      proposeTx = await relGov.propose(
+        propArgs[0],
+        propArgs[1],
+        propArgs[2],
+        desc,
       )
       const tx = await proposeTx.wait()
+
       proposalId = tx.events.find((e) => e.event == 'ProposalCreated').args
         .proposalId
 
       expect(tx.status).to.equal(ProposalState.Active)
+      expect(tx.status).to.equal(ProposalState.Active)
 
+      expect(tx.status).to.equal(1)
+    })
+    it('should vote on proposal', async function () {
       await network.provider.send('evm_mine')
 
       const voteTx = await relGov.castVote(proposalId, VoteType.For)
@@ -130,12 +159,7 @@ describe('Governance', function () {
       expect(state).to.equal(ProposalState.Succeeded)
     })
     it('should queue', async function () {
-      const queueTx = await relGov.queue(
-        [rel.address],
-        [0],
-        [transferCalldata],
-        descriptionHash,
-      )
+      const queueTx = await relGov.queue(...propArgs)
       await queueTx.wait()
 
       const state = await relGov.state(proposalId)
@@ -146,18 +170,19 @@ describe('Governance', function () {
       const timestamp = Math.round(Date.now() / 1000) + 5 * 24 * 60 * 60
       await network.provider.send('evm_setNextBlockTimestamp', [timestamp])
 
-      const executeTx = await relGov.execute(
-        [rel.address],
-        [0],
-        [transferCalldata],
-        descriptionHash,
-      )
+      const executeTx = await relGov.execute(...propArgs)
       await executeTx.wait()
 
       const state = await relGov.state(proposalId)
       expect(state).to.equal(ProposalState.Executed)
 
       expect(await rel.balanceOf(addr1)).to.equal(parseUnits('100'))
+
+      expect(await relGov.proposalThreshold()).to.equal(parseUnits('33000'))
+      expect(await relGov.votingPeriod()).to.equal('1000')
+      expect(await relGov.votingDelay()).to.equal('3')
+
+      expect(await rel.balanceOf(addr2)).to.equal(parseUnits('1000'))
     })
   })
 })

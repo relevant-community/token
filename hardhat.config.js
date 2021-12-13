@@ -22,7 +22,7 @@ const {
 module.exports = {
   gasReporter: {
     currency: 'USD',
-    gasPrice: 129,
+    gasPrice: 38,
     coinmarketcap: CMC_API,
   },
   solidity: {
@@ -72,9 +72,12 @@ module.exports = {
       gasPrice: 3.1e9,
     },
     mainnet: {
-      accounts: DEPLOYER_PK ? [DEPLOYER_PK] : undefined,
+      accounts:
+        REL_OWNER_PK || DEPLOYER_PK || REL_OWNER_PK
+          ? [DEPLOYER_PK, PROXY_ADMIN_PK, REL_OWNER_PK].filter((k) => k != null)
+          : undefined,
       url: 'https://mainnet.infura.io/v3/' + INFURA_API_KEY,
-      gasPrice: 2.1e9,
+      gasPrice: 38e9,
       chainId: 1,
     },
   },
@@ -90,7 +93,7 @@ module.exports = {
     },
     // original owner
     relOwner: {
-      default: '0x649d39c228B4708473220cF2A5e19F82Bc35FB51',
+      default: '0x6e1D15c98742d981E76fe3982027C48D8303C136',
     },
     relAdmin: {
       1: '0x6DdF9DA4C37DF97CB2458F85050E09994Cbb9C2A',

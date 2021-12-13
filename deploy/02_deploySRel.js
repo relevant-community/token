@@ -1,4 +1,5 @@
 const { parseUnits } = require('@ethersproject/units')
+const { network, ethers } = require('hardhat')
 const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 const { getRelContract } = require('../scripts/upgradeRel')
 const { setupAccount } = require('../test/utils')
@@ -26,16 +27,23 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   })
 
-  // set sRel as vesting contract
-  const deployerS = await setupAccount(deployer)
+  if (network.name === 'hardhat')
+    // set sRel as vesting contract
+    await setupAccount(deployer)
+
+  const deployerS = await ethers.getSigner(deployer)
   const rel = await getRelContract(deployerS)
   const sRel = await deployments.get('sRel')
-  await rel.setVestingContract(sRel.address)
+  const vestingContract = await rel.vestingContract()
+  if (vestingContract !== sRel.address) {
+    const tx = await rel.setVestingContract(sRel.address)
+    const res = await tx.wait()
+    console.log(res)
+  }
 
   // transfer 1000 Rel into sRel to test vesting
-  if (network.name == 'hardhat') {
+  if (network.name == 'hardhat')
     await rel.vestAllocatedTokens(parseUnits('1000'))
-  }
 }
 
 module.exports.tags = ['sRel']

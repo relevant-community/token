@@ -32,14 +32,26 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   // setup vesting amounts on local network (for testing)
   if (network.name == 'hardhat') {
-    await rel.vestAllocatedTokens(sRel.address, parseUnits('500000'))
+    const tx = await rel.vestAllocatedTokens(sRel.address, parseUnits('500000'))
+    const res = await tx.wait()
+    console.log(res)
+  }
+
+  // REL VestingContract
+  const vestingContract = await rel.vestingContract()
+  if (vestingContract !== sRel.address) {
+    const tx = await rel.setVestingContract(sRel.address)
+    const res = await tx.wait()
+    console.log(res)
   }
 
   // REL OWNER
   const relTokenOwner = await rel.owner()
   if (relTokenOwner !== timelock.address) {
     console.log('setting Timelock as owner of Rel', timelock.address)
-    await rel.transferOwnership(timelock.address)
+    const tx = await rel.transferOwnership(timelock.address)
+    const res = await tx.wait()
+    console.log(res)
   } else {
     console.log('Timelock is owner of Rel', timelock.address)
   }
@@ -48,7 +60,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const sRelOwner = await sRel.owner()
   if (sRelOwner !== timelock.address) {
     console.log('setting Timelock as owner of sRel', timelock.address)
-    await sRel.transferOwnership(timelock.address)
+    const tx = await sRel.transferOwnership(timelock.address)
+    const res = await tx.wait()
+    console.log(res)
   } else {
     console.log('Timelock is owner of sRel', timelock.address)
   }
@@ -57,7 +71,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const govIsProposer = await timelock.hasRole(PROPOSER_ROLE, relGov.address)
   if (!govIsProposer) {
     console.log('Setting RelGovernor as timelock proposer')
-    await timelock.grantRole(PROPOSER_ROLE, relGov.address)
+    const tx = await timelock.grantRole(PROPOSER_ROLE, relGov.address)
+    const res = await tx.wait()
+    console.log(res)
   } else {
     console.log('RelGovernor is timelock proposer')
   }
@@ -66,7 +82,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const deployerIsAdmin = await timelock.hasRole(TIMELOCK_ADMIN_ROLE, deployer)
   if (deployerIsAdmin) {
     console.log('Renounce Deployer Admin Role')
-    await timelock.renounceRole(TIMELOCK_ADMIN_ROLE, deployer)
+    const tx = await timelock.renounceRole(TIMELOCK_ADMIN_ROLE, deployer)
+    const res = await tx.wait()
+    console.log(res)
   } else {
     console.log('Deployer is not Admin')
   }
@@ -79,7 +97,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   )
   if ((await proxyAdminContract.owner()) !== relGov.address) {
     console.log('Setting RelGovernor as proxyAdmin owner')
-    await proxyAdminContract.transferOwnership(relGov.address)
+    const tx = await proxyAdminContract.transferOwnership(relGov.address)
+    const res = await tx.wait()
+    console.log(res)
   } else {
     console.log('RelGovernor is proxyAdmin owner')
   }

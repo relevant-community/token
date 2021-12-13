@@ -24,8 +24,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   const deployerS = await ethers.getSigner(deployer)
   // console.log('dep', deployerS.address)
-  // await upgradeRel(deployerS)
-  await initV3(deployerS, relAdmin)
+  await upgradeRel(deployerS)
+  // await initV3(deployerS, relAdmin)
   return true
 }
 module.exports.tags = ['Rel']

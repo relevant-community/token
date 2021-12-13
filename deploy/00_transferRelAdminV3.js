@@ -30,7 +30,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     proxyAdmin,
   )
 
-  console.log('rink owner', await relv2.owner())
+  console.log('rel owner', await relv2.owner())
   const tx = await proxyAdminContract.transferOwnership(deployer)
   const res = await tx.wait()
   console.log(res)

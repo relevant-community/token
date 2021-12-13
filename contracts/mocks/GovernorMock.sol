@@ -18,7 +18,7 @@ contract GovernorMock is
 {
   uint256 private _votingDelay = 1; // 1 block
   uint256 private _votingPeriod = 20; // 1 week
-  uint256 private _proposalThreshold = 10000e18; // 10,000 REL
+  uint256 private _proposalThreshold = 10000e18; // 20,000 REL
 
   constructor(ERC20Votes _token, TimelockController _timelock)
     Governor("RelGovernor")
