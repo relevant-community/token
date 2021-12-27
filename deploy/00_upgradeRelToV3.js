@@ -1,6 +1,7 @@
 const { network, ethers } = require('hardhat')
 const { setupAccount } = require('../test/utils')
 const { upgradeRel, initV3, getRelContract } = require('../scripts/upgradeRel')
+const OZ_SDK_EXPORT = require('../openzeppelin-cli-export.json')
 
 // upgrades of Rel are managed via the openzepellin plugin
 // mainnet upgrade should run first
@@ -19,13 +20,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     const deployerS = await setupAccount(deployer)
     await initV3(deployerS, relAdmin)
-    return true
+    // return true
   }
 
-  const deployerS = await ethers.getSigner(deployer)
+  // const deployerS = await ethers.getSigner(deployer)
   // console.log('dep', deployerS.address)
-  await upgradeRel(deployerS)
+  // await upgradeRel(deployerS)
   // await initV3(deployerS, relAdmin)
+
   return true
 }
 module.exports.tags = ['Rel']

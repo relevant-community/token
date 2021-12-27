@@ -10,7 +10,7 @@
     "cover": "hardhat coverage --testfiles ./test/RelevantV3.js",
     "local": "hardhat node",
     "fork:proxyOwner": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Proxy",
-    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Rel,sRel",
+    "fork": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh --tags Rel,sRel --no-reset",
     "fork:full": "INFURA_API_KEY=$(grep INFURA_API_KEY .env | cut -d '=' -f2) bash ./scripts/fork.sh",
     "fastforward": "hardhat run ./scripts/fastForward.js"
   },
@@ -19,7 +19,7 @@
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@openzeppelin/contracts": "^4.3.3",
+    "@openzeppelin/contracts": "4.3.3",
     "@openzeppelin/contracts-ethereum-package": "^2.5.0",
     "@openzeppelin/hardhat-upgrades": "^1.9.0",
     "@openzeppelin/upgrades": "^2.5.3",

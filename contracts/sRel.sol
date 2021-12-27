@@ -18,8 +18,8 @@ contract sRel is IsRel, ERC20Votes, Ownable {
   uint256 public lockPeriod = 4 days; // how long it takes for staked tokens to become unlocked
 
   uint256 public immutable vestBegin; // start of all vesting periods
-  uint256 public immutable vestShort; // short vesting period
-  uint256 public immutable vestLong; // long vesting period
+  uint256 public immutable vestShort; // short vesting end date
+  uint256 public immutable vestLong; // long vesting end date
 
   uint256 public totalUnvested;
   mapping(address => uint256) private vestNonce;

@@ -4,6 +4,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   await deploy('Utils', {
     from: deployer,
+    log: true,
   })
 }
 

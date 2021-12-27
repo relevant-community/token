@@ -8,7 +8,7 @@ const {
 } = require('./utils')
 const { TASK_ETHERSCAN_VERIFY } = require('hardhat-deploy')
 
-describe('Upgrade', function () {
+describe.skip('Upgrade', function () {
   let rel
 
   before(async () => {

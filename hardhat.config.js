@@ -14,6 +14,7 @@ const {
   OWNER,
   REL_ADMIN,
   VEST_ADMIN,
+  ETHERSCAN_API,
 } = process.env
 
 /**
@@ -24,6 +25,9 @@ module.exports = {
     currency: 'USD',
     gasPrice: 38,
     coinmarketcap: CMC_API,
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API,
   },
   solidity: {
     compilers: [
