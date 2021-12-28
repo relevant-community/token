@@ -58,14 +58,14 @@ sREL is governance wrapper for REL tokens and allows staking and vesting.
 
 - REL tokens can be staked via the contract in exchange for sRel
 - sRel cannot be transferred or exchanged back to REL unless they are 'unlocked' (unstaked) and unvested
-- `lockPeriod` deterimines the time it takes to unstake the tokens
+- `lockPeriod` determines the time it takes to unstake the tokens
 
 ### Vesting
 
 - Unvested tokens can be added by the `owner` of the contract or via a signature from the `vestAdmin'
 - There are two vesting schedules - short and long, exact params TBD, likely 4 and 16 years respectively
 - The params are global - meant to distribute a set amount of tokens to users
-- Unested tokens can be used to cast governance votes
+- Unvested tokens can be used to cast governance votes
 - The full amount of unvested tokens can be transferred to a new account
 
 ## Governor
